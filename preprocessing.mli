@@ -1,9 +1,26 @@
-(* The Dictionary namespace contains all information relevant to preprocessing
- * a file prior to comparison *)
-module type Dictionary = sig
 
-  (* The dictionary that stores associations between files and fingerprints.*)
-  type dict
+
+  (* The Dictionary namespace contains all information relevant to
+   * preprocessing a file prior to comparison *)
+  module type Dictionary = sig
+
+    type key
+
+    type value
+
+    type t
+
+    val empty : t
+
+    val member : key -> t -> bool
+
+    val find : key -> t -> value option
+
+    val insert : key -> value -> t -> t
+
+    val remove : key -> t -> t
+
+  end
 
   (* Obtain a list of key words given a file with specified key words. *)
   val keywords_list : Yojson.Basic.json -> string list
@@ -28,7 +45,3 @@ module type Dictionary = sig
 
   (* [winnow windows] Selects fingerprints from [windows] via winnowing *)
   val winnow : int list list -> int list
-
-  (* [dir_to_dict dir] looks through all of the files in the directory [dir] and
-   * returns a dictionary representation of all code files in [dir] *)
-  val dir_to_dict : string -> dict
