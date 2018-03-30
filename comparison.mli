@@ -3,8 +3,8 @@
 (* The dictionary that stores associations between files and fingerprints. *)
 type file_dict
 
-(* [dir_to_dict dir] looks through all of the files in the directory [dir] and
- * returns a dictionary representation of all code files in [dir]. *)
+(* [dir_to_dict dir] looks through all of the files in the directory [dir]
+ * and returns a dictionary representation of all code files in [dir]. *)
 val dir_to_dict : string -> file_dict
 
 (* A pair_comparison is a record that stores the information after comparing
