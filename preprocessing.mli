@@ -1,7 +1,10 @@
 
 
-  (* The Dictionary namespace contains all information relevant to
-   * preprocessing a file prior to comparison *)
+(* A [Dictionary] maps keys to values. The keys
+ * must be comparable, but there are no restrictions
+ * on the values.  All operations must use stack space
+ * that is at most logarithmic in the number of dictionary
+ * bindings. *)
   module type Dictionary = sig
 
     type key
@@ -16,11 +19,16 @@
 
     val find : key -> t -> value option
 
-    val insert : key -> value -> t -> t
+    val insert : key -> int -> t -> t
 
     val remove : key -> t -> t
 
+    val to_list : t -> (key * value) list
+
   end
+
+  (* An implementation of dictionary *)
+  module TreeDictionary: Dictionary
 
   (* Obtain a list of key words given a file with specified key words. *)
   val keywords_list : Yojson.Basic.json -> string list
@@ -32,7 +40,8 @@
   val remove_noise : string -> string list -> string
 
   (* [k_grams str n] creates a list of strings of length n, starting at each
-   * character in [str] up to and including ([str] length - [n])th character. *)
+   * character in [str] up to and including ([str] length - [n])th character.
+   *)
   val k_grams : string -> int -> string list
 
   (* [hash str] produces a hash of str *)
