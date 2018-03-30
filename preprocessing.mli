@@ -62,13 +62,13 @@ end
 module TreeDictionary: Dictionary
 
 (* [keywords_list keyword_file] is a list of keywords pertaining to a
- * particular language, which are stored in keyword_file.
- * requires: keyword_file is a valid JSON file.
+ * particular language, which are stored in a plaintext file with the name [keyword_file].
+ * If a file with that name does not exist, then this function returns []
  *)
-val keywords_list : Yojson.Basic.json -> string list
+val keywords_list : string-> string list
 
 (* [remove_noise str keywords] removes/replaces all of the noise, for example,
- * whitespace, ariable names, function names, and language key words found in
+ * whitespace, variable names, function names, and language key words found in
  * [keywords] with more general names so that hashing can catch similarities
  * that it otherwise would not. *)
 val remove_noise : string -> string list -> string
