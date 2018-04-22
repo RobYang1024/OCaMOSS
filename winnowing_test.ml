@@ -1,112 +1,90 @@
 (* OCaml Winnowing Algorithm *)
+module type BoundedQueueWithCounter = sig
+	type a' t
+	val create : int -> a' t
+	val is_empty : a' t -> bool
+	val size : a' t -> int
+	val enqueue : 'a -> 'a t -> 'a t
+	val dequeue : 'a -> 'a t -> 'a t
+	val count : a' t -> int
+	val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+end
+
+module Window : BoundedQueueWithCounter = struct
+	type t = ((int * string) list * int * int)
+	
+	let create n = ([], n, 0)
+
+	let is_empty q = match q with (data, _, _) -> List.length data = 0
+
+	let size q = match q with (data, _, _) -> List.length data
+
+	let dequeue q = match q with 
+		|(data, _, _) -> begin
+			match data with
+			|[] -> q
+			|h::t -> t
+		end
+
+	let enqueue item q = 
+		let s = size q in
+		match q with
+		|(data, maxsize, trans) -> 
+			if s = maxsize then dequeue q |> (data@[item],maxsize,trans + 1) 
+			else (data @ [item],maxsize, trans + 1)
+
+	let count q = match q with (_, _, trans) -> trans
+
+	let fold f init q = match q with
+		|(data, _, _) -> List.fold_left f init data
+
+end
+
+(* record - Dict.insert where k = filename and v = list of hashes that we selected as fingerprint *)
+let record k v d = (k,v)::d (* currently a placeholder *)
 
 
-let next_hash k = Some (String.length k) (* placeholder, see below *)
 
-let global_pos min r w = r + w + min (* placeholder, see below *)
-
-let record k v d = (k,v)::d (* placeholder, see below *)
-
-(*
-What the helpers do:
-record is essentially Dict.insert - insert hash with global position pos into dictionary
-(int -> int -> dict -> dict) - order of arguments may be modified
-
-global_pos min r w - calculates global position of hash somehow, min = position of min hash, r = position of current, w = window size
-(int -> int -> int -> int)
-
-next_hash k - process the next hash for file k
-(string -> int option)
-*)
-
-let find_min_pos r w min arr =
-(* Scan h leftward starting from r
-	// for the rightmost minimal hash. Note min
-	// starts with the index of the rightmost
-	// hash.
-	*)
-	let rec checkmin pos m = 
-		if pos = r then m
-		else
-			if arr.(pos) < arr.(m) then 
-				let newmin = pos in
-				checkmin ((pos - 1 + w) mod w) newmin
-			else
-				checkmin ((pos - 1 + w) mod w) m
+(* f = filename, h = hashes list, d = output dict, w = window size *)
+let winnow (f,h) d w = 
+	(* calculates the global position of the i-th hash in the window
+	   example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th hash 
+	   that was processed by the winnowing algorithm. *)
+	let global_pos i w = 
+		let c = Window.count in
+		let s = Window.size w in
+		c - (s - 1 - i)
 	in
-	checkmin ((r - 1) mod w) (min)
-
-let rec winnowhelper arr r min w k d = 
-(* 	// At the end of each iteration, min holds the
-	// position of the rightmost minimal hash in the
-	// current window. record(x) is called only the
-	// first time an instance of x is selected as the
-	// rightmost minimal hash of a window. *)
-	let r = (r + 1) mod w in
-	let next = next_hash k in
-	match next with
-	|None -> d
-	|Some hash -> begin
-		arr.(r) <- hash ;
-		if min = r then
-		(* 	// The previous minimum is no longer in this
-			// window.  *)
-			let newmin = find_min_pos r w min arr in
-			let newdict = record arr.(newmin) (global_pos newmin r w) d in
-			winnowhelper arr r newmin w k newdict
-		else
-		(* 	// The previous minimum is still in
-			// this window. Compare against the new value
-			// and update min if necessary. *)
-			if (arr.(r) <= arr.(min)) then
-				let newdict = record arr.(r) (global_pos r r w) d in
-				winnowhelper arr r r w k newdict
+	(* helper function *)
+	let mincheck ((minval,minpos),c) x = 
+		if x <= minval then ((x, c), c + 1)
+		else ((minval, minpos), c + 1)
+	in
+	(*  At the end of each iteration, min is a tuple of the (value,position)
+		of the rightmost minimal hash in the
+		current window. hash x is only added to the fingerprint [res] the
+		first time an instance of x is selected as the
+		rightmost minimal hash of a window. *)
+	let rec winnowhelper hashes window res n (val,pos) = 
+		if n = List.length hashes then res
+		else begin
+			let nexthash = List.nth hashes n in
+			let updateW = Window.enqueue nexthash window in
+			if pos = 0 && window.size = w then 
+				let newmin = fst (Window.fold mincheck ((max_int,0),0) window) in
+				let newres = (fst newmin)::res in
+				winnowhelper hashes updateW newres (n+1) newmin
+			else if nexthash < val then 
+				let newres = nexthash::res
+				winnowhelper hashes updateW newres (n+1) (nexthash, Window.size updateW)
 			else 
-				winnowhelper arr r min w k d
-	end
+				winnowhelper hashes updateW res (n+1) (val,pos - 1)
+		end
+	in
 
-(* k = file, d = dictionary with file as a key, w = window size *)
-let winnow w k d = 
-	let arr = Array.init w (fun x -> max_int) in
-	winnowhelper arr 0 0 w k d
-
-(* C++ implementation from the paper
-void winnow(int w /*window size*/) {
-	// circular buffer implementing window of size w
-	hash_t h[w];
-
-	for (int i=0; i<w; ++i) h[i] = INT_MAX;
-	int r = 0; // window right end
-	int min = 0; // index of minimum hash
-	// At the end of each iteration, min holds the
-	// position of the rightmost minimal hash in the
-	// current window. record(x) is called only the
-	// first time an instance of x is selected as the
-	// rightmost minimal hash of a window.
-
-	while (true) {
-		r = (r + 1) % w; // shift the window by one
-		h[r] = next_hash(); // and add one new hash
-		if (min == r) {
-			// The previous minimum is no longer in this
-			// window. Scan h leftward starting from r
-			// for the rightmost minimal hash. Note min
-			// starts with the index of the rightmost
-			// hash.
-			for(int i=(r-1)%w; i!=r; i=(i-1+w)%w) if (h[i] < h[min]) min = i;
-			record(h[min], global_pos(min, r, w));
-		} else {
-			// Otherwise, the previous minimum is still in
-			// this window. Compare against the new value
-			// and update min if necessary.
-			if (h[r] <= h[min]) { // (*)
-				min = r;
-				record(h[min], global_pos(min, r, w));
-			}
-		}
-	}
-} 
-*)
+	let window = Window.create w in
+	let fingerprint = winnowhelper h window [] 0 (max_int, 0) in
+	record k fingerprint d
 
 
 
