@@ -12,20 +12,32 @@ module type Comparable = sig
 
 end
 
+
+module type Formattable = sig
+
+  type t
+
+  val format: t -> unit
+
+end
+
 (* A [Dictionary] maps keys to values. The keys
  * must be comparable, but there are no restrictions
  * on the values.
- *)
+*)
+
 module type Dictionary = sig
 
   module Key : Comparable
+
+  module Value : Formattable
 
   type key = Key.t
 
   type value
 
-(* Type t represents how the dictionary itself is implemented and stored as.
- *)
+  (* Type t represents how the dictionary itself is implemented and stored as.
+  *)
   type t
 
   (* [empty] represents an empty dictionary. *)
@@ -33,24 +45,19 @@ module type Dictionary = sig
 
   (* [member k dict] returns true if k is a binding in the dictionary d
    * and false if not.
-   *)
+  *)
   val member : key -> t -> bool
 
   (* [find k dict] returns None if k is not a binding in dict, and Some v
    * if v is the value bound to k in dict.
-   *)
+  *)
   val find : key -> t -> value option
 
   (* [insert k v dict] adds a new binding of k with value v to dict if k is not
    * in dict already, and binds k to a new value v if it is already
    * present in the dictionary, and returns the new dictionary.
-   *)
+  *)
   val insert : key -> int -> t -> t
-
-  (* [remove k dict] returns dict with binding k removed from it if it is
-   * a binding in dict, and dict as it is otherwise.
-   *)
-  val remove : key -> t -> t
 
   (* [to_list dict] returns an association list where each element of the list
    * is a tuple of a key and it's corresponding value in dict. *)
@@ -58,14 +65,14 @@ module type Dictionary = sig
 
 end
 
-(* An implementation of dictionary using avl trees. *)
-module TreeDictionary: Dictionary
+module type TreeDictionary = functor (K:Comparable) -> functor (V:Formattable)
+-> Dictionary with module Key = K and module Value = V
 
 (* [keywords_list keyword_file] is a list of keywords pertaining to a
  * particular language, which are stored in a plaintext file with the name [keyword_file].
  * If a file with that name does not exist, then this function returns []
  *)
-val keywords_list : string-> string list
+val keywords_list : string -> string list
 
 (* [remove_noise str keywords] removes/replaces all of the noise, for example,
  * whitespace, variable names, function names, and language key words found in
