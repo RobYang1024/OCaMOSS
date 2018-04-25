@@ -60,7 +60,7 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
       if Key.compare k k2 > 0 then find k r else find k m
 
   let rec insert k v d =
-    let ins_fix_leaf d = failwith "Unimplemented" in
+    (*let ins_fix_leaf d = failwith "Unimplemented" in
     let ins_fix_two (k,v) l r = failwith "Unimplemented" in
     (*let ins_fix_three d = failwith "Unimplemented" in*)
 
@@ -84,7 +84,9 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
       then ThreeNode ((k1,v1),(k2,v2),(insert k v l),m,r)
       else if Key.compare k k2 > 0
       then ThreeNode ((k1,v1),(k2,v2),l,m,(insert k v r))
-      else ThreeNode ((k1,v1),(k2,v2),l,(insert k v m),r)
+      else ThreeNode ((k1,v1),(k2,v2),l,(insert k v m),r)*)
+
+    failwith "Unimplemented"
 
   let to_list d = failwith "Unimplemented"
 
