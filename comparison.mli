@@ -1,5 +1,4 @@
-
-
+open Dictionary
 (* The dictionary that stores associations between files and fingerprints. *)
 type file_dict
 
