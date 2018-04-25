@@ -1,10 +1,9 @@
 open Winnowing
-
 (* [keywords_list keyword_file] is a list of keywords pertaining to a
  * particular language, which are stored in a plaintext file with the name [keyword_file].
  * If a file with that name does not exist, then this function returns []
  *)
-val keywords_list : string-> string list
+val keywords_list : string -> string list
 
 (* [remove_noise str keywords] removes/replaces all of the noise, for example,
  * whitespace, variable names, function names, and language key words found in

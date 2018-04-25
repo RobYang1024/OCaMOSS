@@ -51,8 +51,14 @@ module type DICTIONARY = sig
     val compare: t -> t -> int
   end
 
+  module type Formattable = sig
+    type t
+    val format: t -> unit
+  end
+
   module type Dictionary = sig
     module Key : Comparable
+    module Value : Formattable
     type key = Key.t
     type value
     type t
@@ -60,10 +66,11 @@ module type DICTIONARY = sig
     val member : key -> t -> bool
     val find : key -> t -> value option
     val insert : key -> int -> t -> t
-    val remove : key -> t -> t
     val to_list : t -> (key * value) list
   end
 
+(*   module type TreeDictionary = functor (K:Comparable) -> functor (V:Formattable)
+  -> Dictionary with module Key = K and module Value = V *)
 end
 
 module CheckComparison : COMPARISON = Comparison
