@@ -20,7 +20,7 @@ module type PREPROCESSING =  sig
   val remove_noise : string -> string list -> string
   val k_grams : string -> int -> string list
   val hash : string -> int
-  val winnow : int list -> int -> int list
+  val winnow : int list -> int -> (int * int) list
 end
 
 module type COMPARISON = sig
@@ -35,14 +35,15 @@ module type WINNOWING = sig
     type 'a t
     val create : int -> 'a t
     val is_empty : 'a t -> bool
+    val is_full : 'a t -> bool
     val size : 'a t -> int
     val enqueue : 'a -> 'a t -> 'a t
-    val dequeue : 'a t -> 'a t
+    val dequeue : 'a t -> 'a option * 'a t
     val count : 'a t -> int
     val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
   end
   module Window : BoundedQueueWithCounter
-  val winnow: int list -> int -> int list 
+  val winnow: int list -> int -> (int * int) list 
 end
 
 module type DICTIONARY = sig

@@ -20,4 +20,4 @@ val k_grams : string -> int -> string list
 val hash : string -> int
 
 (* [winnow hashes n] Selects fingerprints via winnowing with window size n *)
-val winnow : int list -> int -> int list
+val winnow : int list -> int -> (int * int) list
