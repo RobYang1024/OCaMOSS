@@ -1,6 +1,6 @@
 module type BoundedQueueWithCounter = sig
 	type 'a t
-	val create : int -> 'a t
+	val create : int -> 'a -> 'a t
 	val is_empty : 'a t -> bool
 	val is_full : 'a t -> bool
 	val size : 'a t -> int
@@ -14,8 +14,14 @@ module Window : BoundedQueueWithCounter = struct
 
 	type 'a t = { data: 'a list ; maxsize: int ; size: int ; count: int}
 	
-	let create n = 
-		if n = 0 then failwith "Cannot create queue of size 0!" else { data = []; maxsize = n; size = 0; count = 0}
+	let create n i = 
+		let rec gen l acc i = 
+			if l = 0 then acc else gen (l - 1) (i::acc) i
+		in
+		if n = 0 then failwith "Cannot create queue of size 0!" 
+		else 
+			let initdata = gen n [] i in
+			{ data = initdata; maxsize = n; size = n; count = 0}
 
 	let is_empty q = (q.size = 0)
 
@@ -62,28 +68,22 @@ let winnow h w =
 		if n = List.length hashes then acc
 		else begin
 			let nexthash = List.nth hashes n in
-			if nexthash < v then
-				let new_window = Window.enqueue nexthash window in
+			let new_window = Window.enqueue nexthash window in
+			if nexthash <= v then
 				let new_acc = (nexthash, global_pos (Window.size new_window - 1) new_window)::acc in
-				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.size new_window)
-			else if Window.is_full window then begin
+				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.count new_window)
+			else begin
 				let p = p - 1 in
 				if p < 0 then
-					let new_window = Window.enqueue nexthash window in
-					let new_min = Window.fold mincheck ((max_int,0),0) window |> fst in
-					let new_acc = (fst new_min, global_pos (snd new_min) window)::acc in
+					let new_min = Window.fold mincheck ((max_int,0),0) new_window |> fst in
+					let new_acc = (fst new_min, global_pos (snd new_min) new_window)::acc in
 					winnowhelper hashes new_window new_acc (n+1) new_min
 				else
-					let new_window = Window.enqueue nexthash window in
-					winnowhelper hashes new_window acc (n+1) (v,p - 1)
+					winnowhelper hashes new_window acc (n+1) (v,p)
 			end
-			else
-				let new_window = Window.enqueue nexthash window in
-				winnowhelper hashes new_window acc (n+1) (v,p)
-
 		end
 	in
-	let window = Window.create w in
+	let window = Window.create w max_int in
 	winnowhelper h window [] 0 (max_int, 0)
 
 
