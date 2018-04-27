@@ -64,6 +64,13 @@ let winnow h w =
 		current window. hash x is only added to the fingerprint [res] the
 		first time an instance of x is selected as the
 		rightmost minimal hash of a window. *)
+	(*
+	hashes - int list - the complete list of hashes
+	window - BoundedQueueWithCounter - window object
+	acc - (hash, position) list of selected hashes
+	n - int - counter for position of hashes
+	(v,p) - int * int - value and position of minimum hash
+	*)
 	let rec winnowhelper hashes window acc n (v,p) =
 		if n = List.length hashes then acc
 		else begin
@@ -71,7 +78,7 @@ let winnow h w =
 			let new_window = Window.enqueue nexthash window in
 			if nexthash <= v then
 				let new_acc = (nexthash, global_pos (Window.size new_window - 1) new_window)::acc in
-				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.count new_window)
+				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.size new_window - 1)
 			else begin
 				let p = p - 1 in
 				if p < 0 then
@@ -84,6 +91,8 @@ let winnow h w =
 		end
 	in
 	let window = Window.create w max_int in
-	winnowhelper h window [] 0 (max_int, 0)
+	let res = winnowhelper h window [] 0 (max_int, 0) in
+	let converted = List.rev res |> List.map (fun x -> fst x) |> List.map (string_of_int) |> List.fold_left (fun a x -> a ^ x) "" in
+	let () = print_endline converted in res
 
 
