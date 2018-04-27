@@ -91,8 +91,6 @@ let winnow h w =
 		end
 	in
 	let window = Window.create w max_int in
-	let res = winnowhelper h window [] 0 (max_int, 0) in
-	let converted = List.rev res |> List.map (fun x -> fst x) |> List.map (string_of_int) |> List.fold_left (fun a x -> a ^ x) "" in
-	let () = print_endline converted in res
+	let res = winnowhelper h window [] 0 (max_int, 0) in res
 
 

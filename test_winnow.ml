@@ -9,12 +9,19 @@ let sort_results r =
 	in
 	List.sort (cmp) r
 
+(* helper function for converting results to strings *)
+let res_to_string r = 
+	let s = List.rev r |> List.map (fun x -> fst x) |> List.map (string_of_int) |> List.fold_left (fun a x -> a ^ x ^ ",") "" in
+	let () = print_endline s in s
+
 (* tests to check Winnowing functionality *)
 let tests = [
 (* testing Winnowing *)
-"winnow2" >:: (fun _ -> assert_equal 5 (winnow [1;2;3;4;5] 1 |> List.length));
-"winnow3" >:: (fun _ -> assert_equal 5 (winnow [5;4;3;2;1] 1 |> List.length));
-"winnow4" >:: (fun _ -> assert_equal 5 (winnow [5;4;3;2;1] 2 |> List.length));
-"winnow5" >:: (fun _ -> assert_equal 4 (winnow [1;2;3;4;5] 2 |> List.length));
+"winnow0" >:: (fun _ -> assert_equal "" (winnow [] 1 |> res_to_string));
+"winnow1" >:: (fun _ -> assert_equal "1," (winnow [1] 1 |> res_to_string));
+"winnow2" >:: (fun _ -> assert_equal "1,2,3,4,5," (winnow [1;2;3;4;5] 1 |> res_to_string));
+"winnow3" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow [5;4;3;2;1] 1 |> res_to_string));
+"winnow4" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow [5;4;3;2;1] 2 |> res_to_string));
+"winnow5" >:: (fun _ -> assert_equal "1,2,3,4," (winnow [1;2;3;4;5] 2 |> res_to_string));
 ]
 
