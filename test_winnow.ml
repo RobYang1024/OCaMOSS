@@ -1,7 +1,8 @@
 open OUnit2
 open Winnowing
 
-(* helper function for sorting winnowing results (int*int) list representing hash * position tuples *)
+(* helper function for sorting winnowing results (int*int) list representing hash * position tuples
+ * sorts from least to greatest, by hash value first, then by position if hashes are equal *)
 let sort_results r = 
 	let cmp x y = 
 		let res = Pervasives.compare (fst x) (fst y) in
@@ -9,14 +10,16 @@ let sort_results r =
 	in
 	List.sort (cmp) r
 
-(* helper function for converting results to strings *)
+(* helper function for converting results to strings
+ * inputs: (int * int) list representing winnowing results
+ * returns: a string representation of the hashes contained in the input
+ * side effects: prints the string that is created *)
 let res_to_string r = 
 	let s = List.rev r |> List.map (fun x -> fst x) |> List.map (string_of_int) |> List.fold_left (fun a x -> a ^ x ^ ",") "" in
 	let () = print_endline s in s
 
 (* tests to check Winnowing functionality *)
 let tests = [
-(* testing Winnowing *)
 "winnow0" >:: (fun _ -> assert_equal "" (winnow [] 1 |> res_to_string));
 "winnow1" >:: (fun _ -> assert_equal "1," (winnow [1] 1 |> res_to_string));
 "winnow2" >:: (fun _ -> assert_equal "1,2,3,4,5," (winnow [1;2;3;4;5] 1 |> res_to_string));
