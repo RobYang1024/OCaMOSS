@@ -1,42 +1,46 @@
 module type BoundedQueueWithCounter = sig
 	type 'a t
-	val create : int -> 'a t
+	val create : int -> 'a -> 'a t
 	val is_empty : 'a t -> bool
+	val is_full : 'a t -> bool
 	val size : 'a t -> int
 	val enqueue : 'a -> 'a t -> 'a t
-	val dequeue : 'a t -> 'a t
+	val dequeue : 'a t -> 'a option * 'a t
 	val count : 'a t -> int
 	val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
 end
 
 module Window : BoundedQueueWithCounter = struct
-	type 'a t = ('a list) * int * int
+
+	type 'a t = { data: 'a list ; maxsize: int ; size: int ; count: int}
 	
-	let create n = 
-		if n = 0 then failwith "Cannot create queue of size 0!" else ([], n, 0)
+	let create n i = 
+		let rec gen l acc i = 
+			if l = 0 then acc else gen (l - 1) (i::acc) i
+		in
+		if n = 0 then failwith "Cannot create queue of size 0!" 
+		else 
+			let initdata = gen n [] i in
+			{ data = initdata; maxsize = n; size = n; count = 0}
 
-	let is_empty q = match q with (data, _, _) -> List.length data = 0
+	let is_empty q = (q.size = 0)
 
-	let size q = match q with (data, _, _) -> List.length data
+	let is_full q = (q.size = q.maxsize)
 
-	let dequeue q = match q with 
-		|(data, x, y) -> begin
-			match data with
-			|[] -> q
-			|h::t -> (t, x, y)
-		end
+	let size q = q.size
+
+	let dequeue q =
+		match q.data with
+		|[] -> (None, q)
+		|h::t -> (Some h, {q with data = t ; size = q.size - 1})
 
 	let rec enqueue item q = 
-		let s = size q in
-		match q with
-		|(data, maxsize, trans) -> 
-			if s = maxsize then dequeue q |> enqueue item
-			else (item::data, maxsize, trans + 1)
+		if is_full q then dequeue q |> snd |> enqueue item
+		else {q with data = q.data @ [item] ; size = q.size + 1 ; count = q.count + 1}
 
-	let count q = match q with (_, _, trans) -> trans
+	let count q = q.count
 
-	let fold f init q = match q with
-		|(data, _, _) -> List.fold_left f init data
+	let fold f init q = List.fold_left f init q.data
 
 end
 
@@ -51,35 +55,42 @@ let winnow h w =
 		c - (s - 1 - i)
 	in
 	(* helper function *)
-	let mincheck ((minval,minpos),c) x = 
-		if x <= minval then ((x, c), c + 1)
-		else ((minval, minpos), c + 1)
+	let mincheck ((minval,minpos),count) x = 
+		if x <= minval then ((x, count), count + 1)
+		else ((minval, minpos), count + 1)
 	in
 	(*  At the end of each iteration, min is a tuple of the (value,position)
 		of the rightmost minimal hash in the
 		current window. hash x is only added to the fingerprint [res] the
 		first time an instance of x is selected as the
 		rightmost minimal hash of a window. *)
-	let rec winnowhelper hashes window res n (v,p) =
-		if n = List.length hashes then res
+	(*
+	hashes - int list - the complete list of hashes
+	window - BoundedQueueWithCounter - window object
+	acc - (hash, position) list of selected hashes
+	n - int - counter for position of hashes
+	(v,p) - int * int - value and position of minimum hash
+	*)
+	let rec winnowhelper hashes window acc n (v,p) =
+		if n = List.length hashes then acc
 		else begin
 			let nexthash = List.nth hashes n in
-			let updateW = Window.enqueue nexthash window in
-			if p = 0 && Window.size window = w then 
-				let newmin = fst (Window.fold mincheck ((max_int,0),0) window) in
-				let newres = (fst newmin)::res in
-				winnowhelper hashes updateW newres (n+1) newmin
-			else if nexthash < v then 
-				let newres = nexthash::res in
-				winnowhelper hashes updateW newres (n+1) (nexthash, Window.size updateW)
-			else 
-				winnowhelper hashes updateW res (n+1) (v,p - 1)
+			let new_window = Window.enqueue nexthash window in
+			if nexthash <= v then
+				let new_acc = (nexthash, global_pos (Window.size new_window - 1) new_window)::acc in
+				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.size new_window - 1)
+			else begin
+				let p = p - 1 in
+				if p < 0 then
+					let new_min = Window.fold mincheck ((max_int,0),0) new_window |> fst in
+					let new_acc = (fst new_min, global_pos (snd new_min) new_window)::acc in
+					winnowhelper hashes new_window new_acc (n+1) new_min
+				else
+					winnowhelper hashes new_window acc (n+1) (v,p)
+			end
 		end
 	in
-	let window = Window.create w in
-	winnowhelper h window [] 0 (max_int, 0)
-
-
-
+	let window = Window.create w max_int in
+	let res = winnowhelper h window [] 0 (max_int, 0) in res
 
 
