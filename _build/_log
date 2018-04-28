@@ -1,0 +1,40 @@
+### Starting build.
+# Target: checktypes.ml.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:ml, file:checktypes.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules checktypes.ml > checktypes.ml.depends # cached
+# Target: comparison.mli.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:mli, file:comparison.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules comparison.mli > comparison.mli.depends # cached
+# Target: dictionary.mli.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:mli, file:dictionary.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules dictionary.mli > dictionary.mli.depends # cached
+# Target: dictionary.cmi, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:mli, file:dictionary.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o dictionary.cmi dictionary.mli # cached
+# Target: comparison.cmi, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:mli, file:comparison.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o comparison.cmi comparison.mli # cached
+# Target: preprocessing.mli.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:mli, file:preprocessing.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules preprocessing.mli > preprocessing.mli.depends # cached
+# Target: winnowing.mli.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:mli, file:winnowing.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules winnowing.mli > winnowing.mli.depends # cached
+# Target: winnowing.cmi, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:mli, file:winnowing.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o winnowing.cmi winnowing.mli # cached
+# Target: preprocessing.cmi, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:mli, file:preprocessing.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o preprocessing.cmi preprocessing.mli # cached
+# Target: checktypes.cmo, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:checktypes.cmo, file:checktypes.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o checktypes.cmo checktypes.ml # cached
+# Target: comparison.ml.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:ml, file:comparison.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules comparison.ml > comparison.ml.depends # cached
+# Target: comparison.cmo, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:comparison.cmo, file:comparison.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o comparison.cmo comparison.ml # cached
+# Target: dictionary.ml.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:ml, file:dictionary.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules dictionary.ml > dictionary.ml.depends # cached
+# Target: dictionary.cmo, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:dictionary.cmo, file:dictionary.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o dictionary.cmo dictionary.ml # cached
+# Target: preprocessing.ml.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:ml, file:preprocessing.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules preprocessing.ml > preprocessing.ml.depends # cached
+# Target: preprocessing.cmo, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:preprocessing.cmo, file:preprocessing.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o preprocessing.cmo preprocessing.ml # cached
+# Target: winnowing.ml.depends, tags: { package(oUnit), package(qcheck), package(str), package(unix), extension:ml, file:winnowing.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package oUnit -package str -package qcheck -modules winnowing.ml > winnowing.ml.depends # cached
+# Target: winnowing.cmo, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, compile, extension:cmo, extension:ml, file:winnowing.cmo, file:winnowing.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package unix -package oUnit -package str -package qcheck -o winnowing.cmo winnowing.ml # cached
+# Target: checktypes.byte, tags: { package(oUnit), package(qcheck), package(str), package(unix), byte, dont_link_with, extension:byte, file:checktypes.byte, link, ocaml, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -package unix -package oUnit -package str -package qcheck dictionary.cmo comparison.cmo winnowing.cmo preprocessing.cmo checktypes.cmo -o checktypes.byte # cached
+# Compilation successful.
