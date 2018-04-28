@@ -65,5 +65,9 @@ module type Dictionary = sig
 
 end
 
-(* module type TreeDictionary = functor (K:Comparable) -> functor (V:Formattable)
--> Dictionary with module Key = K and module Value = V *)
+module type DictionaryMaker =
+  functor (K : Comparable)
+    -> functor (V : Formattable)
+    -> Dictionary with module Key = K and module Value = V
+
+module TreeDictionary : DictionaryMaker
