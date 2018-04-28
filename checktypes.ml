@@ -2,7 +2,7 @@
 (* TODO                                        *)
 (******************************************************************)
 
-(* 
+(*
 module type TEST_DATA = sig
   module type Tests = sig
     val tests : OUnit2.test list
@@ -25,9 +25,8 @@ end
 
 module type COMPARISON = sig
   type file_dict
-  val dir_to_dict : string -> file_dict
   type pair_comparison
-  val compare : file_dict -> pair_comparison list
+  val compare : file_dict -> file_dict
 end
 
 module type WINNOWING = sig
@@ -71,8 +70,12 @@ module type DICTIONARY = sig
     val to_list : t -> (key * value) list
   end
 
-(*   module type TreeDictionary = functor (K:Comparable) -> functor (V:Formattable)
-  -> Dictionary with module Key = K and module Value = V *)
+  module type DictionaryMaker =
+    functor (K : Comparable)
+      -> functor (V : Formattable)
+      -> Dictionary with module Key = K and module Value = V
+
+  module TreeDictionary : DictionaryMaker
 end
 
 module CheckComparison : COMPARISON = Comparison

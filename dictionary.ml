@@ -27,6 +27,10 @@ module type Dictionary = sig
   val to_list : t -> (key * value) list
 end
 
+module type DictionaryMaker =
+  functor (K : Comparable) (V : Formattable)
+    -> Dictionary with module Key = K and module Value = V
+
 module TreeDictionary (K : Comparable) (V : Formattable) = struct
 
   module Key = K
