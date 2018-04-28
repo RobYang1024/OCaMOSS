@@ -24,8 +24,14 @@ module type PREPROCESSING =  sig
 end
 
 module type COMPARISON = sig
-  type file_dict
-  val compare : file_dict -> file_dict
+  module StringKey : Dictionary.Comparable
+  module HashValue : Dictionary.Formattable
+  module DictValue : Dictionary.Formattable
+  module FileDict : Dictionary.Dictionary
+  module ComparisonDict: Dictionary.Dictionary
+  val create_pair_comparison : string ->
+    (StringKey.t * HashValue.t) list -> ComparisonDict.t -> FileDict.t
+  val compare : FileDict.t -> ComparisonDict.t
 end
 
 module type WINNOWING = sig
@@ -60,12 +66,12 @@ module type DICTIONARY = sig
     module Key : Comparable
     module Value : Formattable
     type key = Key.t
-    type value
+    type value = Value.t
     type t
     val empty : t
     val member : key -> t -> bool
     val find : key -> t -> value option
-    val insert : key -> int -> t -> t
+    val insert : key -> value -> t -> t
     val to_list : t -> (key * value) list
   end
 

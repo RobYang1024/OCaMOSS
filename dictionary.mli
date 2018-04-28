@@ -34,7 +34,7 @@ module type Dictionary = sig
 
   type key = Key.t
 
-  type value
+  type value = Value.t
 
   (* Type t represents how the dictionary itself is implemented and stored as.
   *)
@@ -57,7 +57,7 @@ module type Dictionary = sig
    * in dict already, and binds k to a new value v if it is already
    * present in the dictionary, and returns the new dictionary.
   *)
-  val insert : key -> int -> t -> t
+  val insert : key -> value -> t -> t
 
   (* [to_list dict] returns an association list where each element of the list
    * is a tuple of a key and it's corresponding value in dict. *)
