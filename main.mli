@@ -11,7 +11,7 @@ type state = {display : string; directory : string; results : unit}
  * RESULTS - displays results, takes 0 arguments (lists files with results) or 1 argument
  * (lists details for that file)
  * COMPARE - compares two files, printing out the similarities, takes 2 arguments *)
-type cmd = RUN | HELP | SETDIR | RESULTS | COMPARE | ERROR
+type cmd = RUN | HELP | SETDIR | RESULTS | COMPARE | ERROR | DIR
 
 (* type for an input for MOSS, containing a command and 2 optional arguments
  * arguments beyond what the command recognizes will be ignored *)
