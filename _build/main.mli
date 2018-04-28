@@ -1,3 +1,0 @@
-open Preprocessing
-open Comparison
-open Interface
