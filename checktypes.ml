@@ -42,11 +42,7 @@ module type WINNOWING = sig
     val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
   end
   module Window : BoundedQueueWithCounter
-<<<<<<< HEAD
-  val winnow: int list -> int -> int list
-=======
   val winnow: int list -> int -> (int * int) list 
->>>>>>> 4a06af11219c6d37a351e4cde6feb2726a4041fd
 end
 
 module type DICTIONARY = sig

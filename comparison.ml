@@ -15,8 +15,8 @@ let compare d = (*let list_of_dict = file_dict.to_list d in*)
     let format d = ()
   end in
 
-  let module ComparisonDict = TreeDictionary (StringKey) (DictValue) in
+  let module ComparisonDict = Dictionary.TreeDictionary(StringKey)(DictValue) in
 
-  let make_compare_dict d = d in
+  let rec make_compare_dict d = d in
 
   (*make_compare_dict ComparisonDict*) failwith "Unimplemented"
