@@ -33,6 +33,7 @@ end
 module type WINNOWING = sig
   module type BoundedQueueWithCounter = sig
     type 'a t
+    val empty : int -> 'a t
     val create : int -> 'a -> 'a t
     val is_empty : 'a t -> bool
     val is_full : 'a t -> bool

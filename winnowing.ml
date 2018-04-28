@@ -1,5 +1,6 @@
 module type BoundedQueueWithCounter = sig
 	type 'a t
+	val empty : int -> 'a t
 	val create : int -> 'a -> 'a t
 	val is_empty : 'a t -> bool
 	val is_full : 'a t -> bool
@@ -14,6 +15,11 @@ module Window : BoundedQueueWithCounter = struct
 
 	type 'a t = { data: 'a list ; maxsize: int ; size: int ; count: int}
 	
+	let empty n = 
+		if n = 0 then failwith "Cannot create queue of size 0!" 
+		else 
+			{ data = []; maxsize = n; size = n; count = 0}
+
 	let create n i = 
 		let rec gen l acc i = 
 			if l = 0 then acc else gen (l - 1) (i::acc) i
