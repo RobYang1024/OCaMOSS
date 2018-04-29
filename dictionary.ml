@@ -63,34 +63,57 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
       then Some v2 else if Key.compare k k1 < 0 then find k l else
       if Key.compare k k2 > 0 then find k r else find k m
 
-  let rec insert k v d =
-    (*let ins_fix_leaf d = failwith "Unimplemented" in
-    let ins_fix_two (k,v) l r = failwith "Unimplemented" in
-    (*let ins_fix_three d = failwith "Unimplemented" in*)
-
-    match d with
-    | Leaf -> ins_fix_leaf ((k,v),Leaf,Leaf)
-    | TwoNode ((k1,v1),Leaf,Leaf) -> if Key.compare k k1 < 0
-      then ThreeNode ((k,v),(k1,v1),Leaf,Leaf,Leaf)
-      else ThreeNode ((k1,v1),(k,v),Leaf,Leaf,Leaf)
-    | ThreeNode ((k1,v1),(k2,v2),Leaf,Leaf,Leaf) -> if Key.compare k k1 < 0
-      then ins_fix_two (k1,v1) (TwoNode ((k,v),Leaf,Leaf))
-          (TwoNode ((k2,v2),Leaf,Leaf))
-      else if Key.compare k k2 > 0
-      then ins_fix_two (k2,v2) (TwoNode ((k1,v1),Leaf,Leaf))
-          (TwoNode ((k,v),Leaf,Leaf))
-      else ins_fix_two (k,v) (TwoNode ((k1,v1),Leaf,Leaf))
-          (TwoNode ((k2,v2),Leaf,Leaf))
-    | TwoNode ((k1,v1),l,r) -> if Key.compare k k1 < 0
-      then TwoNode ((k1,v1),(insert k v l),r)
-      else TwoNode ((k1,v1),l,(insert k v r))
-    | ThreeNode ((k1,v1),(k2,v2),l,m,r) -> if Key.compare k k1 < 0
-      then ThreeNode ((k1,v1),(k2,v2),(insert k v l),m,r)
-      else if Key.compare k k2 > 0
-      then ThreeNode ((k1,v1),(k2,v2),l,m,(insert k v r))
-      else ThreeNode ((k1,v1),(k2,v2),l,(insert k v m),r)*)
-
-    failwith "Unimplemented"
+  let insert k v d =
+    let rec insert_helper k v d =
+      match d with
+        | Leaf -> (TwoNode((k,v),Leaf,Leaf),true)
+        | TwoNode ((k1,v1),Leaf,Leaf) -> if Key.compare k k1 <= 0
+          then (ThreeNode ((k,v),(k1,v1),Leaf,Leaf,Leaf),false)
+          else (ThreeNode ((k1,v1),(k,v),Leaf,Leaf,Leaf), false)
+        | ThreeNode ((k1,v1),(k2,v2),Leaf,Leaf,Leaf) -> if Key.compare k k1 <= 0
+          then ((TwoNode((k1,v1),TwoNode((k,v),Leaf,Leaf),
+                         TwoNode((k2,v2),Leaf,Leaf))),true)
+          else if Key.compare k k2 > 0
+          then ((TwoNode((k2,v2),TwoNode((k1,v1),Leaf,Leaf),
+                         TwoNode((k,v),Leaf,Leaf))),true)
+          else ((TwoNode((k,v),TwoNode((k1,v1),Leaf,Leaf),
+                                 TwoNode((k2,v2),Leaf,Leaf))), true)
+        | TwoNode ((k1,v1),l,r) -> if Key.compare k k1 < 0
+          then (let leftinserted = insert_helper k v l in
+              if snd leftinserted = true then
+                (match (fst leftinserted) with
+                | TwoNode((key, value), left, middle) ->
+                  (ThreeNode((key,value), (k1,v1), left, middle ,r), false)
+                | _ -> failwith "incorrect kickup")
+              else (TwoNode((k1,v1), fst leftinserted, r)), false)
+          else (let rightinserted = insert_helper k v r in
+                if snd rightinserted = true then
+                  (match fst rightinserted with
+                   | TwoNode((key, value), middle, right)->
+                     (ThreeNode((k1,v1), (key,value), l, middle, right), false)
+                   | _ -> failwith "incorrect kickup" )
+                else (TwoNode((k1,v1),l,fst rightinserted)), false)
+        | ThreeNode ((k1,v1),(k2,v2),l,m,r) -> if Key.compare k k1 < 0
+          then (let leftinserted = insert_helper k v l in
+                if snd leftinserted = true then (match fst leftinserted with
+                    | TwoNode((key, value), a, b) ->  (TwoNode((k1,v1),
+                      TwoNode((key,value),a,b), TwoNode((k2,v2),m,r)), true)
+                    | _ -> failwith "incorrect kickup")
+                else (ThreeNode ((k1,v1),(k2,v2),(fst leftinserted),m,r), false))
+          else if Key.compare k k2 > 0
+          then (let rightinserted = insert_helper k v r in
+                if snd rightinserted = true then (match fst rightinserted with
+                    | TwoNode((key, value), c, d) -> (TwoNode((k2,v2),
+                      TwoNode((k1,v1),l,m), TwoNode((key,value),c,d)), true)
+                    | _ -> failwith "incorrect kickup")
+                else (ThreeNode ((k1,v1),(k2,v2),l,m,fst rightinserted), false))
+          else (let midinserted = insert_helper k v m in
+                if snd midinserted = true then (match fst midinserted with
+                    | TwoNode((key, value), b, c) -> (TwoNode((key,value),
+                      TwoNode((k1,v1),l,b), TwoNode((k2,v2),c,r)), true)
+                    | _ -> failwith "incorrect kickup")
+                else (ThreeNode((k1,v1),(k2,v2),l,fst midinserted,r), false)) in
+    fst (insert_helper k v d)
 
   let to_list d = failwith "Unimplemented"
 
