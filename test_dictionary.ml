@@ -28,7 +28,7 @@ let t = DictString.(insert "S" "" t)
 
 let tests = [
 
-  "Inserted Correct" >:: (fun _ -> assert_equal [("I", ""); ("G", "");
-  ("A", ""); ("H", ""); ("O", ""); ("S", ""); ("L", ""); ("M", ""); ("R", "");
+  "Inserted Correct" >:: (fun _ -> assert_equal [("A", ""); ("G", "");
+  ("H", ""); ("I", ""); ("L", ""); ("M", ""); ("O", ""); ("R", ""); ("S", "");
   ("T", "")] (DictString.to_list t));
 ]

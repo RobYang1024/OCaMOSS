@@ -120,10 +120,12 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
       match lst1 with
       | [] -> lst2
       | h::t -> append t (h::lst2) in
-    match d with
-    | Leaf -> []
-    | TwoNode (a, b, c) -> (a::(append (List.rev(to_list b)) (to_list c)))
-    | ThreeNode (a, b, c, d, e) ->
-      (a::b ::(append (List.rev(append (List.rev(to_list c))(to_list d)))
-              (to_list e)))
+    let rec to_list_helper d =
+      match d with
+      | Leaf -> []
+      | TwoNode (a, b, c) -> (a::(append (List.rev(to_list b)) (to_list c)))
+      | ThreeNode (a, b, c, d, e) ->
+        (a::b ::(append (List.rev(append (List.rev(to_list c))(to_list d)))
+                   (to_list e))) in
+    List.sort (fun (k1,v1) (k2,v2) -> Key.compare k1 k2) (to_list_helper d)
 end
