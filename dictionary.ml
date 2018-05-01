@@ -115,6 +115,15 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
                 else (ThreeNode((k1,v1),(k2,v2),l,fst midinserted,r), false)) in
     fst (insert_helper k v d)
 
-  let to_list d = failwith "Unimplemented"
-
+  let rec to_list d =
+    let rec append lst1 lst2 =
+      match lst1 with
+      | [] -> lst2
+      | h::t -> append t (h::lst2) in
+    match d with
+    | Leaf -> []
+    | TwoNode (a, b, c) -> (a::(append (List.rev(to_list b)) (to_list c)))
+    | ThreeNode (a, b, c, d, e) ->
+      (a::b ::(append (List.rev(append (List.rev(to_list c))(to_list d)))
+              (to_list e)))
 end
