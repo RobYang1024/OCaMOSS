@@ -15,3 +15,5 @@ val create_pair_comparison : string -> (StringKey.t * HashValue.t) list -> Compa
 (* [compare files] returns a list of comparisons between every pair of entries
  * in a dictionary files. *)
 val compare : FileDict.t -> ComparisonDict.t
+
+val create_sim_list : ComparisonDict.t -> StringKey.t list

@@ -42,3 +42,14 @@ let compare d =
   else List.fold_left (fun x (k,v) ->
       ComparisonDict.insert k (create_pair_comparison k file_list x) x)
       ComparisonDict.empty file_list
+
+let create_sim_list comp_dict =
+  List.fold_left (fun x (k,d) -> match FileDict.find k d with
+      | None -> failwith "Unimplemented"
+      | Some v -> let file_length = float_of_int (List.length v) in
+        let sim_score =
+          List.fold_left (fun a (k1,v1) -> if StringKey.compare k k1 = 0
+            then a
+            else a +. ((float_of_int (List.length v1))/.file_length)) 0.0 (FileDict.to_list d) in
+        if sim_score > 0.9
+        then k::x else x) [] (ComparisonDict.to_list comp_dict)
