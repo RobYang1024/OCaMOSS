@@ -11,10 +11,11 @@ open Filename
 *)
 
 let special_chars =
-  ['(';')';'[';']';'{';'}';'<';'>';'"';';';'|';'+';'-';'/';'*';'&';'~';'.']
+  ['(';')';'[';']';'{';'}';'<';'>';'"';';';'|';'+';'-';'/';'*';'=';'&';'~';'.';':';'\"';'\'']
 
 let rem_white_space code_string =
   code_string |>
+  String.split_on_char '\n' |> String.concat " " |>
   String.split_on_char ' ' |>
   List.filter (fun str -> str <> "")
 
@@ -37,7 +38,7 @@ let split_and_keep_on_spec_chars str =
          | [] -> failwith "Array should never be empty"
     )
     [""]
-    char_array) |> List.filter (fun str -> str <> "")
+    char_array) |> List.filter (fun str -> str <> "") |> List.rev
 
 let replace_generics keywords str_arr =
   List.map
@@ -45,7 +46,10 @@ let replace_generics keywords str_arr =
        if List.mem str keywords ||
         ((String.length str = 1) && (List.mem (String.get str 0) special_chars))
        then str
-       else "v")
+       else
+         try
+           int_of_string str |> string_of_int
+         with Failure _ -> "v" )
     str_arr
 
 let keywords_list keywords_file_name =
@@ -90,7 +94,7 @@ let remove_noise code_string keywords =
   code_string |>
   rem_white_space |>
   List.map split_and_keep_on_spec_chars |> List.flatten |>
-  replace_generics keywords |> String.concat " "
+  replace_generics keywords |> String.concat ""
 
 let rec k_grams_helper acc s n =
   try
@@ -99,7 +103,7 @@ let rec k_grams_helper acc s n =
     k_grams_helper (n_sub_str::acc) tail_str n
   with Invalid_argument _ -> List.rev acc
 
-let k_grams s n =   k_grams_helper [] s n
+let k_grams s n = k_grams_helper [] s n
 
 let hash = Hashtbl.hash
 
