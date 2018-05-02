@@ -10,7 +10,7 @@ type input = cmd * string option * string option
 
 let newstate = {display = "Welcome to MOSS. Type 'help' for a list of commands" ; directory = "./" ; results = ()}
 
-let help = 
+let help =
 "
 run : runs MOSS on the specified directory \n
 dir : lists the working directory \n
@@ -22,7 +22,7 @@ compare [fileA] [fileB] : prints out specific overlapping sections of files A an
 
 let parse str =
 	let input_split = String.split_on_char ' ' str in
-	match input_split with 
+	match input_split with
 	|"help"::_ -> (HELP, None, None)
 	|"run"::_ -> (RUN, None, None)
   |"dir"::_ -> (DIR, None, None)
@@ -32,7 +32,7 @@ let parse str =
 	|"compare"::a::b::_ -> (COMPARE, Some a, Some b)
 	|_ -> (ERROR, None, None)
 
-let rec repl st = 
+let rec repl st =
   print_endline st.display;
   print_string  "> ";
   match String.lowercase_ascii (read_line ()) with
@@ -45,12 +45,12 @@ let rec repl st =
       |RUN -> failwith "unimplemented"
       |DIR -> repl {st with display = st.directory}
       |SETDIR -> begin
-      	match x with 
-      	|Some d -> repl {st with directory = d ; display = "Successfully set directory to: "^d}
+      	match x with
+      	|Some d -> repl {st with directory = d ; display = "Successfully set directory to: " ^ d}
       	|None -> repl {st with display = "Error: Something went wrong"}
       end
       |RESULTS -> failwith "unimplemented"
-      |COMPARE -> begin 
+      |COMPARE -> begin
         match (x,y) with
       	|Some a,Some b -> failwith "unimplemented"
       	|_,_ -> repl {st with display = "Error: Something went wrong"}

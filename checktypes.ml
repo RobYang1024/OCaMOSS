@@ -26,13 +26,14 @@ end
 module type COMPARISON = sig
   module StringKey : Dictionary.Comparable
   module HashValue : Dictionary.Formattable
-  module DictValue : Dictionary.Formattable
   module FileDict : Dictionary.Dictionary
-  module ComparisonDict: Dictionary.Dictionary
-  val create_pair_comparison : string ->
-    (StringKey.t * HashValue.t) list -> ComparisonDict.t -> FileDict.t
-  val compare : FileDict.t -> ComparisonDict.t
-  val create_sim_list : ComparisonDict.t -> StringKey.t list
+  module DictValue : Dictionary.Formattable
+  module CompDict: Dictionary.Dictionary
+  val intersection : int list -> int list -> int list
+  val make_pair_comp : string ->
+    (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
+  val compare : FileDict.t -> CompDict.t
+  val create_sim_list : CompDict.t -> StringKey.t list
 end
 
 module type WINNOWING = sig
