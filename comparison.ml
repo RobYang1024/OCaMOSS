@@ -26,7 +26,7 @@ let intersection v1 v2 =
     | h::t -> intersection_helper t lst2
                 (if List.mem h lst2 then h::common else common)
   in
-  intersection_helper v1 v2 []
+  List.rev(intersection_helper v1 v2 [])
 
 let make_pair_comp k0 file_list comp_dict =
   List.fold_left (fun x (k,v) -> match CompDict.find k comp_dict with
