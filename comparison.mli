@@ -2,27 +2,29 @@ open Dictionary
 
 (* [StringKey] is a module that represents a key of a dictionary of type
 * string. *)
-module StringKey : Comparable
+module StringKey : Comparable with type t = string
 
 (* [HashValue] is a module that represents a value of a dictionary of type
  * int list.
  *)
-module HashValue : Formattable
+module HashValue : Formattable with type t = int list
 
 (* [FileDict] is a module that represents a dictionary with keys of type string
  * and values of type int list.
  *)
-module FileDict : Dictionary
+module FileDict : Dictionary with type Key.t = string
+                              and type Value.t = int list
 
 (* [DictValue] is a module that represents a value of a dictionary of type
  * FileDict.t
  *)
-module DictValue : Formattable
+module DictValue : Formattable with type t = FileDict.t
 
 (* [CompDict] is a module that represents a dictionary with keys of type string
  * and values of type FileDict.t
  *)
-module CompDict: Dictionary
+module CompDict: Dictionary with type Key.t = string
+                              and type Value.t = FileDict.t
 
 (* [intersection v1 v2] returns a list of elements present in both v1 and
  * v2. The elements are in the order that they appear in v1.
@@ -51,5 +53,6 @@ val compare : FileDict.t -> CompDict.t
  * calculated as the number of matching hashes between the files divided by
  * the number of hashes of the file itself, and hence the similarity score of
  * a file is the sum of the similarities of that file with every other file.
+ * The files are ordered from least to greatest. 
  *)
 val create_sim_list : CompDict.t -> StringKey.t list
