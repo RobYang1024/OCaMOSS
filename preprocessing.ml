@@ -105,6 +105,16 @@ let rec k_grams_helper acc s n =
 
 let k_grams s n = k_grams_helper [] s n
 
-let hash = Hashtbl.hash
+let hash_file f =
+  let rec hash_helper f_channel s =
+  try
+    let line = input_line f_channel in
+    hash_helper f_channel (s^line)
+  with
+  | End_of_file -> s in
 
-let winnow = Winnowing.winnow
+  let f_string = hash_helper (open_in f) "" in
+
+  let n_grams = k_grams (remove_noise f_string (keywords_list "")) 5 in
+
+  List.map (Hashtbl.hash) n_grams

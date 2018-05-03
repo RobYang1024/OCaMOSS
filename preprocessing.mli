@@ -16,8 +16,4 @@ val remove_noise : string -> string list -> string
  *)
 val k_grams : string -> int -> string list
 
-(* [hash str] produces a hash of str *)
-val hash : string -> int
-
-(* [winnow hashes n] Selects fingerprints via winnowing with window size n *)
-val winnow : int list -> int -> (int * int) list
+val hash_file : string -> int list

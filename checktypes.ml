@@ -19,8 +19,7 @@ module type PREPROCESSING =  sig
   val keywords_list : string-> string list
   val remove_noise : string -> string list -> string
   val k_grams : string -> int -> string list
-  val hash : string -> int
-  val winnow : int list -> int -> (int * int) list
+  val hash_file : string -> int list
 end
 
 module type COMPARISON = sig

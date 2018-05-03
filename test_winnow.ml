@@ -3,8 +3,8 @@ open Winnowing
 
 (* helper function for sorting winnowing results (int*int) list representing hash * position tuples
  * sorts from least to greatest, by hash value first, then by position if hashes are equal *)
-let sort_results r = 
-	let cmp x y = 
+let sort_results r =
+	let cmp x y =
 		let res = Pervasives.compare (fst x) (fst y) in
 		if res = 0 then Pervasives.compare (snd x) (snd y) else res
 	in
@@ -14,9 +14,9 @@ let sort_results r =
  * inputs: (int * int) list representing winnowing results
  * returns: a string representation of the hashes contained in the input
  * side effects: prints the string that is created *)
-let res_to_string r = 
-	let s = List.rev r |> List.map (fun x -> fst x) |> List.map (string_of_int) |> List.fold_left (fun a x -> a ^ x ^ ",") "" in
-	let () = print_endline s in s
+let res_to_string r =
+  List.rev r |> List.map (fun x -> fst x) |> List.map (string_of_int) |>
+  List.fold_left (fun a x -> a ^ x ^ ",") ""
 
 (* Non-trivial test cases generated with a Python implementation of the same algorithm *)
 (* 10 hashes, w = 5 *)
@@ -48,4 +48,3 @@ let tests = [
 "winnow8" >:: (fun _ -> assert_equal r3 (winnow t3 5 |> res_to_string));
 "winnow9" >:: (fun _ -> assert_equal r4 (winnow t4 20 |> res_to_string));
 ]
-
