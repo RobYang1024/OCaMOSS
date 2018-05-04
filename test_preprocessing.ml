@@ -35,5 +35,7 @@ let tests = [
     [\"\"]
     char_array) |> List.filter (fun str -> str <> \"\") |> List.rev"
          keywords)
-    "letvv=letv=vvin(v.v(funvv->letv=v.v1vinifv.vvvthenv.v\"\"(v.vvv)elsematchvwith|v::v->(v.v\"\"[v;v])::v|[]->failwith\"vvvvv\")[\"\"]v)|>v.v(funv->v<>\"\")|>v.v");
+      "letvv=letv=vvin(v.v(funvv->letv=v.v1vinifv.vvvthenv.v\"\"(v.vvv)elsematchvwith|v::v->(v.v\"\"[v;v])::v|[]->failwith\"vvvvv\")[\"\"]v)|>v.v(funv->v<>\"\")|>v.v");
+
+  "keywords" >:: (fun _ -> assert_equal (keywords_list "keywords.txt") ["let"; "try"; "with"; "Failure"; "fun"; "failwith"; "if"; "then"; "else"; "match"; "with"; "in"])
 ]
