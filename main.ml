@@ -32,6 +32,18 @@ let parse str =
 	|"compare"::a::b::_ -> (COMPARE, Some a, Some b)
 	|_ -> (ERROR, None, None)
 
+let concat_str_list lst =
+  List.fold_left (fun s a -> a ^ "\n" ^ s) "" lst
+
+let rec parse_dir dir dict =
+  try
+    let f_name = Unix.readdir dir in
+    let new_dict = Comparison.FileDict.insert f_name
+        (Winnowing.winnow (Preprocessing.hash_file f_name) 5) dict in
+    parse_dir dir new_dict
+  with
+  | End_of_file -> dict
+
 let rec repl st =
   print_endline st.display;
   print_string  "> ";
@@ -42,7 +54,10 @@ let rec repl st =
   	  let (c,x,y) = parse input in
       match c with
       |HELP -> repl {st with display = help}
-      |RUN -> failwith "unimplemented"
+      |RUN -> repl {st with display = "The list of plagiarised files are: \n" ^
+      concat_str_list ((parse_dir (Unix.opendir st.directory)
+                          Comparison.FileDict.empty) |> Comparison.compare |>
+                       Comparison.create_sim_list) }
       |DIR -> repl {st with display = st.directory}
       |SETDIR -> begin
       	match x with

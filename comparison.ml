@@ -6,7 +6,7 @@ module StringKey = struct
 end
 
 module HashValue = struct
-  type t = int list
+  type t = (int*int) list
   let format d = ()
 end
 
@@ -23,17 +23,17 @@ let intersection v1 v2 =
   let rec intersection_helper lst1 lst2 common =
     match lst1 with
     | [] -> common
-    | h::t -> intersection_helper t lst2
-                (if List.mem h lst2 then h::common else common)
+    | (h,p)::t -> intersection_helper t lst2
+                    (if List.mem_assoc h lst2 then (h,p)::common else common)
   in
   List.rev(intersection_helper v1 v2 [])
 
 let make_pair_comp k0 file_list comp_dict =
-  List.fold_left (fun x (k,v) -> match CompDict.find k comp_dict with
-      | None -> FileDict.insert k (intersection v (List.assoc k0 file_list)) x
-      | Some dict -> match FileDict.find k0 dict with
+  List.fold_left (fun x (k,v) -> (*match CompDict.find k comp_dict with
+      | None -> *)FileDict.insert k (intersection v (List.assoc k0 file_list)) x
+        (*| Some dict -> match FileDict.find k0 dict with
         | None -> failwith "Invalid comparison dictionary"
-        | Some v2 -> FileDict.insert k v2 x)
+          | Some v2 -> FileDict.insert k v2 x*))
     FileDict.empty file_list
 
 let compare d =

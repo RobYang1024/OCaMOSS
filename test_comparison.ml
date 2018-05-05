@@ -4,19 +4,23 @@ open Comparison
 
 let emp_file = FileDict.empty
 
-let se_dict = FileDict.insert "a" [1] emp_file
-let de_dict = FileDict.(empty |> insert "a" [1;2] |> insert "b" [1;3])
-let emp_e_dict = FileDict.(empty |> insert "a" [] |> insert "b" [7;4]
-                           |> insert "c" [4;8;13])
+let se_dict = FileDict.insert "a" [(1,0)] emp_file
+let de_dict = FileDict.(empty |> insert "a" [(1,0);(2,0)]
+                        |> insert "b" [(1,0);(3,0)])
+let emp_e_dict = FileDict.(empty |> insert "a" [] |> insert "b" [(7,0);(4,0)]
+                           |> insert "c" [(4,0);(8,0);(13,0)])
 
-let def_p_comp = FileDict.(empty |> insert "a" [1;2] |> insert "b" [1])
-let des_p_comp = FileDict.(empty |> insert "a" [1] |> insert "b" [1;3])
+let def_p_comp = FileDict.(empty |> insert "a" [(1,0);(2,0)]
+                           |> insert "b" [(1,0)])
+let des_p_comp = FileDict.(empty |> insert "a" [(1,0)]
+                           |> insert "b" [(1,0);(3,0)])
 let emp_e_f_p_comp = FileDict.(empty |> insert "a" [] |> insert "b" []
                                |> insert "c" [])
-let emp_e_s_p_comp = FileDict.(empty |> insert "a" [] |> insert "b" [7;4]
-                               |> insert "c" [4])
-let emp_e_t_p_comp = FileDict.(empty |> insert "a" [] |> insert "b" [4]
-                               |> insert "c" [4;8;13])
+let emp_e_s_p_comp = FileDict.(empty |> insert "a" []
+                               |> insert "b" [(7,0);(4,0)]
+                               |> insert "c" [(4,0)])
+let emp_e_t_p_comp = FileDict.(empty |> insert "a" [] |> insert "b" [(4,0)]
+                               |> insert "c" [(4,0);(8,0);(13,0)])
 
 
 let emp_comp = CompDict.empty
@@ -29,19 +33,27 @@ let emp_e_comp = CompDict.(empty |> insert "a" emp_e_f_p_comp
 
 let tests = [
   "empty int" >:: (fun _ -> assert_equal [] (intersection [] []));
-  "single lists uneq" >:: (fun _ -> assert_equal [] (intersection [1] [2]));
-  "single lists eq" >:: (fun _ -> assert_equal [1] (intersection [1] [1]));
-  "diff order" >:: (fun _ -> assert_equal [1;2] ((intersection [1;2] [2;1]) |>
-                                                 List.sort Pervasives.compare));
-  "simp case" >:: (fun _ -> assert_equal [1;2] ((intersection [3;1;2] [2;1]) |>
-                                                List.sort Pervasives.compare));
-  "long case" >:: (fun _ -> assert_equal [41;20;7;53]
-  (intersection [82;23;46;93;41;20;47;7;84;53] [80;42;41;53;72;7;20;100]));
+  "single lists uneq" >::
+  (fun _ -> assert_equal [] (intersection [(1,0)] [(2,0)]));
+  "single lists eq" >::
+  (fun _ -> assert_equal [(1,0)] (intersection [(1,0)] [(1,0)]));
+  "diff order" >::
+  (fun _ -> assert_equal [(1,0);(2,0)]
+      ((intersection [(1,0);(2,0)] [(2,0);(1,0)])
+       |> List.sort Pervasives.compare));
+  "simp case" >::
+  (fun _ -> assert_equal [(1,0);(2,0)]
+      ((intersection [(3,0);(1,0);(2,0)] [(2,0);(1,0)])
+       |> List.sort Pervasives.compare));
+  "long case" >:: (fun _ -> assert_equal [(41,0);(20,0);(7,0);(53,0)]
+                      (intersection [(82,0);(23,0);(46,0);(93,0);(41,0);(20,0);
+                                     (47,0);(7,0);(84,0);(53,0)]
+                    [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
 
   "empty file" >:: (fun _ -> assert_equal emp_file
                        (make_pair_comp "" [] emp_comp));
   "single entry" >:: (fun _ -> assert_equal se_dict
-                         (make_pair_comp "a" [("a",[1])] emp_comp));
+                         (make_pair_comp "a" [("a",[(1,0)])] emp_comp));
   "double entry first" >:: (fun _ -> assert_equal def_p_comp
   (make_pair_comp "a" (FileDict.to_list de_dict) emp_comp));
   "double entry second" >:: (fun _ -> assert_equal des_p_comp
