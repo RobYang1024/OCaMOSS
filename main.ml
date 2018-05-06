@@ -38,6 +38,9 @@ let parse str =
 let concat_str_list lst =
   List.fold_left (fun s a -> a ^ "\n" ^ s) "" lst
 
+let concat_int_list lst =
+  List.fold_left (fun a x -> a ^ "," ^ string_of_int x) "" lst
+
 let rec parse_dir dir dict =
   try
     let f_name = Unix.readdir dir in
@@ -46,6 +49,8 @@ let rec parse_dir dir dict =
     parse_dir dir new_dict
   with
   | End_of_file -> dict
+
+
 
 let rec repl st =
   print_endline st.display;
@@ -64,7 +69,7 @@ let rec repl st =
           print_endline "comparing files...";
           let comparison = Comparison.compare parsefiles in
           print_endline "generating results...";
-          repl {st with display = "Success. The list of plagiarised files are:" ^ 
+          repl {st with display = "Success. The list of plagiarised files are:\n" ^ 
                           concat_str_list (Comparison.create_sim_list comparison);
                         results = Some comparison}
         end
@@ -81,22 +86,57 @@ let rec repl st =
         match st.results with
         |Some r -> begin
           match x with
-          |Some f -> failwith "unimplemented"
-          |None -> failwith "unimplemented"
+          |Some f -> handle_results st f
+          |None -> repl {st with display =  "Results for files: \n" ^
+              concat_str_list (List.map (fst) (CompDict.to_list r))}
         end
-        |None -> repl {st with display = "Error: There are no results to display. Run MOSS first"}
+        |None -> repl {st with display = "Error: no results to display. Run MOSS first"}
       end
       |COMPARE -> begin
         match st.results with
         |Some r -> begin 
             match (x,y) with
-            |Some a,Some b -> failwith "unimplemented"
+            |Some a,Some b -> handle_compare st a b
             |_,_ -> repl {st with display = "Error: please specify which two files to compare"}
         end
-        |None -> repl {st with display = "Error: There are no results to display. Run MOSS first"}
+        |None -> repl {st with display = "Error: no results to display. Run MOSS first"}
   	  end
       |ERROR -> repl {st with display = "Error: invalid command"}
   	end
+
+and handle_compare st a b = 
+  match st.results with
+  |None -> failwith "unexpected"
+  |Some r -> begin
+    match (CompDict.find a r, CompDict.find b r) with
+    |(Some v1, Some v2) -> begin
+      match (FileDict.find b v1, FileDict.find a v2) with
+      |(Some r1, Some r2) -> begin
+        let l1 = List.map (snd) r1 |> concat_int_list in
+        let l2 = List.map (snd) r2 |> concat_int_list in
+        let res = concat_str_list [a ; l1 ; b ; l2] in
+        repl {st with display = "Fingerprint matches: \n" ^ res}
+      end
+      |_,_ -> failwith "unexpected"
+    end
+    |_,_ -> repl {st with display = "Error: no results to display for files " ^ a ^","^ b}
+  end
+
+
+and handle_results st f = 
+  match st.results with
+  |None -> failwith "unexpected"
+  |Some r -> begin
+    match CompDict.find f r with
+    |Some v -> begin
+      let v_list = FileDict.to_list v in
+      let d = List.map (fun x -> 
+        fst x ^ "\n" ^ concat_int_list (List.map (fun y -> snd y) (snd x))) 
+      v_list in
+      repl {st with display = "Results for file " ^ f ^": \n"^ concat_str_list d}
+    end
+    |None -> repl {st with display = "Error: no results to display for file " ^ f}
+  end
 
 let main () = repl newstate
 
