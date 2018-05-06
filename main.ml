@@ -50,8 +50,6 @@ let rec parse_dir dir dict =
   with
   | End_of_file -> dict
 
-
-
 let rec repl st =
   print_endline st.display;
   print_string  "> ";
@@ -75,11 +73,11 @@ let rec repl st =
         end
         with _ -> repl {st with display = "Error: Something went wrong"}
       end
-      |DIR -> repl {st with display = st.directory}
+      |DIR -> repl {st with display = "Current working directory: " ^ st.directory}
       |SETDIR -> begin
         (* TODO: check to see if valid directory, print out file names in directory *)
       	match x with
-      	|Some d -> repl {st with directory = d ; display = "Successfully set directory to: " ^ d}
+      	|Some d -> repl {st with directory = d ; display = "Successfully set working directory to: " ^ d}
       	|None -> repl {st with display = "Error: Could not set directory"}
       end
       |RESULTS -> begin 
