@@ -27,6 +27,14 @@ else
   environment=bad
 fi
 
+YOJSON_VERSION="$(opam info yojson -f installed-version 2>&1)"
+if [[ "$YOJSON_VERSION" =~ "1.4.0" && "$YOJSON_VERSION" =~ "4.06.0" ]]; then
+  echo "Yojson version 1.4.0 is active.  Good."
+else
+  echo "Yojson version 1.4.0 is NOT active.  This is bad."
+  environment=bad
+fi
+
 if [[ "$environment" == good ]]; then
   cat <<EOF
 ===========================================================

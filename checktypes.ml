@@ -16,8 +16,9 @@ module type TEST_ENGINE = sig
 end *)
 
 module type PREPROCESSING =  sig
-  val keywords_list : string-> string list
-  val remove_noise : string -> string list -> string
+  val keywords_list : string -> string list
+  val special_chars : string -> char list
+  val remove_noise : string -> string list -> char list -> string
   val k_grams : string -> int -> string list
   val hash_file : string -> int list
 end
