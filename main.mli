@@ -2,7 +2,7 @@ open Preprocessing
 open Comparison
 
 (* type representing the state of the interface *)
-type state = {display : string; directory : string; results : unit}
+type state = {display : string; directory : string; results : CompDict.t option}
 
 (* type for commands recognised by MOSS
  * RUN - runs MOSS on the current directory of the state, no arguments

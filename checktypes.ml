@@ -52,6 +52,15 @@ module type WINNOWING = sig
   val winnow: int list -> int -> (int * int) list
 end
 
+module type MAIN = sig
+  type state = {display : string; directory : string; results : Comparison.CompDict.t option}
+  type cmd = RUN | DIR | HELP | SETDIR | RESULTS | COMPARE | ERROR
+  type input = cmd * string option * string option
+  val parse: string -> input
+  val repl : state -> unit
+end
+
+
 module type DICTIONARY = sig
   module type Comparable = sig
     type t
@@ -88,3 +97,4 @@ module CheckComparison : COMPARISON = Comparison
 module CheckPreprocessing : PREPROCESSING = Preprocessing
 module CheckWinnowing : WINNOWING = Winnowing
 module CheckDictionary : DICTIONARY = Dictionary
+module CheckMain : MAIN = Main

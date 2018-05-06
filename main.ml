@@ -1,14 +1,17 @@
 (* this will be the main file that does everything *)
 open Preprocessing
 open Comparison
+open Dictionary
 
-type state = {display : string; directory : string; results : unit}
+type state = {display : string; directory : string; results : CompDict.t option}
 
 type cmd = RUN | DIR | HELP | SETDIR | RESULTS | COMPARE | ERROR
 
 type input = cmd * string option * string option
 
-let newstate = {display = "Welcome to MOSS. Type 'help' for a list of commands" ; directory = "./" ; results = ()}
+let newstate = {display = "Welcome to MOSS. Type 'help' for a list of commands" ;
+                directory = "./" ;
+                results = None}
 
 let help =
 "
@@ -54,23 +57,45 @@ let rec repl st =
   	  let (c,x,y) = parse input in
       match c with
       |HELP -> repl {st with display = help}
-      |RUN -> repl {st with display = "The list of plagiarised files are: \n" ^
-      concat_str_list ((parse_dir (Unix.opendir st.directory)
-                          Comparison.FileDict.empty) |> Comparison.compare |>
-                       Comparison.create_sim_list) }
+      |RUN -> begin
+        try begin
+          print_endline "parsing files...";
+          let parsefiles = (parse_dir (Unix.opendir st.directory) Comparison.FileDict.empty) in
+          print_endline "comparing files...";
+          let comparison = Comparison.compare parsefiles in
+          print_endline "generating results...";
+          repl {st with display = "Success. The list of plagiarised files are:" ^ 
+                          concat_str_list (Comparison.create_sim_list comparison);
+                        results = Some comparison}
+        end
+        with _ -> repl {st with display = "Error: Something went wrong"}
+      end
       |DIR -> repl {st with display = st.directory}
       |SETDIR -> begin
+        (* TODO: check to see if valid directory, print out file names in directory *)
       	match x with
       	|Some d -> repl {st with directory = d ; display = "Successfully set directory to: " ^ d}
-      	|None -> repl {st with display = "Error: Something went wrong"}
+      	|None -> repl {st with display = "Error: Could not set directory"}
       end
-      |RESULTS -> failwith "unimplemented"
+      |RESULTS -> begin 
+        match st.results with
+        |Some r -> begin
+          match x with
+          |Some f -> failwith "unimplemented"
+          |None -> failwith "unimplemented"
+        end
+        |None -> repl {st with display = "Error: There are no results to display. Run MOSS first"}
+      end
       |COMPARE -> begin
-        match (x,y) with
-      	|Some a,Some b -> failwith "unimplemented"
-      	|_,_ -> repl {st with display = "Error: Something went wrong"}
+        match st.results with
+        |Some r -> begin 
+            match (x,y) with
+            |Some a,Some b -> failwith "unimplemented"
+            |_,_ -> repl {st with display = "Error: please specify which two files to compare"}
+        end
+        |None -> repl {st with display = "Error: There are no results to display. Run MOSS first"}
   	  end
-      |ERROR -> repl {st with display = "Error: Something went wrong"}
+      |ERROR -> repl {st with display = "Error: invalid command"}
   	end
 
 let main () = repl newstate
