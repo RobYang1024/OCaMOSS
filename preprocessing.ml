@@ -35,8 +35,7 @@ let split_and_keep_on_spec_chars spec_chars str =
        else
          match acc_arr with
          | h::t -> (String.concat "" [h;str_of_chr])::t
-         | [] -> failwith "Array should never be empty"
-    )
+         | [] -> failwith "Array should never be empty")
     [""]
     char_array) |> List.filter (fun str -> str <> "") |> List.rev
 
@@ -85,5 +84,5 @@ let hash_file f =
   let spec_chars = special_chars keywords_file in
   let f_string = hash_helper (open_in f) keywords_file in
   let n_grams = k_grams (remove_noise f_string keywords spec_chars) 5 in
-  
+
   List.map (Hashtbl.hash) n_grams
