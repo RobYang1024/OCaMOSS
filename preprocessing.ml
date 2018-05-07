@@ -73,16 +73,15 @@ let determine_keywords_file f =
 
 let hash_file f =
   let rec hash_helper f_channel s =
-  try
-    let line = input_line f_channel in
-    hash_helper f_channel (s^line)
-  with
-  | End_of_file -> s in
+    try
+      let line = input_line f_channel in
+      hash_helper f_channel (s^line)
+    with
+    | End_of_file -> s in
 
-  let keywords_file = determine_keywords_file f in
-  let keywords = keywords_list keywords_file in
-  let spec_chars = special_chars keywords_file in
-  let f_string = hash_helper (open_in f) keywords_file in
-  let n_grams = k_grams (remove_noise f_string keywords spec_chars) 5 in
-
-  List.map (Hashtbl.hash) n_grams
+    let keywords_file = determine_keywords_file f in
+    let keywords = keywords_list keywords_file in
+    let spec_chars = special_chars keywords_file in
+    let f_string = hash_helper (open_in f) keywords_file in
+    let n_grams = k_grams (remove_noise f_string keywords spec_chars) 5 in
+    List.map (Hashtbl.hash) n_grams

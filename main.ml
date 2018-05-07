@@ -41,14 +41,24 @@ let concat_str_list lst =
 let concat_int_list lst =
   List.fold_left (fun a x -> a ^ "," ^ string_of_int x) "" lst
 
-let rec parse_dir dir dict =
+let rec parse_dir dir dict dir_name =
   try
     let f_name = Unix.readdir dir in
+    if String.get f_name 0 = '.' then parse_dir dir dict dir_name else
     let new_dict = Comparison.FileDict.insert f_name
-        (Winnowing.winnow (Preprocessing.hash_file f_name) 5) dict in
-    parse_dir dir new_dict
+        (Winnowing.winnow (Preprocessing.hash_file
+                             (dir_name ^ Filename.dir_sep ^ f_name)) 5) dict in
+    parse_dir dir new_dict dir_name
   with
   | End_of_file -> dict
+
+let rec print_dir_files dir str =
+  try
+    let f_name = Unix.readdir dir in
+    if String.get f_name 0 = '.' then print_dir_files dir str else
+    print_dir_files dir (str^f_name^"\n")
+  with
+  | End_of_file -> str
 
 let rec repl st =
   print_endline st.display;
@@ -61,26 +71,29 @@ let rec repl st =
       match c with
       |HELP -> repl {st with display = help}
       |RUN -> begin
-        try begin
-          print_endline "parsing files...";
-          let parsefiles = (parse_dir (Unix.opendir st.directory) Comparison.FileDict.empty) in
-          print_endline "comparing files...";
-          let comparison = Comparison.compare parsefiles in
-          print_endline "generating results...";
-          repl {st with display = "Success. The list of plagiarised files are:\n" ^ 
-                          concat_str_list (Comparison.create_sim_list comparison);
-                        results = Some comparison}
+          try begin
+            print_endline "parsing files...";
+            let parsefiles = (parse_dir (Unix.opendir st.directory) Comparison.FileDict.empty st.directory) in
+            print_endline "comparing files...";
+            let comparison = Comparison.compare parsefiles in
+            print_endline "generating results...";
+            repl {st with display = "Success. The list of plagiarised files are:\n" ^
+                            concat_str_list (Comparison.create_sim_list comparison);
+                          results = Some comparison}
         end
-        with _ -> repl {st with display = "Error: Something went wrong"}
+        with
+        | Failure f_msg -> repl {st with display = f_msg}
+        | _ -> repl {st with display = "Error: Something went wrong"}
       end
       |DIR -> repl {st with display = "Current working directory: " ^ st.directory}
       |SETDIR -> begin
         (* TODO: check to see if valid directory, print out file names in directory *)
       	match x with
-      	|Some d -> repl {st with directory = d ; display = "Successfully set working directory to: " ^ d}
+         |Some d -> repl {st with directory = d ; display = "Successfully set working directory to: " ^ d
+                                                            ^ "\n Files: " ^ (print_dir_files (Unix.opendir d) "")}
       	|None -> repl {st with display = "Error: Could not set directory"}
       end
-      |RESULTS -> begin 
+      |RESULTS -> begin
         match st.results with
         |Some r -> begin
           match x with
@@ -92,7 +105,7 @@ let rec repl st =
       end
       |COMPARE -> begin
         match st.results with
-        |Some r -> begin 
+        |Some r -> begin
             match (x,y) with
             |Some a,Some b -> handle_compare st a b
             |_,_ -> repl {st with display = "Error: please specify which two files to compare"}
@@ -102,7 +115,7 @@ let rec repl st =
       |ERROR -> repl {st with display = "Error: invalid command"}
   	end
 
-and handle_compare st a b = 
+and handle_compare st a b =
   match st.results with
   |None -> failwith "unexpected"
   |Some r -> begin
@@ -121,15 +134,15 @@ and handle_compare st a b =
   end
 
 
-and handle_results st f = 
+and handle_results st f =
   match st.results with
   |None -> failwith "unexpected"
   |Some r -> begin
     match CompDict.find f r with
     |Some v -> begin
       let v_list = FileDict.to_list v in
-      let d = List.map (fun x -> 
-        fst x ^ "\n" ^ concat_int_list (List.map (fun y -> snd y) (snd x))) 
+      let d = List.map (fun x ->
+        fst x ^ "\n" ^ concat_int_list (List.map (fun y -> snd y) (snd x)))
       v_list in
       repl {st with display = "Results for file " ^ f ^": \n"^ concat_str_list d}
     end

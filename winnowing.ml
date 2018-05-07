@@ -14,18 +14,18 @@ end
 module Window : BoundedQueueWithCounter = struct
 
 	type 'a t = { data: 'a list ; maxsize: int ; size: int ; count: int}
-	
-	let empty n = 
-		if n = 0 then failwith "Cannot create queue of size 0!" 
-		else 
+
+	let empty n =
+		if n = 0 then failwith "Cannot create queue of size 0!"
+		else
 			{ data = []; maxsize = n; size = n; count = 0}
 
-	let create n i = 
-		let rec gen l acc i = 
+	let create n i =
+		let rec gen l acc i =
 			if l = 0 then acc else gen (l - 1) (i::acc) i
 		in
-		if n = 0 then failwith "Cannot create queue of size 0!" 
-		else 
+		if n = 0 then failwith "Cannot create queue of size 0!"
+		else
 			let initdata = gen n [] i in
 			{ data = initdata; maxsize = n; size = n; count = 0}
 
@@ -40,7 +40,7 @@ module Window : BoundedQueueWithCounter = struct
 		|[] -> (None, q)
 		|h::t -> (Some h, {q with data = t ; size = q.size - 1})
 
-	let rec enqueue item q = 
+	let rec enqueue item q =
 		if is_full q then dequeue q |> snd |> enqueue item
 		else {q with data = q.data @ [item] ; size = q.size + 1 ; count = q.count + 1}
 
@@ -51,17 +51,17 @@ module Window : BoundedQueueWithCounter = struct
 end
 
 (* h = hashes list, w = window size *)
-let winnow h w = 
+let winnow h w =
 	(* calculates the global position of the i-th hash in the window
-	   example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th hash 
+	   example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th hash
 	   that was processed by the winnowing algorithm. *)
-	let global_pos i w = 
+	let global_pos i w =
 		let c = Window.count w in
 		let s = Window.size w in
 		c - (s - 1 - i)
 	in
 	(* helper function *)
-	let mincheck ((minval,minpos),count) x = 
+	let mincheck ((minval,minpos),count) x =
 		if x <= minval then ((x, count), count + 1)
 		else ((minval, minpos), count + 1)
 	in
@@ -98,5 +98,3 @@ let winnow h w =
 	in
 	let window = Window.create w max_int in
 	let res = winnowhelper h window [] 0 (max_int, 0) in res
-
-
