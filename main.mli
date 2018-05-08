@@ -2,7 +2,8 @@ open Preprocessing
 open Comparison
 
 (* type representing the state of the interface *)
-type state = {display : string; directory : string; results : CompDict.t option}
+type state = {display:string; directory:string; results:CompDict.t option;
+              params:(int*int)}
 
 (* type for commands recognised by MOSS
  * RUN - runs MOSS on the current directory of the state, no arguments
@@ -11,11 +12,12 @@ type state = {display : string; directory : string; results : CompDict.t option}
  * RESULTS - displays results, takes 0 arguments (lists files with results) or 1 argument
  * (lists details for that file)
  * COMPARE - compares two files, printing out the similarities, takes 2 arguments *)
-type cmd = RUN | DIR | HELP | SETDIR | RESULTS | COMPARE | ERROR
+type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+         | RESULTS of string | COMPARE of (string*string)| ERROR
 
 (* type for an input for MOSS, containing a command and 2 optional arguments
  * arguments beyond what the command recognizes will be ignored *)
-type input = cmd * string option * string option
+type input = cmd
 
 (* parses the string of a user into specific commands for MOSS *)
 val parse: string -> input

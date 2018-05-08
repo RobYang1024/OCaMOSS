@@ -3,52 +3,62 @@ open Preprocessing
 open Comparison
 open Dictionary
 
-type state = {display : string; directory : string; results : CompDict.t option}
+type state = {display:string; directory:string; results:CompDict.t option;
+              params:(int*int)}
 
-type cmd = RUN | DIR | HELP | SETDIR | RESULTS | COMPARE | ERROR
+type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+         | RESULTS of string | COMPARE of (string*string)| ERROR
 
-type input = cmd * string option * string option
+type input = cmd
 
 let newstate = {display = "Welcome to MOSS. Type 'help' for a list of commands" ;
                 directory = "./" ;
-                results = None}
+                results = None; params = (5,25)}
 
 let help =
 "
-run : runs MOSS on the specified directory \n
+run : runs MOSS on the specified directory. If you would like, specify k and
+window sizes(If you do not specify any, the defaults values will be 5 for k
+and 25 for window size). \n
 dir : lists the working directory \n
-setdir [dir]: sets the relative directory to look for files \n
+setdir [dir]: sets the directory to look for files \n
 results : lists the file names for which there are results \n
-results [filename] : lists the detailed results of overlap for that file \n
-compare [fileA] [fileB] : prints out specific overlapping sections of files A and B \n
+results [filename] : lists the detailed results of overlap for that file
+(Make sure to include the extension of the file)\n
+compare [fileA] [fileB] : prints out specific overlapping sections of files A and B
+(Make sure to include the extension of the files) \n
+quit : exits the program \n
 "
 
 let parse str =
-	let input_split = String.split_on_char ' ' str in
+  let input_split = String.split_on_char ' ' (String.trim str) in
 	match input_split with
-	|"help"::_ -> (HELP, None, None)
-	|"run"::_ -> (RUN, None, None)
-  |"dir"::_ -> (DIR, None, None)
-	|"setdir"::d::_ -> (SETDIR, Some d, None)
-	|"results"::f::_ -> (RESULTS, Some f, None)
-	|"results"::_ -> (RESULTS, None, None)
-	|"compare"::a::b::_ -> (COMPARE, Some a, Some b)
-	|_ -> (ERROR, None, None)
+  | ["help"] -> HELP
+  | "run"::k::w::[] -> RUN (k,w)
+  | ["run"] -> RUN ("5","25")
+  | ["dir"] -> DIR
+  | "setdir"::d::[] -> SETDIR d
+  | "results"::f::[] -> RESULTS f
+  | ["results"] -> RESULTS ""
+  | "compare"::a::b::[] -> COMPARE (a,b)
+	| _ -> ERROR
 
 let concat_str_list lst =
   List.fold_left (fun s a -> a ^ "\n" ^ s) "" lst
 
 let concat_int_list lst =
-  List.fold_left (fun a x -> a ^ "," ^ string_of_int x) "" lst
+  let int_list = List.fold_left (fun a x -> string_of_int x ^ "," ^ a) "" lst in
+  if int_list = "" then "" else String.sub int_list 0
+      (String.length int_list - 1)
 
-let rec parse_dir dir dict dir_name =
+let rec parse_dir dir dict dir_name k w =
   try
     let f_name = Unix.readdir dir in
-    if String.get f_name 0 = '.' then parse_dir dir dict dir_name else
+    if String.get f_name 0 = '.' then parse_dir dir dict dir_name k w else
     let new_dict = Comparison.FileDict.insert f_name
         (Winnowing.winnow (Preprocessing.hash_file
-                             (dir_name ^ Filename.dir_sep ^ f_name)) 5) dict in
-    parse_dir dir new_dict dir_name
+                             (dir_name ^ Filename.dir_sep ^ f_name) k) w) dict in
+    parse_dir dir new_dict dir_name k w
   with
   | End_of_file -> dict
 
@@ -67,49 +77,47 @@ let rec repl st =
     | exception End_of_file -> ()
     | "quit" -> print_endline "You have exited the REPL.";
   	| input -> begin
-  	  let (c,x,y) = parse input in
-      match c with
+      match parse input with
       |HELP -> repl {st with display = help}
-      |RUN -> begin
+      |RUN (k,w)-> begin
           try begin
             print_endline "parsing files...";
-            let parsefiles = (parse_dir (Unix.opendir st.directory) Comparison.FileDict.empty st.directory) in
+            let parsefiles = (parse_dir (Unix.opendir st.directory)
+                                Comparison.FileDict.empty st.directory
+                                (int_of_string k) (int_of_string w)) in
             print_endline "comparing files...";
             let comparison = Comparison.compare parsefiles in
             print_endline "generating results...";
             repl {st with display = "Success. The list of plagiarised files are:\n" ^
                             concat_str_list (Comparison.create_sim_list comparison);
                           results = Some comparison}
-        end
-        with
-        | Failure f_msg -> repl {st with display = f_msg}
-        | _ -> repl {st with display = "Error: Something went wrong"}
+          end
+          with
+          | Failure f_msg when f_msg = "int_of_string" ->
+            repl {st with display = "Error: Invalid argument(s)"}
+          | Failure f_msg -> repl {st with display = f_msg}
+          | _ -> repl {st with display = "Error: Something went wrong"}
       end
       |DIR -> repl {st with display = "Current working directory: " ^ st.directory}
-      |SETDIR -> begin
-        (* TODO: check to see if valid directory, print out file names in directory *)
-      	match x with
-         |Some d -> repl {st with directory = d ; display = "Successfully set working directory to: " ^ d
+      |SETDIR d -> begin
+          if d = "" || not (Sys.is_directory d) then repl {st with display = "Error: Invalid directory"}
+              else repl {st with directory = d ; display = "Successfully set working directory to: " ^ d
                                                             ^ "\n Files: " ^ (print_dir_files (Unix.opendir d) "")}
-      	|None -> repl {st with display = "Error: Could not set directory"}
-      end
-      |RESULTS -> begin
+            end
+      (*TODO: Avoid triple nesting here. *)
+      |RESULTS f -> begin
         match st.results with
         |Some r -> begin
-          match x with
-          |Some f -> handle_results st f
-          |None -> repl {st with display =  "Results for files: \n" ^
-              concat_str_list (List.map (fst) (CompDict.to_list r))}
+            if f = "" then repl {st with display =  "Results for files: \n" ^
+                                                    concat_str_list (List.map (fst) (CompDict.to_list r))}
+            else handle_results st f
         end
         |None -> repl {st with display = "Error: no results to display. Run MOSS first"}
       end
-      |COMPARE -> begin
+      (*TODO: Avoid triple nesting here. *)
+      |COMPARE (a,b) -> begin
         match st.results with
-        |Some r -> begin
-            match (x,y) with
-            |Some a,Some b -> handle_compare st a b
-            |_,_ -> repl {st with display = "Error: please specify which two files to compare"}
-        end
+        |Some r -> handle_compare st a b
         |None -> repl {st with display = "Error: no results to display. Run MOSS first"}
   	  end
       |ERROR -> repl {st with display = "Error: invalid command"}
@@ -120,9 +128,10 @@ and handle_compare st a b =
   |None -> failwith "unexpected"
   |Some r -> begin
     match (CompDict.find a r, CompDict.find b r) with
-    |(Some v1, Some v2) -> begin
+      | (Some v1, Some v2) -> begin
+      (*TODO: Avoid triple nesting here. *)
       match (FileDict.find b v1, FileDict.find a v2) with
-      |(Some r1, Some r2) -> begin
+      | (Some r1, Some r2) -> begin
         let l1 = List.map (snd) r1 |> concat_int_list in
         let l2 = List.map (snd) r2 |> concat_int_list in
         let res = concat_str_list [a ; l1 ; b ; l2] in

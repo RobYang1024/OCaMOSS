@@ -20,7 +20,7 @@ module type PREPROCESSING =  sig
   val special_chars : string -> char list
   val remove_noise : string -> string list -> char list -> string
   val k_grams : string -> int -> string list
-  val hash_file : string -> int list
+  val hash_file : string -> int -> int list
 end
 
 module type COMPARISON = sig
@@ -54,9 +54,11 @@ module type WINNOWING = sig
 end
 
 module type MAIN = sig
-  type state = {display : string; directory : string; results : Comparison.CompDict.t option}
-  type cmd = RUN | DIR | HELP | SETDIR | RESULTS | COMPARE | ERROR
-  type input = cmd * string option * string option
+  type state = {display:string; directory:string;
+                results: Comparison.CompDict.t option; params:(int*int)}
+  type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+           | RESULTS of string | COMPARE of (string*string)| ERROR
+  type input = cmd
   val parse: string -> input
   val repl : state -> unit
 end

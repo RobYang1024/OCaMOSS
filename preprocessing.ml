@@ -71,7 +71,7 @@ let determine_keywords_file f =
   if check_suffix f "ml" || check_suffix f "mli" then "ocaml_keywords.json"
   else failwith "This file format is not supported"
 
-let hash_file f =
+let hash_file f k =
   let rec hash_helper f_channel s =
     try
       let line = input_line f_channel in
@@ -83,5 +83,5 @@ let hash_file f =
     let keywords = keywords_list keywords_file in
     let spec_chars = special_chars keywords_file in
     let f_string = hash_helper (open_in f) keywords_file in
-    let n_grams = k_grams (remove_noise f_string keywords spec_chars) 5 in
+    let n_grams = k_grams (remove_noise f_string keywords spec_chars) k in
     List.map (Hashtbl.hash) n_grams
