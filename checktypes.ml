@@ -54,8 +54,9 @@ module type WINNOWING = sig
 end
 
 module type MAIN = sig
-  type state = {display:string; directory:string;
-                results: Comparison.CompDict.t option; params:(int*int)}
+  type color = RED | BLACK | GREEN
+  type state = {display:(color * string) list; directory:string; 
+                results:Comparison.CompDict.t option; params:(int*int)}
   type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
            | RESULTS of string | COMPARE of (string*string)| ERROR
   type input = cmd

@@ -1,8 +1,9 @@
 open Preprocessing
 open Comparison
 
+type color = RED | BLACK | GREEN
 (* type representing the state of the interface *)
-type state = {display:string; directory:string; results:CompDict.t option;
+type state = {display:(color * string) list; directory:string; results:CompDict.t option;
               params:(int*int)}
 
 (* type for commands recognised by MOSS
