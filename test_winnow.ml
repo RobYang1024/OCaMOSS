@@ -1,8 +1,10 @@
 open OUnit2
 open Winnowing
 
-(* helper function for sorting winnowing results (int*int) list representing hash * position tuples
- * sorts from least to greatest, by hash value first, then by position if hashes are equal *)
+(* helper function for sorting winnowing results (int*int) list representing
+ * hash * position tuples sorts from least to greatest, by hash value first,
+ * then by position if hashes are equal
+ *)
 let sort_results r =
 	let cmp x y =
 		let res = Pervasives.compare (fst x) (fst y) in
@@ -18,7 +20,8 @@ let res_to_string r =
   List.rev r |> List.map (fun x -> fst x) |> List.map (string_of_int) |>
   List.fold_left (fun a x -> a ^ x ^ ",") ""
 
-(* Non-trivial test cases generated with a Python implementation of the same algorithm *)
+(* Non-trivial test cases generated with a Python implementation of the same
+ * algorithm *)
 (* 10 hashes, w = 5 *)
 let t1 = [407;345;-163;-695;54;898;-182;759;172;-345]
 let r1 = "407,345,-163,-695,-182,-345,"

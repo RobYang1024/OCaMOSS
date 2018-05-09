@@ -1,6 +1,7 @@
 open Winnowing
 (* [keywords_list keyword_file] is a list of keywords pertaining to a
- * particular language, which are stored in a plaintext file with the name [keyword_file].
+ * particular language, which are stored in a plaintext file with the name
+ * [keyword_file].
  * If a file with that name does not exist, then this function returns []
  *)
 val keywords_list : string -> string list

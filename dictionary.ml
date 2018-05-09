@@ -99,7 +99,7 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
                     | TwoNode((key, value), a, b) ->  (TwoNode((k1,v1),
                       TwoNode((key,value),a,b), TwoNode((k2,v2),m,r)), true)
                     | _ -> failwith "incorrect kickup")
-                else (ThreeNode ((k1,v1),(k2,v2),(fst leftinserted),m,r), false))
+                else (ThreeNode ((k1,v1),(k2,v2),(fst leftinserted),m,r),false))
           else if Key.compare k k2 > 0
           then (let rightinserted = insert_helper k v r in
                 if snd rightinserted = true then (match fst rightinserted with

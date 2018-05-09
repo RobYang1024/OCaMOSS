@@ -42,7 +42,7 @@ module Window : BoundedQueueWithCounter = struct
 
 	let rec enqueue item q =
 		if is_full q then dequeue q |> snd |> enqueue item
-		else {q with data = q.data @ [item] ; size = q.size + 1 ; count = q.count + 1}
+		else {q with data = q.data@[item] ;size = q.size + 1 ;count = q.count + 1}
 
 	let count q = q.count
 
@@ -53,8 +53,8 @@ end
 (* h = hashes list, w = window size *)
 let winnow h w =
 	(* calculates the global position of the i-th hash in the window
-	   example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th hash
-	   that was processed by the winnowing algorithm. *)
+    example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th
+    hash that was processed by the winnowing algorithm. *)
 	let global_pos i w =
 		let c = Window.count w in
 		let s = Window.size w in
@@ -83,13 +83,15 @@ let winnow h w =
 			let nexthash = List.nth hashes n in
 			let new_window = Window.enqueue nexthash window in
 			if nexthash <= v then
-				let new_acc = (nexthash, global_pos (Window.size new_window - 1) new_window)::acc in
-				winnowhelper hashes new_window new_acc (n+1) (nexthash, Window.size new_window - 1)
+     let new_acc = (nexthash, global_pos (Window.size new_window - 1)
+                      new_window)::acc in
+     winnowhelper hashes new_window new_acc (n+1) (nexthash,
+                                                   Window.size new_window - 1)
 			else begin
 				let p = p - 1 in
 				if p < 0 then
-					let new_min = Window.fold mincheck ((max_int,0),0) new_window |> fst in
-					let new_acc = (fst new_min, global_pos (snd new_min) new_window)::acc in
+      let new_min = fst (Window.fold mincheck ((max_int,0),0) new_window) in
+      let new_acc = (fst new_min, global_pos (snd new_min) new_window)::acc in
 					winnowhelper hashes new_window new_acc (n+1) new_min
 				else
 					winnowhelper hashes new_window acc (n+1) (v,p)
