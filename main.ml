@@ -39,7 +39,7 @@ let newstate = {display = [(GREEN,
 ");
 (WHITE,"Welcome to oCaMOSS!! The following are the instructions for how to run
 this program. Type 'help' to see the list of commands again.\n");(CYAN,help)];
-                directory = "./" ; results = None; params = (5,25)}
+                directory = "./" ; results = None; params = (10,25)}
 
 let parse str =
   let input_split = String.split_on_char ' ' (String.trim str) in
@@ -166,8 +166,22 @@ and handle_compare st a b =
         match (FileDict.find b v1, FileDict.find a v2) with
           | (Some r1, Some r2) -> begin
             let l1 = List.map (snd) r1 |> List.rev in
-            let res = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l1 in
-            repl {st with display = List.map (fun x -> (BLACK,x)) res}
+            let l2 = List.map (snd) r2 |> List.rev in
+            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l1 in
+            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) b l2 in
+            (* TODO: make both lists same length, sort by increasing order of hash instead of by position
+             * just rehash fist k characters *)
+            let newdispl = List.fold_left2 (fun acc r1 r2 -> 
+              if String.length (snd r1) >= 40 then
+                [(BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2));
+                (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (snd r2 ^ "\n"))]
+                @ acc
+              else
+                [(BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2));
+                (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))]
+                @ acc
+            ) [] res1 res2 in
+            repl {st with display = newdispl}
             end
           |_,_ -> failwith "unexpected"
     end

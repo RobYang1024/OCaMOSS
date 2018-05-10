@@ -22,4 +22,4 @@ val k_grams : string -> int -> string list
 
 val hash_file : string -> int -> int list
 
-val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> string list
+val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> (string*string) list

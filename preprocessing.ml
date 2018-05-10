@@ -120,11 +120,10 @@ let rec get_file_positions dir dir_name k filename positions =
       let matches = (fst merge_matches)::(snd merge_matches) in
       List.map (fun x -> 
         try
-          "Position: " ^ string_of_int (fst x) ^ "\n" ^
-          "Text: " ^ (String.sub file ((fst x) - 1) (snd x))
+          (string_of_int (fst x), (String.sub file ((fst x) - 1) (snd x)))
         with
-        | _ -> ""
-      ) matches |> List.rev 
+        | _ -> ("","")
+      ) matches
     end
   with
   | _ -> []
