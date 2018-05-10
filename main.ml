@@ -13,15 +13,16 @@ type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
 
 let help =
-"run [words per hash] [window size] --- runs oCaMoss on the working directory.
-params are optional, defaults to 5 words per hash, 25 per window
-dir --- lists the working directory and the files that it contains
-setdir [dir] --- sets the relative directory to look for files
-results --- lists the file names for which there are results
-results [filename] --- lists the detailed results of overlap for that file
-(Make sure to include the extension of the file)
+"Commands: \n
+run [words per hash] [window size] --- runs oCaMoss on the working directory.
+params are optional, defaults to 5 words per hash, 25 per window \n
+dir --- lists the working directory and the files that it contains \n
+setdir [dir] --- sets the relative directory to look for files \n
+results --- lists the file names for which there are results \n
+results [filename] --- lists the detailed results of overlap for that file 
+(Make sure to include the extension of the file) \n
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
-(Make sure to include the extension of the files)
+(Make sure to include the extension of the files) \n
 quit --- exits the REPL
 "
 
@@ -102,7 +103,7 @@ let rec repl st =
 
 and handle_input st input =
   match parse input with
-  |HELP -> repl {st with display = [(BLACK,help)]}
+  |HELP -> repl {st with display = [(CYAN,help)]}
   |RUN (k,w)-> begin
       try begin
         if st.directory = "./"
@@ -162,14 +163,13 @@ and handle_compare st a b =
     match (CompDict.find a r, CompDict.find b r) with
       | (Some v1, Some v2) -> begin
       (*TODO: Avoid triple nesting here. *)
-          match (FileDict.find b v1, FileDict.find a v2) with
+        match (FileDict.find b v1, FileDict.find a v2) with
           | (Some r1, Some r2) -> begin
-        let l1 = List.map (snd) r1 |> concat_int_list in
-        let l2 = List.map (snd) r2 |> concat_int_list in
-        let res = concat_str_list [a ; l1 ; b ; l2] in
-        repl {st with display = [(BLACK, "Fingerprint matches: \n" ^ res)]}
-      end
-      |_,_ -> failwith "unexpected"
+            let l1 = List.map (snd) r1 |> List.rev in
+            let res = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l1 in
+            repl {st with display = List.map (fun x -> (BLACK,x)) res}
+            end
+          |_,_ -> failwith "unexpected"
     end
       |_,_ -> repl {st with display = [(RED,
       "Error: no results to display for files " ^ a ^","^ b)]}

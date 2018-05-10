@@ -87,6 +87,15 @@ let hash_file f k =
     List.map (Hashtbl.hash) n_grams
 
 let rec get_file_positions dir dir_name k filename positions =
+  let pos_helper a x = 
+    let acc = snd a in
+    let p = fst (fst a) in
+    let l = snd (fst a) in
+    let current = p + l in
+    if current >= x then ((p, x+k-p),acc)
+    else ((x,k),(p,l)::acc) 
+  in
+
   let rec hash_helper f_channel s =
       try
         let line = input_line f_channel in
@@ -94,16 +103,30 @@ let rec get_file_positions dir dir_name k filename positions =
       with
       | End_of_file -> s 
   in
+
   try
     let f_name = Unix.readdir dir in
     if f_name <> filename then get_file_positions dir dir_name k filename positions 
     else begin
-      let keywords_file = determine_keywords_file filename in
+      let f = dir_name ^ Filename.dir_sep ^ f_name in
+      let keywords_file = determine_keywords_file f in
       let keywords = keywords_list keywords_file in
       let spec_chars = special_chars keywords_file in
-      let f_string = hash_helper (open_in filename) keywords_file in
-      let n_grams = k_grams (remove_noise f_string keywords spec_chars) k in
-      List.fold_left (fun a x -> (List.nth n_grams x)::a) [] (List.rev positions)
+      let channel = open_in f in
+      let f_string = hash_helper channel keywords_file in
+      let file = remove_noise f_string keywords spec_chars in
+      let init_acc = ((List.hd positions,k),[]) in
+      let merge_matches = List.fold_left pos_helper init_acc positions in
+      let matches = (fst merge_matches)::(snd merge_matches) in
+      List.map (fun x -> 
+        try
+          "Position: " ^ string_of_int (fst x) ^ "\n" ^
+          "Text: " ^ (String.sub file ((fst x) - 1) (snd x))
+        with
+        | _ -> ""
+      ) matches |> List.rev 
     end
   with
-  | End_of_file -> []
+  | _ -> []
+
+
