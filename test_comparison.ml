@@ -37,14 +37,21 @@ let tests = [
   (fun _ -> assert_equal [] (intersection [(1,0)] [(2,0)]));
   "single lists eq" >::
   (fun _ -> assert_equal [(1,0)] (intersection [(1,0)] [(1,0)]));
-  "diff order" >::
-  (fun _ -> assert_equal [(1,0);(2,0)]
-      ((intersection [(1,0);(2,0)] [(2,0);(1,0)])
-       |> List.sort Pervasives.compare));
+  "diff order" >:: (fun _ -> assert_equal [(1,0);(2,0)]
+                       ((intersection [(1,0);(2,0)] [(2,0);(1,0)])));
+  "second order" >:: (fun _ -> assert_equal [(2,0);(1,0)]
+                       ((intersection [(2,0);(1,0)] [(1,0);(2,0)] )));
+  "diff pos" >:: (fun _ -> assert_equal [(1,3);(2,1)]
+                     ((intersection [(1,3);(2,1)] [(2,2);(1,5)])));
+  "diff number of elems" >:: (fun _ -> assert_equal [(1,0);(2,1)]
+                                 ((intersection [(1,0);(7,3);(2,1);(4,3)]
+                                     [(2,2);(1,5)])));
+  "one list empty" >:: (fun _ -> assert_equal []
+                           ((intersection [(12,7);(9,13)] [])));
+
   "simp case" >::
   (fun _ -> assert_equal [(1,0);(2,0)]
-      ((intersection [(3,0);(1,0);(2,0)] [(2,0);(1,0)])
-       |> List.sort Pervasives.compare));
+      ((intersection [(3,0);(1,0);(2,0)] [(2,0);(1,0)])));
   "long case" >:: (fun _ -> assert_equal [(41,0);(20,0);(7,0);(53,0)]
                       (intersection [(82,0);(23,0);(46,0);(93,0);(41,0);(20,0);
                                      (47,0);(7,0);(84,0);(53,0)]

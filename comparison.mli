@@ -27,16 +27,14 @@ module CompDict: Dictionary with type Key.t = string
                               and type Value.t = FileDict.t
 
 (* [intersection v1 v2] returns a list of elements present in both v1 and
- * v2. The elements are in the order that they appear in v1.
+ * v2. The elements are in the order that they appear in v1, and the positions
+ * are as they are in the corresponding values in v1.
  *)
-val intersection : (int*int) list -> (int*int) list -> (int*int) list
+val intersection : HashValue.t -> HashValue.t -> HashValue.t
 
 (* [make_pair_comp k0 file_list comp_dict] returns a file dictionary where the
  * keys are the keys from file_list, and each value is the intersection of
  * the values in file_list of the key mapped to that value, and the key k0.
- * If any of the keys from file_dict are present in comp_dict, however, the
- * value mapped to that key is the value mapped to k0 in the value mapped to
- * that key in comp_dict.
  *)
 val make_pair_comp : string -> (StringKey.t * HashValue.t) list ->
   CompDict.t -> FileDict.t

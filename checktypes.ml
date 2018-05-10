@@ -30,7 +30,7 @@ module type COMPARISON = sig
   module FileDict : Dictionary.Dictionary
   module DictValue : Dictionary.Formattable
   module CompDict: Dictionary.Dictionary
-  val intersection : (int*int) list -> (int*int) list -> (int*int) list
+  val intersection : HashValue.t -> HashValue.t -> HashValue.t
   val make_pair_comp : string ->
     (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
   val compare : FileDict.t -> CompDict.t
