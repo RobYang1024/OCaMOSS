@@ -1,4 +1,5 @@
 open Winnowing
+open Unix
 (* [keywords_list keyword_file] is a list of keywords pertaining to a
  * particular language, which are stored in a plaintext file with the name
  * [keyword_file].
@@ -20,3 +21,5 @@ val remove_noise : string -> string list -> char list -> string
 val k_grams : string -> int -> string list
 
 val hash_file : string -> int -> int list
+
+val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> string list

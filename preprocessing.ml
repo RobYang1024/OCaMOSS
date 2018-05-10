@@ -85,3 +85,25 @@ let hash_file f k =
     let f_string = hash_helper (open_in f) keywords_file in
     let n_grams = k_grams (remove_noise f_string keywords spec_chars) k in
     List.map (Hashtbl.hash) n_grams
+
+let rec get_file_positions dir dir_name k filename positions =
+  let rec hash_helper f_channel s =
+      try
+        let line = input_line f_channel in
+        hash_helper f_channel (s^line)
+      with
+      | End_of_file -> s 
+  in
+  try
+    let f_name = Unix.readdir dir in
+    if f_name <> filename then get_file_positions dir dir_name k filename positions 
+    else begin
+      let keywords_file = determine_keywords_file filename in
+      let keywords = keywords_list keywords_file in
+      let spec_chars = special_chars keywords_file in
+      let f_string = hash_helper (open_in filename) keywords_file in
+      let n_grams = k_grams (remove_noise f_string keywords spec_chars) k in
+      List.fold_left (fun a x -> (List.nth n_grams x)::a) [] (List.rev positions)
+    end
+  with
+  | End_of_file -> []

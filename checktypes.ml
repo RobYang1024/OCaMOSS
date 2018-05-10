@@ -21,6 +21,7 @@ module type PREPROCESSING =  sig
   val remove_noise : string -> string list -> char list -> string
   val k_grams : string -> int -> string list
   val hash_file : string -> int -> int list
+  val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> string list
 end
 
 module type COMPARISON = sig
@@ -59,8 +60,7 @@ module type MAIN = sig
                 results:Comparison.CompDict.t option; params:(int*int)}
   type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
            | RESULTS of string | COMPARE of (string*string)| ERROR
-  type input = cmd
-  val parse: string -> input
+  val parse: string -> cmd
   val repl : state -> unit
 end
 

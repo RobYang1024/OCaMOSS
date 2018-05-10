@@ -98,75 +98,62 @@ let rec repl st =
   match String.lowercase_ascii (read_line ()) with
     | exception End_of_file -> ()
     | "quit" -> print_endline "You have exited the REPL.";
-  	| input -> begin
-      match parse input with
-      |HELP -> repl {st with display = [(CYAN,help)]}
-      (* TODO check k and w are valid - k should be 5-50, w should be 10-100 *)
-      |RUN (k,w)-> begin
-          try begin
-            if st.directory = "./"
-            then
-              repl {st with display =
-                              [(RED,"Error: Directory has not been set")]}
-            else
-            let k' = int_of_string k in
-            let w' = int_of_string w in
-            if (k' >= 5 && k' <=50 && w' >=10 && w' <=100) then begin
-              print_endline "parsing files...";
-              let parsefiles = (parse_dir (Unix.opendir st.directory)
-                                  Comparison.FileDict.empty st.directory
-                                  k' w') in
-              print_endline "comparing files...";
-              let comparison = Comparison.compare parsefiles in
-              print_endline "generating results...";
-              repl {st with display = [(GREEN,"Success.
-              The list of plagiarised files are:");
-              (BLACK, concat_str_list (Comparison.create_sim_list comparison))];
-                            results = Some comparison;
-                            params = (k', w')}
-            end
-            else repl {st with display = [(RED,"Error: k must be in range
-            [5,50] and w must be in range [10,100]")]}
-          end
-          with
-          | Failure f_msg when f_msg = "int_of_string" ->
-            repl {st with display = [(RED,"Error: Invalid argument(s)")]}
-          | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
-          | _ -> repl {st with display = [(RED,"Error: Something went wrong")]}
-      end
-      |DIR -> if st.directory = "./"
-        then repl {st with display =
-                             [(RED,"Error: Directory has not been set")]}
-        else repl {st with display = [(BLACK, "Current working directory: " ^
-                                              st.directory ^ "\n Files: " ^
-                            (print_dir_files (Unix.opendir st.directory) ""))]}
-      |SETDIR d -> begin
-          try
-            if d = "" || not (Sys.is_directory d)
-            then repl {st with display = [(RED,"Error: Invalid directory")]}
-            else repl {st with directory = d ; display = [(GREEN,
-            "Successfully set working directory to: " ^ d);
-            (BLACK,"Files: \n" ^ (print_dir_files (Unix.opendir d) ""))]}
-          with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
-      end
-      (*TODO: Avoid triple nesting here. *)
-      |RESULTS f -> begin
-        match st.results with
-        |Some r -> begin
-            if f = "" then repl {st with display = [(BLACK, "Results for files:
-            \n" ^ concat_str_list (List.map (fst) (CompDict.to_list r)))]}
-            else handle_results st f
-        end
-        |None -> repl {st with display = [(RED,
-        "Error: no results to display. Run oCaMoss first")]}
-      end
+  	| input -> handle_input st input
 
-      |COMPARE (a,b) -> if st.results = None then
-          repl {st with display =
-                    [(RED,"Error: no results to display. Run oCaMoss first")]}
-        else handle_compare st a b
-      |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
-  	end
+and handle_input st input =
+  match parse input with
+  |HELP -> repl {st with display = [(BLACK,help)]}
+  |RUN (k,w)-> begin
+      try begin
+        if st.directory = "./"
+        then repl {st with display =
+            [(RED,"Error: Directory has not been set")]}
+        else
+        let k' = int_of_string k in
+        let w' = int_of_string w in
+        if (k' >= 5 && k' <=50 && w' >=10 && w' <=100) then handle_run st k' w'
+        else repl {st with display = 
+        [(RED,"Error: k must be in range [5,50] and w must be in range [10,100]")]}
+      end 
+      with
+      | Failure f_msg when f_msg = "int_of_string" ->
+        repl {st with display = [(RED,"Error: Invalid argument(s)")]}
+      | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
+      | _ -> repl {st with display = [(RED,"Error: Something went wrong")]}
+  end
+  |DIR -> if st.directory = "./"
+    then repl {st with display =
+                         [(RED,"Error: Directory has not been set")]}
+    else repl {st with display = [(BLACK, "Current working directory: " ^
+                                          st.directory ^ "\n Files: " ^
+                        (print_dir_files (Unix.opendir st.directory) ""))]}
+  |SETDIR d -> begin
+      try
+        if d = "" || not (Sys.is_directory d)
+        then repl {st with display = [(RED,"Error: Invalid directory")]}
+        else repl {st with directory = d ; display = [(GREEN,
+        "Successfully set working directory to: " ^ d);
+        (BLACK,"Files: \n" ^ (print_dir_files (Unix.opendir d) ""))]}
+      with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
+  end
+  |RESULTS f -> begin
+    match st.results with
+    |Some r -> begin
+        if f = "" then repl {st with display = 
+          [(BLACK, "Results for files: \n" ^ 
+          concat_str_list (List.map (fst) (CompDict.to_list r)))]}
+        else handle_results st f
+    end
+    |None -> repl {st with display = 
+    [(RED,"Error: no results to display. Run oCaMoss first")]}
+  end
+  |COMPARE (a,b) -> begin
+    match st.results with
+    |Some r -> handle_compare st a b
+    |None -> repl {st with display = 
+    [(RED,"Error: no results to display. Run oCaMoss first")]}
+  end
+  |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
 
 and handle_compare st a b =
   match st.results with
@@ -188,6 +175,7 @@ and handle_compare st a b =
       "Error: no results to display for files " ^ a ^","^ b)]}
   end
 
+
 and handle_results st f =
   match st.results with
   |None -> failwith "unexpected"
@@ -198,12 +186,27 @@ and handle_results st f =
       let d = List.map (fun x ->
         fst x ^ "\n" ^ concat_int_list (List.map (fun y -> snd y) (snd x)))
       v_list in
-      repl {st with display = [(BLACK, "Results for file " ^ f ^": \n" ^
-                                       concat_str_list d)]}
+      repl {st with display = [(BLACK, "Results for file " ^ f ^
+        ": \n" ^ concat_str_list d)]}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
   end
+
+
+and handle_run st k w = 
+  print_endline "parsing files...";
+  let parsefiles = (parse_dir (Unix.opendir st.directory)
+                      Comparison.FileDict.empty st.directory
+                      k w) in
+  print_endline "comparing files...";
+  let comparison = Comparison.compare parsefiles in
+  print_endline "generating results...";
+  repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
+                  (BLACK, concat_str_list (Comparison.create_sim_list comparison))];
+                results = Some comparison;
+                params = (k, w)}
+
 
 let main () = repl newstate
 
