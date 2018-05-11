@@ -34,7 +34,7 @@ module type COMPARISON = sig
   val make_pair_comp : string ->
     (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
   val compare : FileDict.t -> CompDict.t
-  val create_sim_list : CompDict.t -> StringKey.t list
+  val create_sim_list : CompDict.t -> (StringKey.t * float) list
 end
 
 module type WINNOWING = sig
@@ -83,6 +83,7 @@ module type DICTIONARY = sig
     type value = Value.t
     type t
     val empty : t
+    val size : t -> int
     val member : key -> t -> bool
     val find : key -> t -> value option
     val insert : key -> value -> t -> t

@@ -31,6 +31,8 @@ let emp_e_comp = CompDict.(empty |> insert "a" emp_e_f_p_comp
                            |> insert "b" emp_e_s_p_comp
                            |> insert "c" emp_e_t_p_comp)
 
+let get_files = List.map (fun (k,s) -> k)
+
 let tests = [
 
   (* The test cases for intersection has cases that test what happens with
@@ -62,7 +64,7 @@ let tests = [
                                      (47,0);(7,0);(84,0);(53,0)]
                     [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
 
-  
+
   "empty file" >:: (fun _ -> assert_equal emp_file
                        (make_pair_comp "" [] emp_comp));
   "single entry" >:: (fun _ -> assert_equal se_dict
@@ -91,8 +93,8 @@ let tests = [
   "single entry sim" >:: (fun _ -> assert_equal []
                               (create_sim_list se_comp));
   "double entry sim" >:: (fun _ -> assert_equal ["a";"b"]
-                              (create_sim_list de_comp));
+                             (create_sim_list de_comp |> get_files));
   "empty entry sim" >:: (fun _ -> assert_equal ["b"]
-                              (create_sim_list emp_e_comp));
+                            (create_sim_list emp_e_comp |> get_files));
 
 ]

@@ -24,7 +24,7 @@ results [filename] --- lists the detailed results of overlap for that file
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
 (Make sure to include the extension of the files)
 quit --- exits the REPL
-"
+help --- display instructions again"
 
 let newstate = {display = [(GREEN,
 "
@@ -37,8 +37,7 @@ let newstate = {display = [(GREEN,
      |  |_|  | |       | |   _   | | ||_|| | |       |  _____| |  _____| |
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
-(WHITE,"Welcome to oCaMOSS!! The following are the instructions for how to run
-this program. Type 'help' to see the list of commands again.\n");(CYAN,help)];
+(WHITE,"Welcome to oCaMOSS!!\n");(CYAN,help)];
                 directory = "./" ; results = None; params = (35,40)}
 
 let parse str =
@@ -46,7 +45,7 @@ let parse str =
 	match input_split with
   | ["help"] -> HELP
   | "run"::k::w::[] -> RUN (k,w)
-  | ["run"] -> RUN ("15","40")
+  | ["run"] -> RUN ("35","40")
   | ["dir"] -> DIR
   | "setdir"::d::[] -> SETDIR d
   | "results"::f::[] -> RESULTS f
@@ -64,6 +63,11 @@ let concat_int_list lst =
   let int_list = List.fold_left (fun a x -> string_of_int x ^ "," ^ a) "" lst in
   if int_list = "" then "" else String.sub int_list 0
       (String.length int_list - 1)
+
+let concat_result_list lst =
+  List.fold_left (fun a (f,ss) -> a ^ "\n" ^ "Filename: " ^ f ^
+                                  "\tSimilarity score: " ^
+                                  (string_of_float ss)) "" lst
 
 let rec parse_dir dir dict dir_name k w =
   try
@@ -117,7 +121,7 @@ and handle_input st input =
         else repl {st with display =
                              [(RED,
         "Error: words per hash must be in range [15,50] and window size must be
-in range [20,100], with words per hash being less than window size.")]}
+        in range [20,100], with words per hash being less than window size.")]}
       end
       with
       | Failure f_msg when f_msg = "int_of_string" ->
@@ -139,7 +143,7 @@ in range [20,100], with words per hash being less than window size.")]}
         else let dir_files = print_dir_files (Unix.opendir d) "" in
           if dir_files = ""
           then repl {st with display = [(RED,"Error: Directory has no files")]}
-          else repl {st with directory = d ; display = [(GREEN,
+          else repl {newstate with directory = d ; display = [(GREEN,
           "Successfully set working directory to: " ^ d);
                                             (BLACK,"Files: \n" ^ dir_files)]}
 
@@ -181,8 +185,6 @@ and handle_compare st a b =
             let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l2 in
             let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) b l1 in
             print_endline "generating display...";
-            print_endline (string_of_int (List.length res1));
-            print_endline (string_of_int (List.length res2));
             let padded1 = pad res1 (List.length res2) in
             let padded2 = pad res2 (List.length res1) in
             let newdispl = List.fold_left2 (fun acc r1 r2 ->
@@ -226,8 +228,10 @@ and handle_run st k w =
   print_endline "comparing files...";
   let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
-  repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
-                  (BLACK, concat_str_list (Comparison.create_sim_list comparison))];
+  let files = concat_result_list (Comparison.create_sim_list comparison) in
+  if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")]}
+  else repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
+                  (BLACK, files)];
                 results = Some comparison;
                 params = (k, w)}
 

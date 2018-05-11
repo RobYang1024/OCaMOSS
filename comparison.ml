@@ -45,12 +45,17 @@ let create_sim_list comp_dict =
     List.fold_left (fun x (k,d) -> match FileDict.find k d with
         | None -> failwith "Unimplemented"
         | Some v -> let file_length = float_of_int (List.length v) in
-          let is_likely =
-            List.fold_left (fun a (k1,v1) -> if StringKey.compare k k1 = 0
-            then a else (if file_length = 0.0 then false
-            else if ((float_of_int (List.length v1))/.file_length) >= 0.5
-            then true else a)) false
+          let file_ss =
+            List.fold_left (fun (score,n) (k1,v1) -> if StringKey.compare k k1 = 0
+                             then (score,n) else (if file_length = 0.0 then (score,n)
+            else let s = ((float_of_int (List.length v1))/.file_length) in
+              if s >= 0.5
+              then (score+.s,n+.1.0) else (score,n))) (0.0,0.0)
               (FileDict.to_list d) in
-          if is_likely
-          then k::x else x) [] (CompDict.to_list comp_dict) in
-  List.sort (Pervasives.compare) (create_sim_list_helper comp_dict)
+          let sim_score = if (snd file_ss) = 0.0 then 0.0 else
+              (fst file_ss)/.(snd file_ss) in
+          if sim_score >= 0.5
+          then (k,sim_score)::x else x) [] (CompDict.to_list comp_dict) in
+  List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0 then
+                Pervasives.compare k1 k2 else Pervasives.compare s1 s2)
+    (create_sim_list_helper comp_dict)

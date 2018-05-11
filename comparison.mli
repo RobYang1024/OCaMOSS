@@ -53,4 +53,4 @@ val compare : FileDict.t -> CompDict.t
  * a file is the sum of the similarities of that file with every other file.
  * The files are ordered from least to greatest.
  *)
-val create_sim_list : CompDict.t -> StringKey.t list
+val create_sim_list : CompDict.t -> (StringKey.t * float) list

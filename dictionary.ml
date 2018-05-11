@@ -21,6 +21,7 @@ module type Dictionary = sig
   type value =  Value.t
   type t
   val empty : t
+  val size : t -> int
   val member : key -> t -> bool
   val find : key -> t -> value option
   val insert : key -> value -> t -> t
@@ -44,6 +45,12 @@ module TreeDictionary (K : Comparable) (V : Formattable) = struct
   type t = (key, value) two_three
 
   let empty = Leaf
+
+  let rec size d =
+    match d with
+    | Leaf -> 0
+    | TwoNode ((k1,v1),l,r) -> 1 + (size l) + (size r)
+    | ThreeNode ((k1,v1),(k2,v2),l,m,r) -> 2 + (size l) + (size m) + (size r)
 
   let rec member k d = match d with
     | Leaf -> false

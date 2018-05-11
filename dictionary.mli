@@ -43,6 +43,9 @@ module type Dictionary = sig
   (* [empty] represents an empty dictionary. *)
   val empty : t
 
+  (* [size d] represents the size of the dictionary d. *)
+  val size : t -> int
+
   (* [member k dict] returns true if k is a binding in the dictionary d
    * and false if not.
   *)
