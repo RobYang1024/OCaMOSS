@@ -56,6 +56,6 @@ let create_sim_list comp_dict =
               (fst file_ss)/.(snd file_ss) in
           if sim_score >= 0.5
           then (k,sim_score)::x else x) [] (CompDict.to_list comp_dict) in
-  List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0 then
+  (List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0 then
                 Pervasives.compare k1 k2 else Pervasives.compare s1 s2)
-    (create_sim_list_helper comp_dict)
+     (create_sim_list_helper comp_dict)) |> List.rev

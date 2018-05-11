@@ -56,8 +56,9 @@ end
 
 module type MAIN = sig
   type color = RED | BLACK | GREEN | CYAN | WHITE
-  type state = {display:(color * string) list; directory:string;
-                results:Comparison.CompDict.t option; params:(int*int)}
+  type state = {display: (color * string) list; directory: string; results:
+                  Comparison.CompDict.t option; result_files: string;
+                params: (int*int)}
   type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
            | RESULTS of string | COMPARE of (string*string)| ERROR
   val parse: string -> cmd

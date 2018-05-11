@@ -6,8 +6,8 @@ open ANSITerminal
 
 type color = RED | BLACK | GREEN | CYAN | WHITE
 
-type state = {display: (color * string) list; directory:string;
-              results:CompDict.t option; params:(int*int)}
+type state = {display: (color * string) list; directory: string; results:
+                CompDict.t option; result_files: string; params: (int*int)}
 
 type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
@@ -38,7 +38,8 @@ let newstate = {display = [(GREEN,
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
 (WHITE,"Welcome to oCaMOSS!!\n");(CYAN,help)];
-                directory = "./" ; results = None; params = (35,40)}
+                directory = "./" ; results = None; result_files = "";
+                params = (35,40)}
 
 let parse str =
   let input_split = String.split_on_char ' ' (String.trim str) in
@@ -153,8 +154,7 @@ and handle_input st input =
     match st.results with
     |Some r -> begin
         if f = "" then repl {st with display =
-          [(BLACK, "Results for files: \n" ^
-          concat_str_list (List.map (fst) (CompDict.to_list r)))]}
+          [(BLACK, "Results for files: \n" ^ st.result_files)]}
         else handle_results st f
     end
     |None -> repl {st with display =
@@ -232,7 +232,8 @@ and handle_run st k w =
   if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")]}
   else repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
                   (BLACK, files)];
-                results = Some comparison;
+                     results = Some comparison;
+                     result_files = files;
                 params = (k, w)}
 
 

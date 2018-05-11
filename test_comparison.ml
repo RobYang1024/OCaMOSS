@@ -92,7 +92,7 @@ let tests = [
                       (create_sim_list emp_comp));
   "single entry sim" >:: (fun _ -> assert_equal []
                               (create_sim_list se_comp));
-  "double entry sim" >:: (fun _ -> assert_equal ["a";"b"]
+  "double entry sim" >:: (fun _ -> assert_equal ["b";"a"]
                              (create_sim_list de_comp |> get_files));
   "empty entry sim" >:: (fun _ -> assert_equal ["b"]
                             (create_sim_list emp_e_comp |> get_files));
