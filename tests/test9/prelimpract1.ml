@@ -1,4 +1,6 @@
-(*unit -> 'a
+(* comments are exactly same as prelimpract. functions are completely different
+
+unit -> 'a
   True -> P
 
   ('a, ('b,'c))
@@ -147,17 +149,20 @@
 
 *)
 
-type ('a,'b) or' = Left of 'a | Right of 'b
+type student = {
+  name: string;
+  mutable gpa: float;
+}
 
-let p_and_q_comm (p,q) = (q,p)
+let student1 = {
+  name = "Alice";
+  gpa = 3.7;
+}
 
-let p_or_q_comm p_or_q = match p_or_q with
-  | Left a -> Right a
-  | Right b -> Left b
+type vector = float array
 
-type void = {nope : 'a .'a}
-type 'a neg = 'a -> void
-let explode (f:void) : 'b = f.nope
+let norm vec= sqrt (Array.fold_left (+.) 0. (Array.map (fun x -> x *. x) vec))
 
-let ex (p, (q:'a neg)) = explode (q p)
-let f x  = fst x
+let normalize vec =
+  for x = 0 to Array.length vec -1
+  do vec.(x) <- vec.(x) * 2 done
