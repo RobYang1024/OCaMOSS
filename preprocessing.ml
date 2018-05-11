@@ -51,11 +51,13 @@ let replace_generics keywords spec_chars str_arr =
          with Failure _ -> "v" )
     str_arr
 
-let remove_noise code_string keywords spec_chars =
-  code_string |>
-  rem_white_space |>
-  List.map (split_and_keep_on_spec_chars spec_chars) |> List.flatten |>
-  replace_generics keywords spec_chars |> String.concat ""
+let remove_noise code_string keywords spec_chars is_txt =
+  if is_txt then code_string
+  else
+    code_string |>
+    rem_white_space |>
+    List.map (split_and_keep_on_spec_chars spec_chars) |> List.flatten |>
+    replace_generics keywords spec_chars |> String.concat ""
 
 let k_grams s n =
   let rec k_grams_helper acc s n =
@@ -68,7 +70,8 @@ let k_grams s n =
   k_grams_helper [] s n
 
 let determine_keywords_file f =
-  if check_suffix f "ml" || check_suffix f "mli" then "ocaml_keywords.json"
+  if check_suffix f "txt" then "txt_keywords.json"
+  else if check_suffix f "ml" || check_suffix f "mli" then "ocaml_keywords.json"
   else failwith "This file format is not supported"
 
 let hash_file f k =
@@ -83,17 +86,18 @@ let hash_file f k =
     let keywords = keywords_list keywords_file in
     let spec_chars = special_chars keywords_file in
     let f_string = hash_helper (open_in f) keywords_file in
-    let n_grams = k_grams (remove_noise f_string keywords spec_chars) k in
+    let is_txt = check_suffix f "txt" in
+    let n_grams = k_grams (remove_noise f_string keywords spec_chars is_txt) k in
     List.map (Hashtbl.hash) n_grams
 
 let rec get_file_positions dir dir_name k filename positions =
-  let pos_helper a x = 
+  let pos_helper a x =
     let acc = snd a in
     let p = fst (fst a) in
     let l = snd (fst a) in
     let current = p + l in
     if current >= x then ((p, x+k-p),acc)
-    else ((x,k),(p,l)::acc) 
+    else ((x,k),(p,l)::acc)
   in
 
   let rec hash_helper f_channel s =
@@ -101,12 +105,12 @@ let rec get_file_positions dir dir_name k filename positions =
         let line = input_line f_channel in
         hash_helper f_channel (s^line)
       with
-      | End_of_file -> s 
+      | End_of_file -> s
   in
 
   try
     let f_name = Unix.readdir dir in
-    if f_name <> filename then get_file_positions dir dir_name k filename positions 
+    if f_name <> filename then get_file_positions dir dir_name k filename positions
     else begin
       let f = dir_name ^ Filename.dir_sep ^ f_name in
       let keywords_file = determine_keywords_file f in
@@ -114,11 +118,12 @@ let rec get_file_positions dir dir_name k filename positions =
       let spec_chars = special_chars keywords_file in
       let channel = open_in f in
       let f_string = hash_helper channel keywords_file in
-      let file = remove_noise f_string keywords spec_chars in
+      let is_txt = check_suffix f "txt" in
+      let file = remove_noise f_string keywords spec_chars is_txt in
       let init_acc = ((List.hd positions,k),[]) in
       let merge_matches = List.fold_left pos_helper init_acc positions in
       let matches = (fst merge_matches)::(snd merge_matches) in
-      List.map (fun x -> 
+      List.map (fun x ->
         try
           (string_of_int (fst x), (String.sub file ((fst x) - 1) (snd x)))
         with
@@ -127,5 +132,3 @@ let rec get_file_positions dir dir_name k filename positions =
     end
   with
   | _ -> []
-
-
