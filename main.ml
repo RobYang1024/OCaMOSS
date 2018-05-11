@@ -39,14 +39,14 @@ let newstate = {display = [(GREEN,
 ");
 (WHITE,"Welcome to oCaMOSS!! The following are the instructions for how to run
 this program. Type 'help' to see the list of commands again.\n");(CYAN,help)];
-                directory = "./" ; results = None; params = (10,40)}
+                directory = "./" ; results = None; params = (15,40)}
 
 let parse str =
   let input_split = String.split_on_char ' ' (String.trim str) in
 	match input_split with
   | ["help"] -> HELP
   | "run"::k::w::[] -> RUN (k,w)
-  | ["run"] -> RUN ("10","40")
+  | ["run"] -> RUN ("15","40")
   | ["dir"] -> DIR
   | "setdir"::d::[] -> SETDIR d
   | "results"::f::[] -> RESULTS f
@@ -113,7 +113,7 @@ and handle_input st input =
         else
         let k' = int_of_string k in
         let w' = int_of_string w in
-        if (k' >= 5 && k' <=50 && w' >=10 && w' <=100) then handle_run st k' w'
+        if (k' >= 5 && k' <=40 && w' >=10 && w' <=100) then handle_run st k' w'
         else repl {st with display =
         [(RED,"Error: k must be in range [5,50] and w must be in range [10,100]")]}
       end
@@ -163,19 +163,8 @@ and handle_input st input =
   |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
 
 and handle_compare st a b =
-  let sort_helper x y =
-    let k = fst (st.params) in
-    let h1 = if String.length (snd x) >= k then Hashtbl.hash (String.sub (snd x) 0 k)
-            else max_int
-    in
-    let h2 = if String.length (snd y) >= k then Hashtbl.hash (String.sub (snd y) 0 k)
-            else max_int
-    in
-    Pervasives.compare h1 h2
-  in
   let rec pad l n =
-    if List.length l >= n then l
-    else pad (l@[("","")]) n
+    if List.length l >= n then l else pad (l@[("","")]) n
   in
   match st.results with
   |None -> failwith "unexpected"
@@ -187,14 +176,13 @@ and handle_compare st a b =
           | (Some r1, Some r2) -> begin
             let l1 = List.map (snd) r1 |> List.rev in
             let l2 = List.map (snd) r2 |> List.rev in
-            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l1 in
-            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) b l2 in
+            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l2 in
+            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) b l1 in
             print_endline "generating display...";
-            let sorted1 = List.sort sort_helper res1 |> List.filter (fun x -> x<>("","")) in
-            let sorted2 = List.sort sort_helper res2 |> List.filter (fun x -> x<>("","")) in
-            let pad1 = pad sorted1 (List.length sorted2) in
-            let pad2 = pad sorted2 (List.length sorted1) in
-            print_endline "done";
+            print_endline (string_of_int (List.length res1));
+            print_endline (string_of_int (List.length res2));
+            let padded1 = pad res1 (List.length res2) in
+            let padded2 = pad res2 (List.length res1) in
             let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
                 (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2))::
@@ -202,7 +190,7 @@ and handle_compare st a b =
               else
                 (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))::acc
-            ) [] pad1 pad2 in
+            ) [] padded1 padded2 in
             repl {st with display = newdispl}
             end
           |_,_ -> failwith "unexpected"
@@ -210,7 +198,6 @@ and handle_compare st a b =
       |_,_ -> repl {st with display = [(RED,
       "Error: no results to display for files " ^ a ^","^ b)]}
   end
-
 
 and handle_results st f =
   match st.results with
