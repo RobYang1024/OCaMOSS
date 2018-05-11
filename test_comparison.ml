@@ -65,6 +65,11 @@ let tests = [
                     [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
 
 
+  (* The test cases for make_pair_comp test if the function works on an
+   * empty file, on a single entry file dictionary, if it works correctly for
+   * either part of a double entry file dictionary with the corresponding
+   * changes, and if it works if one of the entries in a file dictionary
+   * is empty, which are all the edge cases. *)
   "empty file" >:: (fun _ -> assert_equal emp_file
                        (make_pair_comp "" [] emp_comp));
   "single entry" >:: (fun _ -> assert_equal se_dict
@@ -73,12 +78,18 @@ let tests = [
   (make_pair_comp "a" (FileDict.to_list de_dict) emp_comp));
   "double entry second" >:: (fun _ -> assert_equal des_p_comp
   (make_pair_comp "b" (FileDict.to_list de_dict) emp_comp));
-  "empty entry in file" >:: (fun _ -> assert_equal emp_e_s_p_comp
+  "empty entry in file" >:: (fun _ -> assert_equal emp_e_f_p_comp
+  (make_pair_comp "a" (FileDict.to_list emp_e_dict) emp_comp));
+  "empty entry second" >:: (fun _ -> assert_equal emp_e_s_p_comp
   (make_pair_comp "b" (FileDict.to_list emp_e_dict) emp_comp));
-  "using comp_dict value" >:: (fun _ -> assert_equal des_p_comp
-  (make_pair_comp "b" (FileDict.to_list de_dict) def_comp));
+  "empty entry third" >:: (fun _ -> assert_equal emp_e_t_p_comp
+  (make_pair_comp "c" (FileDict.to_list emp_e_dict) emp_comp));
 
 
+  (* The test for compare test if it works on an empty file dictionary,
+   * a single entry file dictionary, a double entry file dictionary,
+   * and a file dictionary with an empty entry, which are all the edge
+   * cases. *)
   "empty comp" >:: (fun _ -> assert_equal emp_comp
                        (compare emp_file));
   "single entry comp" >:: (fun _ -> assert_equal se_comp
@@ -88,6 +99,10 @@ let tests = [
   "empty entry comp" >:: (fun _ -> assert_equal emp_e_comp
                              (compare emp_e_dict));
 
+
+  (* The test cases for create_sim_list test if the function works for
+   * an empty comparison dictionary, one with a single entry, one with two
+   * entries, and only with an empty entry, which are all the edge cases. *)
   "empty sim" >:: (fun _ -> assert_equal []
                       (create_sim_list emp_comp));
   "single entry sim" >:: (fun _ -> assert_equal []
@@ -96,5 +111,24 @@ let tests = [
                              (create_sim_list de_comp |> get_files));
   "empty entry sim" >:: (fun _ -> assert_equal ["b"]
                             (create_sim_list emp_e_comp |> get_files));
+
+
+  (* The tests for create_pair_sim_list test if it works on an empty file
+   * dictionary list, a single entry list, a double entry list for both entries
+   * and for a list with an empty entry with every other filename than that of
+   * of the one with the empty entry, since a precondition is that that case
+   * will not work, which are all of the edge cases. *)
+  "empty pair" >:: (fun _ -> assert_equal []
+                       (create_pair_sim_list "" []));
+  "single entry" >:: (fun _ -> assert_equal []
+                         (create_pair_sim_list "a" (FileDict.to_list se_dict)));
+  "double entry first" >:: (fun _ -> assert_equal [("b",0.5)]
+  (create_pair_sim_list "a" (FileDict.to_list def_p_comp)));
+  "double entry second" >:: (fun _ -> assert_equal [("a",0.5)]
+  (create_pair_sim_list "b" (FileDict.to_list des_p_comp)));
+  "empty entry second" >:: (fun _ -> assert_equal [("c",0.5);("a",0.0)]
+  (create_pair_sim_list "b" (FileDict.to_list emp_e_s_p_comp)));
+  "empty entry third" >:: (fun _ -> assert_equal ["b";"a"]
+  ((create_pair_sim_list "c" (FileDict.to_list emp_e_t_p_comp)) |> get_files));
 
 ]
