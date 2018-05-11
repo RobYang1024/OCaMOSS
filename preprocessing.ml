@@ -99,7 +99,6 @@ let rec get_file_positions dir dir_name k filename positions =
     if current >= x then ((p, x+k-p),acc)
     else ((x,k),(p,l)::acc)
   in
-
   let rec hash_helper f_channel s =
       try
         let line = input_line f_channel in
@@ -107,7 +106,6 @@ let rec get_file_positions dir dir_name k filename positions =
       with
       | End_of_file -> s
   in
-
   try
     let f_name = Unix.readdir dir in
     if f_name <> filename then get_file_positions dir dir_name k filename positions
@@ -119,16 +117,13 @@ let rec get_file_positions dir dir_name k filename positions =
       let channel = open_in f in
       let f_string = hash_helper channel keywords_file in
       let is_txt = check_suffix f "txt" in
-      let file = remove_noise f_string keywords spec_chars is_txt in
-      let init_acc = ((List.hd positions,k),[]) in
-      let merge_matches = List.fold_left pos_helper init_acc positions in
-      let matches = (fst merge_matches)::(snd merge_matches) in
-      List.map (fun x ->
-        try
-          (string_of_int (fst x), (String.sub file ((fst x) - 1) (snd x)))
-        with
-        | _ -> ("","")
-      ) matches
+      let file = k_grams (remove_noise f_string keywords spec_chars is_txt) k in
+      let results = List.map (fun x -> 
+        (string_of_int x, List.nth file (x - 1))
+      ) positions in
+      List.sort (fun a b -> 
+        Pervasives.compare (snd a |> Hashtbl.hash) (snd b |> Hashtbl.hash)
+      ) results
     end
   with
   | _ -> []
