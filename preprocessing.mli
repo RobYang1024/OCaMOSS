@@ -13,7 +13,7 @@ val special_chars : string -> char list
  * whitespace, variable names, function names, and language key words found in
  * [keywords] with more general names so that hashing can catch similarities
  * that it otherwise would not. *)
-val remove_noise : string -> string list -> char list -> string
+val remove_noise : string -> string list -> char list -> bool -> string
 
 (* [k_grams str n] creates a list of strings of length n, starting at each
  * character in [str] up to and including ([str] length - [n])th character.
