@@ -46,7 +46,7 @@ let parse str =
 	match input_split with
   | ["help"] -> HELP
   | "run"::k::w::[] -> RUN (k,w)
-  | ["run"] -> RUN ("15","40")
+  | ["run"] -> RUN ("35","40")
   | ["dir"] -> DIR
   | "setdir"::d::[] -> SETDIR d
   | "results"::f::[] -> RESULTS f
@@ -97,7 +97,7 @@ let rec print_display d =
 let rec repl st =
   print_display st.display;
   print_string  [black] "> ";
-  match String.lowercase_ascii (read_line ()) with
+  match read_line () with
     | exception End_of_file -> ()
     | "quit" -> print_endline "You have exited the REPL.";
   	| input -> handle_input st input
@@ -115,9 +115,9 @@ and handle_input st input =
         let w' = int_of_string w in
         if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w') then handle_run st k' w'
         else repl {st with display =
-                             [(RED,
-        "Error: words per hash must be in range [15,50] and window size must be
-in range [20,100], with words per hash being less than window size.")]}
+        [(RED, "Error: words per hash must be in range [15,40] 
+          and window size must be in range [20,100], 
+        with words per hash being less than window size.")]}
       end
       with
       | Failure f_msg when f_msg = "int_of_string" ->
@@ -204,7 +204,7 @@ and handle_compare st a b =
 and handle_results st f =
   match st.results with
   |None -> failwith "unexpected"
-  |Some r -> begin print_endline f;
+  |Some r -> begin
     match CompDict.find f r with
     |Some v -> begin
       let v_list = List.filter (fun x  -> fst x <> f) (FileDict.to_list v) in
