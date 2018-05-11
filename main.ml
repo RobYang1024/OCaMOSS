@@ -13,11 +13,11 @@ type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
 
 let help =
-"The following are the commands: for this program: \n
+"Commands (case-sensitive): \n
 run [words per hash] [window size] --- runs oCaMoss on the working directory.
 Parameters are optional, default to 35 words per hash, 40 per window
 dir --- lists the working directory and the files that it contains
-setdir [dir] --- sets the relative directory to look for files
+setdir [dir] --- sets the relative directory to look for files and resets any results
 results --- lists the file names for which there are results
 results [filename] --- lists the detailed results of overlap for that file
 (Make sure to include the extension of the file)
