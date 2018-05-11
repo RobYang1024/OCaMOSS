@@ -1,0 +1,78 @@
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:1:winnow1.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:1:winnow1 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:1:winnow1.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:3:winnow3.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:3:winnow3 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:3:winnow3.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:5:winnow5.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:5:winnow5 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:5:winnow5.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:6:winnow6.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:6:winnow6 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:6:winnow6.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:8:winnow8.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:8:winnow8 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:8:winnow8.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:10:Inserted Correct.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:10:Inserted Correct is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:10:Inserted Correct.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:12:member_empty.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:12:member_empty is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:12:member_empty.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:15:member_three.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:15:member_three is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:15:member_three.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:16:find_fake.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:16:find_fake is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:16:find_fake.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:18:find_first.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:18:find_first is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:18:find_first.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:20:find_three.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:20:find_three is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:20:find_three.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:22:single lists uneq.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:22:single lists uneq is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:22:single lists uneq.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:24:diff order.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:24:diff order is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:24:diff order.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:26:diff pos.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:26:diff pos is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:26:diff pos.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:28:one list empty.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:28:one list empty is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:28:one list empty.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:30:long case.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:30:long case is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:30:long case.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:32:single entry.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:32:single entry is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:32:single entry.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:34:double entry second.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:34:double entry second is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:34:double entry second.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:36:using comp_dict value.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:36:using comp_dict value is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:36:using comp_dict value.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:38:single entry comp.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:38:single entry comp is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:38:single entry comp.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:39:double entry comp.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:39:double entry comp is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:39:double entry comp.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:41:empty sim.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:41:empty sim is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:41:empty sim.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:43:double entry sim.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:43:double entry sim is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:43:double entry sim.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:45:k_grams_2.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:45:k_grams_2 is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:45:k_grams_2.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:47:keywords.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:47:keywords is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:47:keywords.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Start test Final Project Test Suite:49:remove_noise.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: Test Final Project Test Suite:49:remove_noise is successful.
+2018-05-11T01:15:23+00:00 dhcp-rhodes-3044.eduroam.cornell.edu#02 I: End test Final Project Test Suite:49:remove_noise.
