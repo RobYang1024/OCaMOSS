@@ -90,9 +90,9 @@ let rec print_display d =
   |[] -> ()
   |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
   |(BLACK, s)::t -> print_endline s; print_display t
-  |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n"));print_display t
+  |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
   |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
-  |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n"));print_display t
+  |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n")); print_display t
 
 let rec repl st =
   print_display st.display;
