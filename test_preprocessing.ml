@@ -8,7 +8,14 @@ let keywords =
    "inherit"; "initializer"; "land"; "lazy"; "let"; "lor"; "lsl"; "lsr";
    "lxor"; "match"; "method"; "mod"; "module"; "mutable"; "new"; "nonrec";
    "object"; "of"; "open"; "or"; "private"; "rec"; "sig"; "struct"; "then";
-   "to"; "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with"]
+   "to"; "true"; "try"; "type"; "val"; "virtual"; "when"; "while"; "with";
+   "Arg"; "Array"; "ArrayLabels"; "Buffer"; "Bytes"; "BytesLabels"; "Callback";
+   "Char"; "Complex"; "Digest"; "Ephemeron"; "Filename"; "Format"; "Gc";
+   "Genlex"; "Hashtbl"; "Int32"; "Int64"; "Lazy"; "Lexing"; "List";
+   "ListLabels"; "Map"; "Marshal"; "MoreLabels"; "Nativeint"; "Oo"; "Parsing";
+   "Printexc"; "Printf"; "Queue"; "Random"; "Scanf"; "Set"; "Sort";
+   "Spacetime"; "Stack"; "StdLabels"; "Stream"; "String"; "StringLabels";
+   "Sys"; "Uchar"; "Weak"]
 
 let spec_chars = ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';'; '<';
                   '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
@@ -31,9 +38,10 @@ let test_fun_str =
     char_array) |> List.filter (fun str -> str <> \"\") |> List.rev"
 
 let expected_res_str = String.concat ""
-    ["letvvv=letv=vvin(v.v(funvv->letv=v.v1vinifv.vvvthenv.v\"\"(v.vvv)else";
-     "matchvwith|v::v->(v.v\"\"[v;v])::v|[]->v\"vvvvv\")[\"\"]v)|>v.v(funv->v";
-     "<>\"\")|>v.v"]
+    ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v\"\"";
+     "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
+     ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
+
 
 (*Tests to check for preprocessing functionality*)
 let tests = [
@@ -47,7 +55,8 @@ let tests = [
   "remove_noise" >:: (fun _ -> assert_equal
                                  (remove_noise
                                     test_fun_str
-                                    keywords spec_chars)
+                                    keywords spec_chars
+                                    false)
                                  expected_res_str);
 
 ]
