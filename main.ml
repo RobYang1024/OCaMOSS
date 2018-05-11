@@ -13,9 +13,9 @@ type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
 
 let help =
-"Commands: \n
+"The following are the commands: for this program: \n
 run [words per hash] [window size] --- runs oCaMoss on the working directory.
-params are optional, defaults to 35 words per hash, 40 per window
+Parameters are optional, default to 35 words per hash, 40 per window
 dir --- lists the working directory and the files that it contains
 setdir [dir] --- sets the relative directory to look for files
 results --- lists the file names for which there are results
@@ -37,7 +37,7 @@ let newstate = {display = [(GREEN,
      |  |_|  | |       | |   _   | | ||_|| | |       |  _____| |  _____| |
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
-(WHITE,"Welcome to oCaMOSS!!\n");(CYAN,help)];
+(WHITE,"Welcome to oCaMOSS!!");(CYAN,help)];
                 directory = "./" ; results = None; result_files = "";
                 params = (35,40)}
 
@@ -66,8 +66,8 @@ let concat_int_list lst =
       (String.length int_list - 1)
 
 let concat_result_list lst =
-  List.fold_left (fun a (f,ss) -> a ^ "\n" ^ "Filename: " ^ f ^
-                                  "\tSimilarity score: " ^
+  List.fold_left (fun a (f,ss) -> a ^ "\n" ^ "File: " ^ f ^
+                                  "\t\tSimilarity score: " ^
                                   (string_of_float ss)) "" lst
 
 let rec parse_dir dir dict dir_name k w =
@@ -104,7 +104,8 @@ let rec repl st =
   print_string  [black] "> ";
   match read_line () with
     | exception End_of_file -> ()
-    | "quit" -> print_endline "You have exited the REPL.";
+    | "quit" -> ANSITerminal.(print_string [green]
+                                ("Thank you for using oCaMOSS!!\n"));
   	| input -> handle_input st input
 
 and handle_input st input =
@@ -209,12 +210,9 @@ and handle_results st f =
   |Some r -> begin
     match CompDict.find f r with
     |Some v -> begin
-      let v_list = List.filter (fun x  -> fst x <> f) (FileDict.to_list v) in
-      let d = List.map (fun x ->
-        fst x ^ "\n" ^ concat_int_list (List.map (fun y -> snd y) (snd x)))
-      v_list in
+      let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
       repl {st with display = [(BLACK, "Results for file " ^ f ^
-        ": \n" ^ concat_str_list d)]}
+        ": \n" ^ concat_result_list r_list)]}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -229,7 +227,8 @@ and handle_run st k w =
   let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
   let files = concat_result_list (Comparison.create_sim_list comparison) in
-  if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")]}
+  if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")];
+                                   results = Some comparison; params = (k, w)}
   else repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
                   (BLACK, files)];
                      results = Some comparison;

@@ -54,3 +54,6 @@ val compare : FileDict.t -> CompDict.t
  * The files are ordered from least to greatest.
  *)
 val create_sim_list : CompDict.t -> (StringKey.t * float) list
+
+val create_pair_sim_list : StringKey.t -> (StringKey.t * HashValue.t) list ->
+  (StringKey.t * float) list

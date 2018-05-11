@@ -35,6 +35,8 @@ module type COMPARISON = sig
     (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
   val compare : FileDict.t -> CompDict.t
   val create_sim_list : CompDict.t -> (StringKey.t * float) list
+  val create_pair_sim_list : StringKey.t -> (StringKey.t * HashValue.t) list ->
+    (StringKey.t * float) list
 end
 
 module type WINNOWING = sig

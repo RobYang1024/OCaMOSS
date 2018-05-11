@@ -57,5 +57,16 @@ let create_sim_list comp_dict =
           if sim_score >= 0.5
           then (k,sim_score)::x else x) [] (CompDict.to_list comp_dict) in
   (List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0 then
-                Pervasives.compare k1 k2 else Pervasives.compare s1 s2)
-     (create_sim_list_helper comp_dict)) |> List.rev
+                 Pervasives.compare k1 k2 else -(Pervasives.compare s1 s2))
+     (create_sim_list_helper comp_dict))
+
+let create_pair_sim_list f_name f_dict_list =
+  try
+    let f_length = float_of_int (List.length (List.assoc f_name f_dict_list)) in
+    (List.fold_left (fun lst (k,v) -> if k = f_name then lst else
+                       (k,(float_of_int(List.length v))/.f_length)::lst)
+       [] f_dict_list) |>
+    List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0 then
+                  Pervasives.compare k1 k2 else -(Pervasives.compare s1 s2))
+  with
+  | Division_by_zero -> failwith "Invalid file dictionary"
