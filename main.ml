@@ -15,7 +15,7 @@ type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
 let help =
 "Commands: \n
 run [words per hash] [window size] --- runs oCaMoss on the working directory.
-params are optional, defaults to 5 words per hash, 25 per window
+params are optional, defaults to 35 words per hash, 40 per window
 dir --- lists the working directory and the files that it contains
 setdir [dir] --- sets the relative directory to look for files
 results --- lists the file names for which there are results
@@ -39,7 +39,7 @@ let newstate = {display = [(GREEN,
 ");
 (WHITE,"Welcome to oCaMOSS!! The following are the instructions for how to run
 this program. Type 'help' to see the list of commands again.\n");(CYAN,help)];
-                directory = "./" ; results = None; params = (15,40)}
+                directory = "./" ; results = None; params = (35,40)}
 
 let parse str =
   let input_split = String.split_on_char ' ' (String.trim str) in
@@ -90,9 +90,9 @@ let rec print_display d =
   |[] -> ()
   |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
   |(BLACK, s)::t -> print_endline s; print_display t
-  |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n"));print_display t
+  |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
   |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
-  |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n"));print_display t
+  |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n")); print_display t
 
 let rec repl st =
   print_display st.display;
@@ -113,9 +113,11 @@ and handle_input st input =
         else
         let k' = int_of_string k in
         let w' = int_of_string w in
-        if (k' >= 5 && k' <=40 && w' >=10 && w' <=100) then handle_run st k' w'
+        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w') then handle_run st k' w'
         else repl {st with display =
-        [(RED,"Error: k must be in range [5,50] and w must be in range [10,100]")]}
+                             [(RED,
+        "Error: words per hash must be in range [15,50] and window size must be
+in range [20,100], with words per hash being less than window size.")]}
       end
       with
       | Failure f_msg when f_msg = "int_of_string" ->

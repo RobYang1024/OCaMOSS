@@ -16,12 +16,16 @@ let rec str_to_chr_arr str =
   | str -> (String.get str 0)::(str_to_chr_arr (String.sub str 1 tail_len))
 
 let special_chars keywords_file_name =
-  Yojson.Basic.from_file keywords_file_name
+  let path_to_keywords_file =
+    String.concat "/" ["keywords_files"; keywords_file_name] in
+  Yojson.Basic.from_file path_to_keywords_file
   |> member "special characters"
   |> to_list |> List.map to_string |> List.map (fun str -> String.get str 0)
 
 let keywords_list keywords_file_name =
-  Yojson.Basic.from_file keywords_file_name
+  let path_to_keywords_file =
+    String.concat "/" ["keywords_files"; keywords_file_name] in
+  Yojson.Basic.from_file path_to_keywords_file
   |> member "keywords"
   |> to_list |> List.map to_string
 
@@ -118,10 +122,10 @@ let rec get_file_positions dir dir_name k filename positions =
       let f_string = hash_helper channel keywords_file in
       let is_txt = check_suffix f "txt" in
       let file = k_grams (remove_noise f_string keywords spec_chars is_txt) k in
-      let results = List.map (fun x -> 
+      let results = List.map (fun x ->
         (string_of_int x, List.nth file (x - 1))
       ) positions in
-      List.sort (fun a b -> 
+      List.sort (fun a b ->
         Pervasives.compare (snd a |> Hashtbl.hash) (snd b |> Hashtbl.hash)
       ) results
     end
