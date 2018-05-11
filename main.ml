@@ -15,14 +15,14 @@ type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
 let help =
 "Commands: \n
 run [words per hash] [window size] --- runs oCaMoss on the working directory.
-params are optional, defaults to 5 words per hash, 25 per window \n
-dir --- lists the working directory and the files that it contains \n
-setdir [dir] --- sets the relative directory to look for files \n
-results --- lists the file names for which there are results \n
-results [filename] --- lists the detailed results of overlap for that file 
-(Make sure to include the extension of the file) \n
+params are optional, defaults to 5 words per hash, 25 per window
+dir --- lists the working directory and the files that it contains
+setdir [dir] --- sets the relative directory to look for files
+results --- lists the file names for which there are results
+results [filename] --- lists the detailed results of overlap for that file
+(Make sure to include the extension of the file)
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
-(Make sure to include the extension of the files) \n
+(Make sure to include the extension of the files)
 quit --- exits the REPL
 "
 
@@ -68,7 +68,8 @@ let concat_int_list lst =
 let rec parse_dir dir dict dir_name k w =
   try
     let f_name = Unix.readdir dir in
-    if String.get f_name 0 = '.' then parse_dir dir dict dir_name k w else
+    if String.get f_name 0 = '.' || not (String.contains f_name '.')
+    then parse_dir dir dict dir_name k w else
     let new_dict = Comparison.FileDict.insert f_name
         (Winnowing.winnow (Preprocessing.hash_file
                             (dir_name ^ Filename.dir_sep ^ f_name) k) w) dict in
@@ -79,8 +80,8 @@ let rec parse_dir dir dict dir_name k w =
 let rec print_dir_files dir str =
   try
     let f_name = Unix.readdir dir in
-    if String.get f_name 0 = '.' then print_dir_files dir str else
-    print_dir_files dir (str^f_name^"\n")
+    if String.get f_name 0 = '.' || not (String.contains f_name '.')
+    then print_dir_files dir str else print_dir_files dir (str^f_name^"\n")
   with
   | End_of_file -> str
 
@@ -113,45 +114,50 @@ and handle_input st input =
         let k' = int_of_string k in
         let w' = int_of_string w in
         if (k' >= 5 && k' <=50 && w' >=10 && w' <=100) then handle_run st k' w'
-        else repl {st with display = 
+        else repl {st with display =
         [(RED,"Error: k must be in range [5,50] and w must be in range [10,100]")]}
-      end 
+      end
       with
       | Failure f_msg when f_msg = "int_of_string" ->
         repl {st with display = [(RED,"Error: Invalid argument(s)")]}
       | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
       | _ -> repl {st with display = [(RED,"Error: Something went wrong")]}
   end
-  |DIR -> if st.directory = "./"
+  |DIR ->
+    if st.directory = "./"
     then repl {st with display =
                          [(RED,"Error: Directory has not been set")]}
-    else repl {st with display = [(BLACK, "Current working directory: " ^
-                                          st.directory ^ "\n Files: " ^
-                        (print_dir_files (Unix.opendir st.directory) ""))]}
+    else let dir_files = print_dir_files (Unix.opendir st.directory) "" in
+      repl {st with display = [(BLACK, "Current working directory: " ^
+                                       st.directory^"\n Files: "^ dir_files)]}
   |SETDIR d -> begin
       try
         if d = "" || not (Sys.is_directory d)
         then repl {st with display = [(RED,"Error: Invalid directory")]}
-        else repl {st with directory = d ; display = [(GREEN,
-        "Successfully set working directory to: " ^ d);
-        (BLACK,"Files: \n" ^ (print_dir_files (Unix.opendir d) ""))]}
+        else let dir_files = print_dir_files (Unix.opendir d) "" in
+          if dir_files = ""
+          then repl {st with display = [(RED,"Error: Directory has no files")]}
+          else repl {st with directory = d ; display = [(GREEN,
+          "Successfully set working directory to: " ^ d);
+                                            (BLACK,"Files: \n" ^ dir_files)]}
+
       with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
   end
   |RESULTS f -> begin
     match st.results with
     |Some r -> begin
-        if f = "" then repl {st with display = 
-          [(BLACK, "Results for files: \n" ^ 
+        if f = "" then repl {st with display =
+          [(BLACK, "Results for files: \n" ^
           concat_str_list (List.map (fst) (CompDict.to_list r)))]}
         else handle_results st f
     end
-    |None -> repl {st with display = 
+    |None -> repl {st with display =
     [(RED,"Error: no results to display. Run oCaMoss first")]}
   end
   |COMPARE (a,b) -> begin
     match st.results with
     |Some r -> handle_compare st a b
-    |None -> repl {st with display = 
+    |None -> repl {st with display =
     [(RED,"Error: no results to display. Run oCaMoss first")]}
   end
   |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
@@ -159,15 +165,15 @@ and handle_input st input =
 and handle_compare st a b =
   let sort_helper x y =
     let k = fst (st.params) in
-    let h1 = if String.length (snd x) >= k then Hashtbl.hash (String.sub (snd x) 0 k) 
-            else max_int 
+    let h1 = if String.length (snd x) >= k then Hashtbl.hash (String.sub (snd x) 0 k)
+            else max_int
     in
-    let h2 = if String.length (snd y) >= k then Hashtbl.hash (String.sub (snd y) 0 k) 
+    let h2 = if String.length (snd y) >= k then Hashtbl.hash (String.sub (snd y) 0 k)
             else max_int
     in
     Pervasives.compare h1 h2
   in
-  let rec pad l n = 
+  let rec pad l n =
     if List.length l >= n then l
     else pad (l@[("","")]) n
   in
@@ -189,7 +195,7 @@ and handle_compare st a b =
             let pad1 = pad sorted1 (List.length sorted2) in
             let pad2 = pad sorted2 (List.length sorted1) in
             print_endline "done";
-            let newdispl = List.fold_left2 (fun acc r1 r2 -> 
+            let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
                 (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (snd r2 ^ "\n"))::acc
@@ -223,7 +229,7 @@ and handle_results st f =
     "Error: no results to display for file " ^ f)]}
   end
 
-and handle_run st k w = 
+and handle_run st k w =
   print_endline "parsing files...";
   let parsefiles = (parse_dir (Unix.opendir st.directory)
                       Comparison.FileDict.empty st.directory

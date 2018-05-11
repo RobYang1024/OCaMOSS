@@ -32,7 +32,15 @@ let emp_e_comp = CompDict.(empty |> insert "a" emp_e_f_p_comp
                            |> insert "c" emp_e_t_p_comp)
 
 let tests = [
-  "empty int" >:: (fun _ -> assert_equal [] (intersection [] []));
+
+  (* The test cases for intersection has cases that test what happens with
+   * one or more empty lists, single element lists, 2 lists with the order
+   * reversed, lists with elements of same hash but different position,
+   * and lists with different number of elements, which are all the edge
+   * cases, and then a couple of general cases. *)
+  "empty lists" >:: (fun _ -> assert_equal [] (intersection [] []));
+  "one list empty" >:: (fun _ -> assert_equal []
+                           ((intersection [(12,7);(9,13)] [])));
   "single lists uneq" >::
   (fun _ -> assert_equal [] (intersection [(1,0)] [(2,0)]));
   "single lists eq" >::
@@ -46,9 +54,6 @@ let tests = [
   "diff number of elems" >:: (fun _ -> assert_equal [(1,0);(2,1)]
                                  ((intersection [(1,0);(7,3);(2,1);(4,3)]
                                      [(2,2);(1,5)])));
-  "one list empty" >:: (fun _ -> assert_equal []
-                           ((intersection [(12,7);(9,13)] [])));
-
   "simp case" >::
   (fun _ -> assert_equal [(1,0);(2,0)]
       ((intersection [(3,0);(1,0);(2,0)] [(2,0);(1,0)])));
@@ -57,6 +62,7 @@ let tests = [
                                      (47,0);(7,0);(84,0);(53,0)]
                     [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
 
+  
   "empty file" >:: (fun _ -> assert_equal emp_file
                        (make_pair_comp "" [] emp_comp));
   "single entry" >:: (fun _ -> assert_equal se_dict
