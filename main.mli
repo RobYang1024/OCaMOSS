@@ -13,7 +13,7 @@ type state = {display: (color * string) list; directory: string; results:
  * SETDIR - sets the working directory where MOSS looks for files, takes
  * 1 argument, displays the working directory
  * DIR - displays the working directory and all the files it contains
- * RESULTS - displays results, takes 0 arguments 
+ * RESULTS - displays results, takes 0 arguments
  * (lists files that are contained in results, and their similarity scores)
  * or 1 argument (lists similarity scores for that file vs other files)
  * COMPARE - compares two files, printing out the similar sections, takes 2
@@ -39,17 +39,17 @@ val parse: string -> cmd
  * some progress indicators when running and displaying results
  * expected behavior for commands:
  *
- * [run] 
+ * [run]
  * - runs MOSS on the current directory of the state
- * - displays an error message if current directory is not set, 
+ * - displays an error message if current directory is not set,
  *   if files are invalid file type, or if not all files have same extn
  * - displays list of files that are likely to be plagiarized
  * - two optional params for w and k, with the following conditions:
  *   w is in range [20,100], k is in range [15,40], k < w
- * - if only one param is provided, if params are invalid an error 
+ * - if only one param is provided, if params are invalid an error
  * message will be displayed
  *
- * [help] 
+ * [help]
  * - lists the available commands, takes no arguments
  *
  * [setdir]
@@ -58,10 +58,10 @@ val parse: string -> cmd
  * - displays the files in the new directory
  * - displays error message if directory is incorrect
  *
- * [dir] 
+ * [dir]
  * - displays the working directory and all the files it contains
  *
- * [results] 
+ * [results]
  * if 0 arguments:
  * - displays all files that have results, and their overall similarity scores
  * if 1 argument (name of a file:
@@ -74,10 +74,12 @@ val parse: string -> cmd
  *   a side by side printout of the matching patterns in the fingerprints of
  *   files will be displayed
  * - otherwise, an error message will be displayed
- * 
+ *
  * [quit]
  * - exits the repl
  *
  * invalid commands will display an error message
  *)
+
+(* *)
 val repl : state -> unit
