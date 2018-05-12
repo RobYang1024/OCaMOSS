@@ -2,6 +2,12 @@ oCaMOSS User's Guide
 -------------------------------------------------------------------------------
 To run:
 navigate to the root directory of this project, and use "make run"
+
+To compile and run tests:
+navigate to the root directory of this project, and use "make"
+
+To check types:
+navigate to the root directory of this project, and use "make check"
 -------------------------------------------------------------------------------
 Commands: (note - commands are case-sensitive)
 
@@ -48,11 +54,13 @@ for file A that are > 0.5
 
 Supported languages/file formats:
  - oCaml: .ml, .mli
+ - Java: .java
+ - C: .c
+ - Python: .py
  - English: .txt (note: english comparison does NOT account for semantics)
- - More coming soon(?)
 
 -------------------------------------------------------------------------------
-Sample test cases description (test case N is in tests/testN):
+Sample test cases description (test case N is in directory tests/testN):
 
 1) exact duplicates - should return positive result
 2) variable names changed - should return positive result
