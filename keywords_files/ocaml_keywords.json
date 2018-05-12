@@ -19,5 +19,5 @@
   "comment-start": "(*",
   "comment-end": "*)",
   "comment": "",
-  "comments-nest": True
+  "comments-nest": true
 }

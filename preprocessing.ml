@@ -5,9 +5,15 @@ open Yojson.Basic.Util
 
 let rem_white_space code_string =
   code_string |>
+  String.split_on_char '\t' |> String.concat " " |>
   String.split_on_char '\n' |> String.concat " " |>
   String.split_on_char ' ' |>
   List.filter (fun str -> str <> "")
+
+let rem_new_lines code_string =
+  code_string |>
+  String.split_on_char '\n' |>
+  List.filter (fun str -> str <> "") |> String.concat ""
 
 let rec str_to_chr_arr str =
   let tail_len = String.length str - 1 in
@@ -29,6 +35,16 @@ let keywords_list keywords_file_name =
   |> member "keywords"
   |> to_list |> List.map to_string
 
+let comment_info keywords_file_name =
+  let path_to_keywords_file =
+    String.concat "/" ["keywords_files"; keywords_file_name] in
+  let json = Yojson.Basic.from_file path_to_keywords_file in
+  let one_line_comm_st = json |> member "comment" |> to_string in
+  let mult_line_comm_st = json |> member "comment-start" |> to_string in
+  let mult_line_comm_end = json |> member "comment-end" |> to_string in
+  let comments_nest = json |> member "comments-nest" |> to_bool in
+  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end, comments_nest)
+
 let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
   (List.fold_left
@@ -43,6 +59,60 @@ let split_and_keep_on_spec_chars spec_chars str =
     [""]
     char_array) |> List.filter (fun str -> str <> "") |> List.rev
 
+let rec split_on_str str_to_split_on acc_str_arr str_to_split =
+  let str_to_split_on_len = String.length str_to_split_on in
+  let str_to_split_len = String.length str_to_split in
+  let new_acc_arr_else_case acc_str_arr str_to_split_on str_to_add =
+    match acc_str_arr with
+    | [] -> [str_to_add]
+    | h::t ->
+      if h = str_to_split_on then str_to_add::acc_str_arr
+      else
+        let new_acc_arr_hd = String.concat "" [h; str_to_add] in
+        new_acc_arr_hd::t
+  in
+  if String.length str_to_split = 0 then List.rev acc_str_arr
+  else
+    try
+      if str_to_split_on = (String.sub str_to_split 0 str_to_split_on_len) then
+        let head_str = str_to_split_on in
+        let tail_len = str_to_split_len - str_to_split_on_len in
+        let tail_str = String.sub str_to_split str_to_split_on_len tail_len in
+        split_on_str str_to_split_on (head_str::acc_str_arr)tail_str
+      else
+        let head_str = String.sub str_to_split 0 1 in
+        let tail_len = str_to_split_len - 1 in
+        let tail_str = String.sub str_to_split 1 tail_len in
+        let new_acc_arr =
+          new_acc_arr_else_case acc_str_arr str_to_split_on head_str in
+        split_on_str str_to_split_on new_acc_arr tail_str
+    with Invalid_argument _ ->
+      let new_acc_arr =
+        new_acc_arr_else_case acc_str_arr str_to_split_on str_to_split in
+      List.rev new_acc_arr
+
+let remove_comments
+    comment_start comment_end comments_nest no_space_str =
+  let do_filter_from_arr (acc_arr, nesting) str =
+    if str = comment_start then
+      if comments_nest then (acc_arr, nesting + 1)
+      else (acc_arr, nesting)
+    else if str = comment_end then
+      if comments_nest then (acc_arr, nesting - 1) (* to account for single line comments *)
+      else (acc_arr, 0)
+    else
+      if nesting > 0 then (acc_arr, nesting)
+      else (str::acc_arr, 0)
+  in
+  let split_on_comments_arr =
+    split_on_str comment_start [] no_space_str |>
+    List.map (split_on_str comment_end []) |> List.flatten
+  in
+  let acc_tup =
+    List.fold_left do_filter_from_arr ([], 0) split_on_comments_arr in
+  match acc_tup with
+  | (acc_arr, _) -> List.rev acc_arr
+
 let replace_generics keywords spec_chars str_arr =
   List.map
     (fun str ->
@@ -55,13 +125,31 @@ let replace_generics keywords spec_chars str_arr =
          with Failure _ -> "v" )
     str_arr
 
-let remove_noise code_string keywords spec_chars is_txt =
+let remove_noise comment_quad code_string keywords spec_chars is_txt =
   if is_txt then code_string
   else
-    code_string |>
-    rem_white_space |>
-    List.map (split_and_keep_on_spec_chars spec_chars) |> List.flatten |>
-    replace_generics keywords spec_chars |> String.concat ""
+    match comment_quad with
+    | (one_line_st, mult_line_st, mult_line_end, comments_nest) ->
+      let one_line_comm_removed =
+        if one_line_st = "" then
+          code_string
+        else
+          code_string |>
+          remove_comments one_line_st "\n" false |>
+          String.concat ""
+      in
+      let mult_line_comm_removed =
+        if mult_line_st = "" then one_line_comm_removed
+        else
+          one_line_comm_removed |>
+          remove_comments mult_line_st mult_line_end comments_nest |>
+          String.concat ""
+      in
+      mult_line_comm_removed |>
+      split_and_keep_on_spec_chars spec_chars |>
+      List.map rem_white_space |> List.flatten |>
+      replace_generics keywords spec_chars |>
+      String.concat ""
 
 let k_grams s n =
   let rec k_grams_helper acc s n =
@@ -94,18 +182,21 @@ let hash_file f k =
     let spec_chars = special_chars keywords_file in
     let f_string = hash_helper (open_in f) keywords_file in
     let is_txt = check_suffix f "txt" in
-    let n_grams = k_grams (remove_noise f_string keywords spec_chars is_txt) k in
+    let comment_info = comment_info f in
+    let noise_removed_str =
+      remove_noise comment_info f_string keywords spec_chars is_txt in
+    let n_grams = k_grams noise_removed_str k in
     List.map (Hashtbl.hash) n_grams
 
 let rec get_file_positions dir dir_name k filename positions =
-  let pos_helper a x =
+  (* let pos_helper a x =
     let acc = snd a in
     let p = fst (fst a) in
     let l = snd (fst a) in
     let current = p + l in
     if current >= x then ((p, x+k-p),acc)
     else ((x,k),(p,l)::acc)
-  in
+  in *)
   let rec hash_helper f_channel s =
       try
         let line = input_line f_channel in
@@ -124,7 +215,11 @@ let rec get_file_positions dir dir_name k filename positions =
       let channel = open_in f in
       let f_string = hash_helper channel keywords_file in
       let is_txt = check_suffix f "txt" in
-      let file = k_grams (remove_noise f_string keywords spec_chars is_txt) k in
+      let comment_info = comment_info f in
+      let noise_removed_str =
+        remove_noise comment_info f_string keywords spec_chars is_txt in
+      let n_grams = k_grams noise_removed_str k in
+      let file = n_grams in
       let results = List.map (fun x ->
         (string_of_int x, List.nth file (x - 1))
       ) positions in

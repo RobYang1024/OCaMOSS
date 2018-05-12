@@ -9,11 +9,14 @@ val keywords_list : string -> string list
 
 val special_chars : string -> char list
 
+val comment_info : string -> (string * string * string * bool)
+
 (* [remove_noise str keywords] removes/replaces all of the noise, for example,
  * whitespace, variable names, function names, and language key words found in
  * [keywords] with more general names so that hashing can catch similarities
  * that it otherwise would not. *)
-val remove_noise : string -> string list -> char list -> bool -> string
+val remove_noise : (string * string * string * bool) ->
+  string -> string list -> char list -> bool -> string
 
 (* [k_grams str n] creates a list of strings of length n, starting at each
  * character in [str] up to and including ([str] length - [n])th character.
@@ -22,4 +25,5 @@ val k_grams : string -> int -> string list
 
 val hash_file : string -> int -> int list
 
-val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> (string*string) list
+val get_file_positions : Unix.dir_handle ->
+  string -> int -> string -> int list -> (string * string) list

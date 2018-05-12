@@ -18,10 +18,12 @@ end *)
 module type PREPROCESSING =  sig
   val keywords_list : string -> string list
   val special_chars : string -> char list
-  val remove_noise : string -> string list -> char list -> bool -> string
+  val remove_noise : (string * string * string * bool)
+    ->string -> string list -> char list -> bool -> string
   val k_grams : string -> int -> string list
   val hash_file : string -> int -> int list
-  val get_file_positions : Unix.dir_handle -> string -> int -> string -> int list -> (string *string)list
+  val get_file_positions : Unix.dir_handle ->
+    string -> int -> string -> int list -> (string *string)list
 end
 
 module type COMPARISON = sig

@@ -21,8 +21,12 @@ let spec_chars = ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';'; '<';
                   '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
                   '['; ']'; '{'; '}']
 
+let comments_info_quad = ("", "(*", "*)", true)
+
 let test_fun_str =
-  "let split_and_keep_on_spec_chars spec_chars str =
+  "(* Hello World this is a comment *)
+   (* (* This is a nested comment *) *)
+  let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
   (List.fold_left
     (fun acc_arr chr ->
@@ -30,6 +34,7 @@ let test_fun_str =
        if List.mem chr spec_chars then
          List.cons \"\" (List.cons str_of_chr acc_arr)
        else
+         (* Hello I am yet another comment *)
          match acc_arr with
          | h::t -> (String.concat \"\" [h;str_of_chr])::t
          | [] -> failwith \"Array should never be empty\"
@@ -75,18 +80,15 @@ let tests = [
   "keywords" >:: (fun _ -> assert_equal
                             (keywords_list "ocaml_keywords.json") keywords);
   "spec_chars" >:: (fun _ -> assert_equal
-                              (special_chars "ocaml_keywords.json") spec_chars);
-  "remove_noise" >:: (fun _ -> assert_equal
-                                 (remove_noise
-                                    test_fun_str
-                                    keywords spec_chars
-                                    false)
-                                 expected_res_str);
-(*   "remove_noise2" >:: (fun _ -> assert_equal
-                                 (remove_noise
-                                    test_fun_str2
-                                    keywords spec_chars
-                                    false)
-                                 expected_res_str2);
- *)
+                        (special_chars "ocaml_keywords.json") spec_chars);
+  "comments_info" >:: (fun _ -> assert_equal
+                      (comment_info "ocaml_keywords.json") comments_info_quad);
+  "remove_noise" >::
+    (fun _ -> assert_equal
+      (remove_noise
+        comments_info_quad
+        test_fun_str
+        keywords spec_chars
+        false)
+      expected_res_str);
 ]
