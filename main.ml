@@ -73,12 +73,17 @@ let rec repl st =
   	| input -> handle_input st input
 
 and handle_input st input =
-  let rec print_dir_files dir str =
+  let rec print_dir_files dir str suf =
     try
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
-      then print_dir_files dir str else print_dir_files dir (str^f_name^"\n")
+      then print_dir_files dir str suf else
+      if suf != "" && not (Filename.check_suffix f_name suf)
+      then failwith "Different file extensions"
+      else
+        print_dir_files dir (str^f_name^"\n") (Filename.extension f_name)
     with
+    | Failure f -> f
     | End_of_file -> str
   in
   match parse input with
@@ -109,16 +114,19 @@ and handle_input st input =
     if st.directory = "./"
     then repl {st with display =
                          [(RED,"Error: Directory has not been set")]}
-    else let dir_files = print_dir_files (Unix.opendir st.directory) "" in
+    else let dir_files = print_dir_files (Unix.opendir st.directory) "" "" in
       repl {st with display = [(BLACK, "Current working directory: " ^
                                        st.directory^"\n Files: "^ dir_files)]}
   |SETDIR d -> begin
       try
         if d = "" || not (Sys.is_directory d)
         then repl {st with display = [(RED,"Error: Invalid directory")]}
-        else let dir_files = print_dir_files (Unix.opendir d) "" in
+        else let dir_files = print_dir_files (Unix.opendir d) "" "" in
           if dir_files = ""
           then repl {st with display = [(RED,"Error: Directory has no files")]}
+          else if dir_files = "Different file extensions"
+          then repl {st with display =
+          [(RED,"Error: Not all files in this directory are of the same type")]}
           else repl {newstate with directory = d ; display = [(GREEN,
           "Successfully set working directory to: " ^ d);
                                             (BLACK,"Files: \n" ^ dir_files)]}

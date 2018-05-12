@@ -53,7 +53,7 @@ for file A that are > 0.5
 - threshold score for detecting possible plagiarism: 0.5
 
 Supported languages/file formats:
- - oCaml: .ml, .mli
+ - oCaml: .ml
  - Java: .java
  - C: .c
  - Python: .py
