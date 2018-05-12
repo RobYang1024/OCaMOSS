@@ -76,6 +76,8 @@ let k_grams s n =
 let determine_keywords_file f =
   if check_suffix f "txt" then "txt_keywords.json"
   else if check_suffix f "ml" || check_suffix f "mli" then "ocaml_keywords.json"
+  else if check_suffix f "c" then "c_keywords.json"
+  else if check_suffix f "java" then "java_keywords.json"
   else failwith "This file format is not supported"
 
 let hash_file f k =
