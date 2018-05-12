@@ -7,8 +7,8 @@ module type BoundedQueueWithCounter = sig
 	(* [empty n] returns an empty queue with capacity n *)
 	val empty : int -> 'a t
 
-(* [create n i] returns a full queue with capacity n, with every element
- * initialized to i *)
+	(* [create n i] returns a full queue with capacity n, 
+ 	* with every element initialized to i *)
 	val create : int -> 'a -> 'a t
 
 	(* [is_empty q] checks if q is empty and returns a boolean *)
@@ -22,13 +22,13 @@ module type BoundedQueueWithCounter = sig
 
 	(* [enqueue v q] returns a queue that has the contents of q with the
 	 * value v enqueued at the tail
-   * if q is full, then the first element will be dequeued before v is
-   * enqueued *)
+     * if q is full, then the first element will be dequeued before v is
+     * enqueued *)
 	val enqueue : 'a -> 'a t -> 'a t
 
 	(* [dequeue q] dequeues the first element (head) of q and returns a tuple
-   * of the element and the updated queue the dequeued element is stored as
-   * an option
+     * of the element and the updated queue the dequeued element is stored as
+     * an option
 	 * if q is empty then the first value of the tuple will be None*)
 	val dequeue : 'a t -> 'a option * 'a t
 
@@ -39,18 +39,25 @@ module type BoundedQueueWithCounter = sig
 	(* [fold f init q] folds [f] over a list of the elements in [q] from
 	 * the head to the tail with initial value [init] *)
 	val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+
+	(* [to_list q] returns a list representation of the elements of q in order,
+	 * with the first element being the head and the last element being the tail
+	 *)
+	val to_list: 'a t -> 'a list
 end
 
 (* an implementation of BoundedQueueWithCounter using a record type and using
- * a list to store data
+ * two lists to store data. The first list stores the front of the queue,
+ * the second list stores the back of the queue in reverse order.
  *
  * AF: the elements of the queue is stored in the [data] field, the current
  * size stored in [size], the maximum size stored in [maxsize], and number of
  * times an element has been enqueued stored in [count]
  *
  * RI: [size] <= [maxsize], [size],[maxsize],[count] cannot be negative, [size]
- * is the length of the list in [data], the first element of [data] is the head
- * of the queue, the last element is the tail
+ * is sum of the lengths of both lists in [data], the head of the first list
+ * in data is the head of the queue, the head of the second list is the tail
+ * of the queue
  *)
 module Window : BoundedQueueWithCounter
 

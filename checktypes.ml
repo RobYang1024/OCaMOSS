@@ -51,6 +51,7 @@ module type WINNOWING = sig
     val dequeue : 'a t -> 'a option * 'a t
     val count : 'a t -> int
     val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+    val to_list : 'a t -> 'a list
   end
   module Window : BoundedQueueWithCounter
   val winnow: int list -> int -> (int * int) list

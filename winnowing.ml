@@ -9,16 +9,17 @@ module type BoundedQueueWithCounter = sig
 	val dequeue : 'a t -> 'a option * 'a t
 	val count : 'a t -> int
 	val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+	val to_list: 'a t -> 'a list
 end
 
 module Window : BoundedQueueWithCounter = struct
 
-	type 'a t = { data: 'a list ; maxsize: int ; size: int ; count: int}
+	type 'a t = { data: ('a list) * ('a list) ; maxsize: int ; size: int ; count: int}
 
 	let empty n =
 		if n = 0 then failwith "Cannot create queue of size 0!"
 		else
-			{ data = []; maxsize = n; size = n; count = 0}
+			{ data = ([],[]); maxsize = n; size = n; count = 0}
 
 	let create n i =
 		let rec gen l acc i =
@@ -27,7 +28,7 @@ module Window : BoundedQueueWithCounter = struct
 		if n = 0 then failwith "Cannot create queue of size 0!"
 		else
 			let initdata = gen n [] i in
-			{ data = initdata; maxsize = n; size = n; count = 0}
+			{ data = (initdata,[]); maxsize = n; size = n; count = 0}
 
 	let is_empty q = (q.size = 0)
 
@@ -35,18 +36,25 @@ module Window : BoundedQueueWithCounter = struct
 
 	let size q = q.size
 
-	let dequeue q =
+	let rec dequeue q =
 		match q.data with
-		|[] -> (None, q)
-		|h::t -> (Some h, {q with data = t ; size = q.size - 1})
+		|h::t, b -> (Some h, {q with data = (t,b) ; size = q.size - 1})
+		|[],[] -> (None, q)
+		|[], h::t -> dequeue {q with data = (List.rev (h::t),[])}
 
 	let rec enqueue item q =
 		if is_full q then dequeue q |> snd |> enqueue item
-		else {q with data = q.data@[item] ;size = q.size + 1 ;count = q.count + 1}
+		else 
+		match q.data with
+		|f,b -> {q with data = (f,item::b); size = q.size + 1 ;count = q.count + 1}
 
 	let count q = q.count
 
-	let fold f init q = List.fold_left f init q.data
+	let to_list q = (fst q.data)@(snd q.data |> List.rev)
+
+	let fold f init q = 
+		List.fold_left f init (to_list q)
+
 
 end
 
