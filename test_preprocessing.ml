@@ -53,7 +53,7 @@ let test_fun_str2 =
        if List.mem chr spec_chars then
          List.cons \"\" (List.cons str_of_chr acc_arr)
        else
-         match acc_arr with
+         match acc_arr with (* hello my name is potato *)
          | h::t -> (String.concat \"\" [h;str_of_chr])::t
          | [] -> failwith \"Array should never be empty\"
     )
