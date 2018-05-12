@@ -43,6 +43,30 @@ let expected_res_str = String.concat ""
      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
 
 
+let test_fun_str2 =
+  "let split_and_keep_on_spec_chars spec_chars str =
+  let char_array = str_to_chr_arr str in
+  (* asdf lasjhdkjasd List let char str in *)
+  (List.fold_left
+    (fun acc_arr chr ->
+       let str_of_chr = String.make 1 chr in
+       if List.mem chr spec_chars then
+         List.cons \"\" (List.cons str_of_chr acc_arr)
+       else
+         match acc_arr with (* hello my name is potato *)
+         | h::t -> (String.concat \"\" [h;str_of_chr])::t
+         | [] -> failwith \"Array should never be empty\"
+    )
+    [\"\"]
+    (* me too thanks *)
+    char_array) |> List.filter (fun str -> str <> \"\") |> List.rev"
+
+let expected_res_str2 = String.concat ""
+    ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v\"\"";
+     "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
+     ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
+
+
 (*Tests to check for preprocessing functionality*)
 let tests = [
   "k_grams_2" >:: (fun _ -> assert_equal (k_grams "test" 3) ["tes"; "est"]);
@@ -58,5 +82,11 @@ let tests = [
                                     keywords spec_chars
                                     false)
                                  expected_res_str);
-
+(*   "remove_noise2" >:: (fun _ -> assert_equal
+                                 (remove_noise
+                                    test_fun_str2
+                                    keywords spec_chars
+                                    false)
+                                 expected_res_str2);
+ *)
 ]
