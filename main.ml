@@ -91,9 +91,9 @@ and handle_input st input =
         else
         let k' = int_of_string k in
         let w' = int_of_string w in
-        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w') 
+        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w')
           then handle_run st k' w'
-        else 
+        else
           repl {st with display =
         [(RED, "Error: words per hash must be in range [15,40]
           and window size must be in range [20,100],
@@ -157,7 +157,7 @@ and handle_compare st a b =
           | (Some r1, Some r2) -> begin
             let l1 = List.map (snd) r1 |> List.rev in
             let l2 = List.map (snd) r2 |> List.rev in
-            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) 
+            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory)
                       st.directory (fst st.params) a l2 in
             let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory)
                       st.directory (fst st.params) b l1 in
@@ -166,11 +166,11 @@ and handle_compare st a b =
             let padded2 = pad res2 (List.length res1) in
             let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
-                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) 
+                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
                   (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (snd r2 ^ "\n"))::acc
               else
-                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) 
+                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
                   (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))::acc
             ) [] padded1 padded2 in
@@ -184,7 +184,7 @@ and handle_compare st a b =
 
 and handle_results st f =
   let concat_result_list lst is_pair =
-    List.fold_left (fun a (f,ss) -> 
+    List.fold_left (fun a (f,ss) ->
       a ^ "\n" ^ "File: " ^ f ^ (
         if is_pair then "\t\tSimilarity score: "
         else "\t\tOverall score: "
@@ -217,11 +217,12 @@ and handle_run st k w =
     | End_of_file -> dict
   in
   let concat_result_list lst is_pair =
-    List.fold_left (fun a (f,ss) -> 
-      a ^ "\n" ^ "File: " ^ f ^ (
-        if is_pair then "\t\tSimilarity score: "
-        else "\t\tOverall score: "
-      ) ^ (string_of_float ss)) "" lst
+    List.fold_left (fun a (f,ss) ->
+        a ^ "\n" ^ "File: " ^ f ^
+        (if String.length f < 10 then "\t\t\t" else "\t\t") ^
+        (if is_pair then "Similarity score: "
+         else "Overall score: ") ^
+        (string_of_float ss)) "" lst
   in
   print_endline "parsing files...";
   let parsefiles = (parse_dir (Unix.opendir st.directory)
@@ -232,12 +233,12 @@ and handle_run st k w =
   print_endline "generating results...";
   let files = concat_result_list
       (Comparison.create_sim_list comparison) false in
-  if files = "" then repl {st with display = 
-                            [(GREEN,"Success. There were no plagarised files found.")];
+  if files = "" then repl {st with display =
+                            [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; params = (k, w)}
-  else repl {st with display = 
-              [(GREEN,"Success. The list of plagiarised files are:"); 
-              (BLACK, files)]; results = Some comparison; 
+  else repl {st with display =
+              [(GREEN,"Success. The list of plagiarised files are:");
+              (BLACK, files)]; results = Some comparison;
               result_files = files; params = (k, w)}
 
 
