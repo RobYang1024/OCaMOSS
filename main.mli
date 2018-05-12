@@ -80,6 +80,4 @@ val parse: string -> cmd
  *
  * invalid commands will display an error message
  *)
-
- * *)
 val repl : state -> unit
