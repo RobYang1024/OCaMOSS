@@ -10,11 +10,6 @@ let rem_white_space code_string =
   String.split_on_char ' ' |>
   List.filter (fun str -> str <> "")
 
-let rem_new_lines code_string =
-  code_string |>
-  String.split_on_char '\n' |>
-  List.filter (fun str -> str <> "") |> String.concat ""
-
 let rec str_to_chr_arr str =
   let tail_len = String.length str - 1 in
   match str with
