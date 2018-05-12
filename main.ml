@@ -54,53 +54,16 @@ let parse str =
   | "compare"::a::b::[] -> COMPARE (a,b)
 	| _ -> ERROR
 
-let concat_str_list lst =
-  List.fold_left (fun s a -> a ^ "\n" ^ s) "" lst
-
-let create_display_list color lst =
-  List.map (fun x -> (color,x)) lst
-
-let concat_int_list lst =
-  let int_list = List.fold_left (fun a x -> string_of_int x ^ "," ^ a) "" lst in
-  if int_list = "" then "" else String.sub int_list 0
-      (String.length int_list - 1)
-
-let concat_result_list lst is_pair =
-  List.fold_left (fun a (f,ss) -> a ^ "\n" ^ "File: " ^ f ^
-                                  ( if is_pair then "\t\tSimilarity score: "
-                                    else "\t\tOverall score: ") ^
-                                  (string_of_float ss)) "" lst
-
-let rec parse_dir dir dict dir_name k w =
-  try
-    let f_name = Unix.readdir dir in
-    if String.get f_name 0 = '.' || not (String.contains f_name '.')
-    then parse_dir dir dict dir_name k w else
-    let new_dict = Comparison.FileDict.insert f_name
-        (Winnowing.winnow (Preprocessing.hash_file
-                            (dir_name ^ Filename.dir_sep ^ f_name) k) w) dict in
-    parse_dir dir new_dict dir_name k w
-  with
-  | End_of_file -> dict
-
-let rec print_dir_files dir str =
-  try
-    let f_name = Unix.readdir dir in
-    if String.get f_name 0 = '.' || not (String.contains f_name '.')
-    then print_dir_files dir str else print_dir_files dir (str^f_name^"\n")
-  with
-  | End_of_file -> str
-
-let rec print_display d =
-  match d with
-  |[] -> ()
-  |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
-  |(BLACK, s)::t -> print_endline s; print_display t
-  |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
-  |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
-  |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n")); print_display t
-
 let rec repl st =
+  let rec print_display d =
+    match d with
+    |[] -> ()
+    |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
+    |(BLACK, s)::t -> print_endline s; print_display t
+    |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
+    |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
+    |(WHITE, s)::t -> ANSITerminal.(print_string [white] (s^"\n")); print_display t
+  in
   print_display st.display;
   print_string  [black] "> ";
   match read_line () with
@@ -110,6 +73,14 @@ let rec repl st =
   	| input -> handle_input st input
 
 and handle_input st input =
+  let rec print_dir_files dir str =
+    try
+      let f_name = Unix.readdir dir in
+      if String.get f_name 0 = '.' || not (String.contains f_name '.')
+      then print_dir_files dir str else print_dir_files dir (str^f_name^"\n")
+    with
+    | End_of_file -> str
+  in
   match parse input with
   |HELP -> repl {st with display = [(CYAN,help)]}
   |RUN (k,w)-> begin
@@ -120,8 +91,10 @@ and handle_input st input =
         else
         let k' = int_of_string k in
         let w' = int_of_string w in
-        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w') then handle_run st k' w'
-        else repl {st with display =
+        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w') 
+          then handle_run st k' w'
+        else 
+          repl {st with display =
         [(RED, "Error: words per hash must be in range [15,40]
           and window size must be in range [20,100],
         with words per hash being less than window size.")]}
@@ -184,17 +157,21 @@ and handle_compare st a b =
           | (Some r1, Some r2) -> begin
             let l1 = List.map (snd) r1 |> List.rev in
             let l2 = List.map (snd) r2 |> List.rev in
-            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) a l2 in
-            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory) st.directory (fst st.params) b l1 in
+            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory) 
+                      st.directory (fst st.params) a l2 in
+            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory)
+                      st.directory (fst st.params) b l1 in
             print_endline "generating display...";
             let padded1 = pad res1 (List.length res2) in
             let padded2 = pad res2 (List.length res1) in
             let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
-                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2))::
+                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) 
+                  (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (snd r2 ^ "\n"))::acc
               else
-                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) (b ^ " position " ^ fst r2))::
+                (BLACK, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1) 
+                  (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))::acc
             ) [] padded1 padded2 in
             repl {st with display = newdispl}
@@ -206,6 +183,13 @@ and handle_compare st a b =
   end
 
 and handle_results st f =
+  let concat_result_list lst is_pair =
+    List.fold_left (fun a (f,ss) -> 
+      a ^ "\n" ^ "File: " ^ f ^ (
+        if is_pair then "\t\tSimilarity score: "
+        else "\t\tOverall score: "
+      ) ^ (string_of_float ss)) "" lst
+  in
   match st.results with
   |None -> failwith "unexpected"
   |Some r -> begin
@@ -220,22 +204,41 @@ and handle_results st f =
   end
 
 and handle_run st k w =
+  let rec parse_dir dir dict dir_name k w =
+    try
+      let f_name = Unix.readdir dir in
+      if String.get f_name 0 = '.' || not (String.contains f_name '.')
+      then parse_dir dir dict dir_name k w else
+      let new_dict = Comparison.FileDict.insert f_name
+          (Winnowing.winnow (Preprocessing.hash_file
+                              (dir_name ^ Filename.dir_sep ^ f_name) k) w) dict in
+      parse_dir dir new_dict dir_name k w
+    with
+    | End_of_file -> dict
+  in
+  let concat_result_list lst is_pair =
+    List.fold_left (fun a (f,ss) -> 
+      a ^ "\n" ^ "File: " ^ f ^ (
+        if is_pair then "\t\tSimilarity score: "
+        else "\t\tOverall score: "
+      ) ^ (string_of_float ss)) "" lst
+  in
   print_endline "parsing files...";
   let parsefiles = (parse_dir (Unix.opendir st.directory)
-                      Comparison.FileDict.empty st.directory
-                      k w) in
+                        Comparison.FileDict.empty st.directory
+                        k w) in
   print_endline "comparing files...";
   let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
   let files = concat_result_list
       (Comparison.create_sim_list comparison) false in
-  if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")];
-                                   results = Some comparison; params = (k, w)}
-  else repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
-                  (BLACK, files)];
-                     results = Some comparison;
-                     result_files = files;
-                params = (k, w)}
+  if files = "" then repl {st with display = 
+                            [(GREEN,"Success. There were no plagarised files found.")];
+                            results = Some comparison; params = (k, w)}
+  else repl {st with display = 
+              [(GREEN,"Success. The list of plagiarised files are:"); 
+              (BLACK, files)]; results = Some comparison; 
+              result_files = files; params = (k, w)}
 
 
 let main () = repl newstate
