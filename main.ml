@@ -42,7 +42,7 @@ let newstate = {display = [(GREEN,
                 params = (35,40)}
 
 let parse str =
-  let input_split = String.split_on_char ' ' (String.trim str) in
+  let input_split = String.split_on_char ' ' str in
 	match input_split with
   | ["help"] -> HELP
   | "run"::k::w::[] -> RUN (k,w)
@@ -66,7 +66,7 @@ let rec repl st =
   in
   print_display st.display;
   print_string  [black] "> ";
-  match read_line () with
+  match String.trim (read_line ()) with
     | exception End_of_file -> ()
     | "quit" -> ANSITerminal.(print_string [green]
                                 ("Thank you for using oCaMOSS!!\n"));

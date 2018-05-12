@@ -24,5 +24,6 @@
     "{", "}", "~", "@"],
   "comment-start" : "/*",
   "comment-end" : "*/",
-  "comment": "//"
+  "comment": "//",
+  "comments-nest": False
 }
