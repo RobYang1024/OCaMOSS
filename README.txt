@@ -65,7 +65,9 @@ result
 7) functions/comments reordered  - should return positive result
 8) more than 2 files - files changed respectively as follows: function/variable names changed; random spaces/new lines added; rec declarations/ match statement lines changed - should return positive result… lab034.ml has all the same functions but bogus implementations - should NOT return positive result.
 9) more than 2 files - files changed respectively as follows: same comments but different code; comments deleted and same code with variable/function names changed - should NOT return positive result for first and should return positive result for second
-10) large group of all different files. - should NOT return positive result
-11) txt files check: files are changed respectively as follows: exact wikipedia article; edited but very similar wikipedia article; sentences shifted around of original; exact same; a file that says “camel” five times; a more hazy edit of the original - should return positive result for all except last two: “Camels.txt” and “CamelMaybeCopy.txt”
-12)
-CS1101_A1) 03-02, 04-06, 05-04, 05-06
+10) large group of all different files - should NOT return positive result
+11) txt files check - files are changed respectively as follows: exact wikipedia article; edited but very similar wikipedia article; sentences shifted around of original; exact same; a file that says “camel” five times; a more hazy edit of the original - should return positive result for all except last two: “Camels.txt” and “CamelMaybeCopy.txt”
+12) Java check - test for a Java file, where one file has all comments removed
+13) C check - test for a C file where one file has all comments removed
+14) Python check - test for a Python file, where one files has comments removed and variable names changed. 
+CS1101_A1) 03-02, 04-06, 05-04, 05-06 are the pair-wise plagiarized files. 
