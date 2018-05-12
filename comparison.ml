@@ -46,8 +46,9 @@ let create_sim_list comp_dict =
         | None -> failwith "Unimplemented"
         | Some v -> let file_length = float_of_int (List.length v) in
           let file_ss =
-            List.fold_left (fun (score,n) (k1,v1) -> if StringKey.compare k k1 = 0
-                             then (score,n) else (if file_length = 0.0 then (score,n)
+            List.fold_left (fun (score,n) (k1,v1) ->
+                if StringKey.compare k k1 = 0 then (score,n)
+                else (if file_length = 0.0 then (score,n)
             else let s = ((float_of_int (List.length v1))/.file_length) in
               if s >= 0.5
               then (score+.s,n+.1.0) else (score,n))) (0.0,0.0)
@@ -62,6 +63,7 @@ let create_sim_list comp_dict =
 
 let create_pair_sim_list f_name f_dict_list =
   try
+    if f_dict_list = [] then [] else
     let f_length = float_of_int (List.length (List.assoc f_name f_dict_list)) in
     (List.fold_left (fun lst (k,v) -> if k = f_name then lst else
                        (k,(float_of_int(List.length v))/.f_length)::lst)

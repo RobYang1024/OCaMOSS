@@ -47,13 +47,19 @@ val compare : FileDict.t -> CompDict.t
 
 (* [create_sim_list comp_dict] assigns a similarity score to each of the
  * keys in comp_dict, and returns a list of files whose similarity scores are
- * above a certain threshold. The similarity of one file with another is
- * calculated as the number of matching hashes between the files divided by
- * the number of hashes of the file itself, and hence the similarity score of
- * a file is the sum of the similarities of that file with every other file.
- * The files are ordered from least to greatest.
+ * above a certain threshold, and their overall similarity score. The
+ * similarity of one file with another is calculated as the number of matching
+ * hashes between the files divided by the number of hashes of the file itself,
+ * and hence the similarity score of a file is the average of the similarities
+ * of that file with every other file. The files are ordered in decreasing
+ * order of similarity, and files that have the same similarity score are
+ * ordered by increasing order of filename.
  *)
 val create_sim_list : CompDict.t -> (StringKey.t * float) list
 
+(* [create_pair_sim_list f_name f_dict_list] returns a list of files and
+ * their corresponding pair similarity scores when compared with f_name.
+ * requires: The value in f_dict_list corresponding to f_name cannot be
+ * an empty list, unless f_dict_list itself is an empty list. *)
 val create_pair_sim_list : StringKey.t -> (StringKey.t * HashValue.t) list ->
   (StringKey.t * float) list

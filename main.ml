@@ -65,9 +65,10 @@ let concat_int_list lst =
   if int_list = "" then "" else String.sub int_list 0
       (String.length int_list - 1)
 
-let concat_result_list lst =
+let concat_result_list lst is_pair =
   List.fold_left (fun a (f,ss) -> a ^ "\n" ^ "File: " ^ f ^
-                                  "\t\tSimilarity score: " ^
+                                  ( if is_pair then "\t\tSimilarity score: "
+                                    else "\t\tOverall score: ") ^
                                   (string_of_float ss)) "" lst
 
 let rec parse_dir dir dict dir_name k w =
@@ -212,7 +213,7 @@ and handle_results st f =
     |Some v -> begin
       let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
       repl {st with display = [(BLACK, "Results for file " ^ f ^
-        ": \n" ^ concat_result_list r_list)]}
+        ": \n" ^ concat_result_list r_list true)]}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -226,7 +227,8 @@ and handle_run st k w =
   print_endline "comparing files...";
   let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
-  let files = concat_result_list (Comparison.create_sim_list comparison) in
+  let files = concat_result_list
+      (Comparison.create_sim_list comparison) false in
   if files = "" then repl {st with display = [(GREEN,"Success. There were no plagarised files found.")];
                                    results = Some comparison; params = (k, w)}
   else repl {st with display = [(GREEN,"Success. The list of plagiarised files are:");
