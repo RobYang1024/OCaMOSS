@@ -78,4 +78,5 @@ result
 12) Java check - test for a Java file, where one file has all comments removed
 13) C check - test for a C file where one file has all comments removed
 14) Python check - test for a Python file, where one files has comments removed and variable names changed. 
-CS1101_A1) 03-02, 04-06, 05-04, 05-06 are the pair-wise plagiarized files. 
+CS1101_A1) 03-02, 04-06, 05-04, 05-06 are the pair-wise plagiarized files.
+MiniFactorialTests) All should return a positive result. Only 14 are detected: all type 1 and type 2 plagiarized files are caught. Writeup elaborates on definitions of plagiarism types. 
