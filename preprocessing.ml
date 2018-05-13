@@ -91,7 +91,7 @@ let rec split_on_str str_to_split_on acc_str_arr str_to_split =
       List.rev new_acc_arr
 
 let remove_comments
-    comment_start comment_end comments_nest no_space_str =
+    comment_start comment_end comments_nest code_str =
   let do_filter_from_arr (acc_arr, nesting) str =
     if str = comment_start then
       if comments_nest then (" "::acc_arr, nesting + 1)
@@ -104,7 +104,7 @@ let remove_comments
       else (" "::str::acc_arr, 0)
   in
   let split_on_comments_arr =
-    split_on_str comment_start [] no_space_str |>
+    split_on_str comment_start [] code_str |>
     List.map (split_on_str comment_end []) |> List.flatten
   in
   let acc_tup =
