@@ -28,16 +28,15 @@ help --- display instructions again"
 
 let newstate = {display = [(GREEN,
 "
-
-                _______             __   __   _______   _______   _______
-               |       |           |  |_|  | |       | |       | |       |
-      _______  |     __|  _______  |       | |   _   | |  _____| |  _____|
-     |   _   | |    |    |   _   | |       | |  | |  | | |_____  | |_____
-     |  | |  | |    |__  |  |_|  | |       | |  |_|  | |_____  | |_____  |
-     |  |_|  | |       | |   _   | | ||_|| | |       |  _____| |  _____| |
+      _______   _______             __   __   _______   _______   _______
+     |       | |       |           |  |_|  | |       | |       | |       |
+     |   _   | |     __|  _______  |       | |   _   | |  _____| |  _____|
+     |  | |  | |    |    |   _   | |       | |  | |  | | |_____  | |_____
+     |  |_|  | |    |__  |  |_|  | |       | |  |_|  | |_____  | |_____  |
+     |       | |       | |   _   | | ||_|| | |       |  _____| |  _____| |
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
-(WHITE,"Welcome to oCaMOSS!!");(CYAN,help)];
+(WHITE,"Welcome to OCaMOSS!!");(CYAN,help)];
                 directory = "./" ; results = None; result_files = "";
                 params = (35,40)}
 
@@ -69,7 +68,7 @@ let rec repl st =
   match String.trim (read_line ()) with
     | exception End_of_file -> ()
     | "quit" -> ANSITerminal.(print_string [green]
-                                ("Thank you for using oCaMOSS!!\n"));
+                                ("Thank you for using OCaMOSS!!\n"));
   	| input -> handle_input st input
 
 and handle_input st input =
@@ -141,13 +140,13 @@ and handle_input st input =
         else handle_results st f
     end
     |None -> repl {st with display =
-    [(RED,"Error: no results to display. Run oCaMoss first")]}
+    [(RED,"Error: no results to display. Run OCaMoss first")]}
   end
   |COMPARE (a,b) -> begin
     match st.results with
     |Some r -> handle_compare st a b
     |None -> repl {st with display =
-    [(RED,"Error: no results to display. Run oCaMoss first")]}
+    [(RED,"Error: no results to display. Run OCaMoss first")]}
   end
   |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
 
@@ -252,5 +251,5 @@ and handle_run st k w =
 
 
 let main () = repl newstate
-
+(* hi anna i am potato *)
 let () = main ()
