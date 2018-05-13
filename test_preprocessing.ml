@@ -26,6 +26,10 @@ let comments_info_quad = ("", "(*", "*)", true)
 let test_fun_str =
   "(* Hello World this is a comment *)
    (* (* This is a nested comment *) *)
+   (* This is a multi line comment
+      This is a multi line comment *)
+   (* This is a multi line (* nested comment
+      Wowie this is *) quite the comment *)
   let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
   (List.fold_left
@@ -47,7 +51,7 @@ let expected_res_str = String.concat ""
      "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
 
-
+    (*)
 let test_fun_str2 =
   "let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
@@ -69,7 +73,15 @@ let test_fun_str2 =
 let expected_res_str2 = String.concat ""
     ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v\"\"";
      "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
-     ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
+      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"] *)
+
+let test_fun_str3 = "wow(*wow wow wow*)wow"
+
+let expected_res_str3 = "vv"
+
+let test_fun_str4 = "wow (* wow wow wow"
+
+let expected_res_str4 = "v"
 
 
 (*Tests to check for preprocessing functionality*)
@@ -91,4 +103,22 @@ let tests = [
         keywords spec_chars
         false)
       expected_res_str);
+
+  "remove_noise_3" >::
+    (fun _ -> assert_equal
+      (remove_noise
+        comments_info_quad
+        test_fun_str3
+        keywords spec_chars
+        false)
+      expected_res_str3);
+
+  "remove_noise_4" >::
+    (fun _ -> assert_equal
+      (remove_noise
+        comments_info_quad
+        test_fun_str4
+        keywords spec_chars
+        false)
+      expected_res_str4);
 ]

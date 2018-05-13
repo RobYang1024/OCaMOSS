@@ -90,14 +90,14 @@ let remove_comments
     comment_start comment_end comments_nest no_space_str =
   let do_filter_from_arr (acc_arr, nesting) str =
     if str = comment_start then
-      if comments_nest then (acc_arr, nesting + 1)
-      else (acc_arr, nesting)
+      if comments_nest then (" "::acc_arr, nesting + 1)
+      else (" "::acc_arr, nesting)
     else if str = comment_end then
-      if comments_nest then (acc_arr, nesting - 1) (* to account for single line comments *)
-      else (acc_arr, 0)
+      if comments_nest then (" "::acc_arr, nesting - 1) (* to account for single line comments *)
+      else (" "::acc_arr, 0)
     else
       if nesting > 0 then (acc_arr, nesting)
-      else (str::acc_arr, 0)
+      else (" "::str::acc_arr, 0)
   in
   let split_on_comments_arr =
     split_on_str comment_start [] no_space_str |>
