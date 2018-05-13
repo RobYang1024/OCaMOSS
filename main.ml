@@ -227,7 +227,8 @@ and handle_run st k w =
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
         a ^ "\n" ^ "File: " ^ f ^
-        (if String.length f < 10 then "\t\t\t" else "\t\t") ^
+        (if String.length f < 10 then "\t\t\t\t" else if String.length f < 18
+         then "\t\t\t" else if String.length f < 27 then "\t\t" else "\t") ^
         (if is_pair then "Similarity score: "
          else "Overall score: ") ^
         (string_of_float ss)) "" lst

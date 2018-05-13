@@ -81,7 +81,7 @@ let expected_res_str = String.concat ""
      "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
 
-(*)
+(*
 let test_fun_str2 =
   "let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
