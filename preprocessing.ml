@@ -7,6 +7,7 @@ let rem_white_space code_string =
   code_string |>
   String.split_on_char '\t' |> String.concat " " |>
   String.split_on_char '\n' |> String.concat " " |>
+  String.split_on_char '\r' |> String.concat " " |>
   String.split_on_char ' ' |>
   List.filter (fun str -> str <> "")
 
