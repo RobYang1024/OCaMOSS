@@ -1,7 +1,7 @@
 open OUnit2
 open Preprocessing
 
-let keywords =
+let ocaml_keywords =
   ["and"; "as"; "assert"; "asr"; "begin"; "class"; "constraint";
    "do"; "done"; "downto"; "else"; "end"; "exception"; "external";
    "false"; "for"; "fun"; "function"; "functor"; "if"; "in"; "include";
@@ -17,11 +17,41 @@ let keywords =
    "Spacetime"; "Stack"; "StdLabels"; "Stream"; "String"; "StringLabels";
    "Sys"; "Uchar"; "Weak"]
 
-let spec_chars = ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';'; '<';
-                  '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
-                  '['; ']'; '{'; '}']
+let ocaml_spec_chars =
+  ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';'; '<';
+   '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
+   '['; ']'; '{'; '}']
 
-let comments_info_quad = ("", "(*", "*)", true)
+let ocaml_comments_info_quad = ("", "(*", "*)", true)
+
+let java_keywords =
+  ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default"; "package";
+   "synchronized"; "boolean"; "do"; "if"; "private"; "this"; "break"; "double"; "implements";
+   "protected"; "throw"; "byte"; "else"; "import"; "public"; "throws"; "case"; "enum";
+   "instanceof"; "return"; "transient"; "catch"; "extends"; "int"; "short"; "try"; "char"; "final";
+   "interface"; "static"; "void"; "class"; "finally"; "long"; "strictfp"; "volatile";
+   "float"; "native"; "super"; "while"; "Boolean"; "Byte"; "Character"; "Class"; "ClassLoader";
+   "ClassValue"; "Compiler"; "Double"; "Enum"; "Float"; "InheritableThreadLocal"; "Integer ";
+   "Long"; "Math"; "Number"; "Object"; "Package"; "Process"; "ProcessBuilder"; "Runtime";
+   "RuntimePermission"; "SecurityManager"; "Short"; "StackTraceElement"; "StrictMath"; "String";
+   "StringBuffer"; "StringBuilder"; "System"; "Thread"; "ThreadGroup"; "ThreadLocal";
+   "Throwable"; "Void"; "AbstractCollection"; "AbstractList"; "AbstractMap"; "AbstractQueue";
+   "AbstractSequentialList"; "AbstractSet"; "ArrayDeque"; "ArrayList"; "Arrays"; "BitSet";
+   "Calendar"; "Collections"; "Currency"; "Date"; "Dictionary"; "EnumMap"; "EnumSet";
+   "EventListenerProxy"; "EventObject"; "FormattableFlags"; "Formatter"; "GregorianCalendar";
+   "HashMap";"HashSet"; "Hashtable"; "IdentityHashMap"; "LinkedHashMap"; "LinkedHashSet"; "LinkedList";
+   "ListResourceBundle"; "Locale"; "Objects"; "Observable"; "PriorityQueue"; "Properties";
+   "PropertyPermission"; "PropertyResourceBundle"; "Random"; "ResourceBundle";
+   "ResourceBundle.Control"; "Scanner"; "ServiceLoader"; "SimpleTimeZone"; "Stack";
+   "StringTokenizer"; "Timer"; "TimerTask"; "TimeZone"; "TreeMap"; "TreeSet"; "UUID";
+   "Vector"; "WeakHashMap"]
+
+let java_spec_chars =
+  ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';';
+   '<'; '='; '>'; '?'; '^'; '|';  '\"'; '\''; '('; ')'; ','; '['; ']';
+   '{'; '}'; '~'; '@']
+
+let java_comments_info_quad = ("//", "/*", "*/", false)
 
 let test_fun_str =
   "(* Hello World this is a comment *)
@@ -51,7 +81,7 @@ let expected_res_str = String.concat ""
      "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
 
-    (*)
+(*)
 let test_fun_str2 =
   "let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
@@ -83,10 +113,6 @@ let test_fun_str4 = "wow (* wow wow wow"
 
 let expected_res_str4 = "v"
 
-let some_java_keywords = ["public"; "class"; "extends"]
-
-let java_comments_quad = ("//", "/*", "*/", false)
-
 let test_fun_str5 =
   "/**
      * A DumbAI is a Controller that always chooses the blank space with the
@@ -96,52 +122,125 @@ let test_fun_str5 =
 
 let expected_res_str5 = "publicclassvextendsv"
 
+let test_fun_str6 =
+   "// Note: Calling delay here will make the CLUI work a little more
+    Hello World
+    I am the World
+    hahaha"
 
-(*Tests to check for preprocessing functionality*)
+let expected_res_str6 = "vvvvvvv"
+
+let test_fun_str7 =
+"package controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Board;
+import model.Game;
+import model.Location;
+import model.NotImplementedException;
+import model.Player;
+
+/**
+ * A DumbAI is a Controller that always chooses the blank space with the
+ * smallest column number from the row with the smallest row number.
+ */
+public class DumbAI extends Controller {
+
+  public DumbAI(Player me) {
+    super(me);
+    // TODO Auto-generated constructor stub
+    //throw new NotImplementedException();
+  }
+
+  protected @Override Location nextMove(Game g) {
+    // Note: Calling delay here will make the CLUI work a little more
+    // nicely when competing different AIs against each other.
+
+    // TODO Auto-generated method stub
+    //throw new NotImplementedException();
+
+    Board b = g.getBoard();
+    // find available moves
+    for (int row = 0;row<Board.NUM_ROWS;row++) {
+      for(int col = 0;col<Board.NUM_COLS;col++) {
+        Location loc = new Location(row,col);
+        if (b.get(loc) == null) {
+          delay();
+          return loc;
+        }
+
+      }
+    }
+    // wait a bit
+    delay();
+
+    return null;
+  }
+}"
+
 let tests = [
   "k_grams_2" >:: (fun _ -> assert_equal (k_grams "test" 3) ["tes"; "est"]);
   "k_grams_1" >:: (fun _ -> assert_equal (k_grams "Hello World" 5)
             ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
-  "keywords" >:: (fun _ -> assert_equal
-                            (keywords_list "ocaml_keywords.json") keywords);
-  "spec_chars" >:: (fun _ -> assert_equal
-                        (special_chars "ocaml_keywords.json") spec_chars);
-  "comments_info" >:: (fun _ -> assert_equal
-                      (comment_info "ocaml_keywords.json") comments_info_quad);
+  "ocaml_keywords" >:: (fun _ -> assert_equal
+                            (keywords_list "ocaml_keywords.json") ocaml_keywords);
+  "ocaml_spec_chars" >:: (fun _ -> assert_equal
+                        (special_chars "ocaml_keywords.json") ocaml_spec_chars);
+  "ocaml_comments_info" >:: (fun _ -> assert_equal
+                        (comment_info "ocaml_keywords.json") ocaml_comments_info_quad);
+
+  "java_keywords" >:: (fun _ -> assert_equal
+                          (keywords_list "java_keywords.json") java_keywords);
+  "java_spec_chars" >:: (fun _ -> assert_equal
+                        (special_chars "java_keywords.json") java_spec_chars);
+  "java_comments_info" >:: (fun _ -> assert_equal
+                        (comment_info "java_keywords.json") java_comments_info_quad);
+
+
   "remove_noise" >::
     (fun _ -> assert_equal
       (remove_noise
-        comments_info_quad
+        ocaml_comments_info_quad
         test_fun_str
-        keywords spec_chars
+        ocaml_keywords ocaml_spec_chars
         false)
       expected_res_str);
 
   "remove_noise_3" >::
     (fun _ -> assert_equal
       (remove_noise
-        comments_info_quad
+        ocaml_comments_info_quad
         test_fun_str3
-        keywords spec_chars
+        ocaml_keywords ocaml_spec_chars
         false)
       expected_res_str3);
 
   "remove_noise_4" >::
     (fun _ -> assert_equal
       (remove_noise
-        comments_info_quad
+        ocaml_comments_info_quad
         test_fun_str4
-        keywords spec_chars
+        ocaml_keywords ocaml_spec_chars
         false)
       expected_res_str4);
-
 
   "remove_noise_5" >::
     (fun _ -> assert_equal
       (remove_noise
-        java_comments_quad
+        java_comments_info_quad
         test_fun_str5
-        some_java_keywords spec_chars
+        java_keywords java_spec_chars
         false)
       expected_res_str5);
+
+  "remove_noise_6" >::
+    (fun _ -> assert_equal
+      (remove_noise
+        java_comments_info_quad
+        test_fun_str6
+        java_keywords java_spec_chars
+        false)
+      expected_res_str6);
 ]
