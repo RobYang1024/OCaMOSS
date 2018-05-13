@@ -171,7 +171,7 @@ let hash_file f k =
   let rec hash_helper f_channel s =
     try
       let line = input_line f_channel in
-      hash_helper f_channel (s^line)
+      hash_helper f_channel (s^line^"\n")
     with
     | End_of_file -> s in
     let keywords_file = determine_keywords_file f in
@@ -197,7 +197,7 @@ let rec get_file_positions dir dir_name k filename positions =
   let rec hash_helper f_channel s =
       try
         let line = input_line f_channel in
-        hash_helper f_channel (s^line)
+        hash_helper f_channel (s^line^"\n")
       with
       | End_of_file -> s
   in
