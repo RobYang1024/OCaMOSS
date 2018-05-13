@@ -116,7 +116,7 @@ and handle_input st input =
                          [(RED,"Error: Directory has not been set")]}
     else let dir_files = print_dir_files (Unix.opendir st.directory) "" "" in
       repl {st with display = [(BLACK, "Current working directory: " ^
-                                       st.directory^"\n Files: "^ dir_files)]}
+                                      st.directory^"\n Files: \n"^ dir_files)]}
   |SETDIR d -> begin
       try
         if d = "" || not (Sys.is_directory d)

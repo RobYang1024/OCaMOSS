@@ -31,14 +31,18 @@ let keywords_list keywords_file_name =
   |> to_list |> List.map to_string
 
 let comment_info keywords_file_name =
-  let path_to_keywords_file =
-    String.concat "/" ["keywords_files"; keywords_file_name] in
+
+  let path_to_keywords_file = "keywords_files" ^ Filename.dir_sep ^
+                              keywords_file_name in
+  try
   let json = Yojson.Basic.from_file path_to_keywords_file in
   let one_line_comm_st = json |> member "comment" |> to_string in
   let mult_line_comm_st = json |> member "comment-start" |> to_string in
   let mult_line_comm_end = json |> member "comment-end" |> to_string in
   let comments_nest = json |> member "comments-nest" |> to_bool in
   (one_line_comm_st, mult_line_comm_st, mult_line_comm_end, comments_nest)
+  with
+  | _ -> failwith "z"
 
 let split_and_keep_on_spec_chars spec_chars str =
   let char_array = str_to_chr_arr str in
@@ -171,15 +175,14 @@ let hash_file f k =
       hash_helper f_channel (s^line)
     with
     | End_of_file -> s in
-
     let keywords_file = determine_keywords_file f in
     let keywords = keywords_list keywords_file in
     let spec_chars = special_chars keywords_file in
     let f_string = hash_helper (open_in f) keywords_file in
     let is_txt = check_suffix f "txt" in
-    let comment_info = comment_info f in
+    let com_info = comment_info keywords_file in
     let noise_removed_str =
-      remove_noise comment_info f_string keywords spec_chars is_txt in
+    remove_noise com_info f_string keywords spec_chars is_txt in
     let n_grams = k_grams noise_removed_str k in
     List.map (Hashtbl.hash) n_grams
 
@@ -210,9 +213,9 @@ let rec get_file_positions dir dir_name k filename positions =
       let channel = open_in f in
       let f_string = hash_helper channel keywords_file in
       let is_txt = check_suffix f "txt" in
-      let comment_info = comment_info f in
+      let com_info = comment_info keywords_file in
       let noise_removed_str =
-        remove_noise comment_info f_string keywords spec_chars is_txt in
+        remove_noise com_info f_string keywords spec_chars is_txt in
       let n_grams = k_grams noise_removed_str k in
       let file = n_grams in
       let results = List.map (fun x ->
