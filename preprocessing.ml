@@ -31,9 +31,8 @@ let keywords_list keywords_file_name =
   |> to_list |> List.map to_string
 
 let comment_info keywords_file_name =
-
-  let path_to_keywords_file = "keywords_files" ^ Filename.dir_sep ^
-                              keywords_file_name in
+  let path_to_keywords_file =
+    "keywords_files" ^ Filename.dir_sep ^ keywords_file_name in
   try
   let json = Yojson.Basic.from_file path_to_keywords_file in
   let one_line_comm_st = json |> member "comment" |> to_string in
@@ -95,7 +94,7 @@ let remove_comments
   let do_filter_from_arr (acc_arr, nesting) str =
     if str = comment_start then
       if comments_nest then (" "::acc_arr, nesting + 1)
-      else (" "::acc_arr, nesting)
+      else (" "::acc_arr, 1)
     else if str = comment_end then
       if comments_nest then (" "::acc_arr, nesting - 1) (* to account for single line comments *)
       else (" "::acc_arr, 0)

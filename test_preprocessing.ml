@@ -83,6 +83,19 @@ let test_fun_str4 = "wow (* wow wow wow"
 
 let expected_res_str4 = "v"
 
+let some_java_keywords = ["public"; "class"; "extends"]
+
+let java_comments_quad = ("//", "/*", "*/", false)
+
+let test_fun_str5 =
+  "/**
+     * A DumbAI is a Controller that always chooses the blank space with the
+     * smallest column number from the row with the smallest row number.
+     */
+    public class DumbAI extends Controller"
+
+let expected_res_str5 = "publicclassvextendsv"
+
 
 (*Tests to check for preprocessing functionality*)
 let tests = [
@@ -121,4 +134,14 @@ let tests = [
         keywords spec_chars
         false)
       expected_res_str4);
+
+
+  "remove_noise_5" >::
+    (fun _ -> assert_equal
+      (remove_noise
+        java_comments_quad
+        test_fun_str5
+        some_java_keywords spec_chars
+        false)
+      expected_res_str5);
 ]
