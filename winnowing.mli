@@ -7,7 +7,7 @@ module type BoundedQueueWithCounter = sig
 	(* [empty n] returns an empty queue with capacity n *)
 	val empty : int -> 'a t
 
-	(* [create n i] returns a full queue with capacity n, 
+	(* [create n i] returns a full queue with capacity n,
  	* with every element initialized to i *)
 	val create : int -> 'a -> 'a t
 

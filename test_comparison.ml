@@ -104,13 +104,13 @@ let tests = [
    * an empty comparison dictionary, one with a single entry, one with two
    * entries, and only with an empty entry, which are all the edge cases. *)
   "empty sim" >:: (fun _ -> assert_equal []
-                      (create_sim_list emp_comp));
+                      (create_sim_list emp_comp 0.5));
   "single entry sim" >:: (fun _ -> assert_equal []
-                              (create_sim_list se_comp));
+                              (create_sim_list se_comp 0.5));
   "double entry sim" >:: (fun _ -> assert_equal ["a";"b"]
-                             (create_sim_list de_comp |> get_files));
+                             (create_sim_list de_comp 0.5 |> get_files));
   "empty entry sim" >:: (fun _ -> assert_equal ["b"]
-                            (create_sim_list emp_e_comp |> get_files));
+                            (create_sim_list emp_e_comp 0.5 |> get_files));
 
 
   (* The tests for create_pair_sim_list test if it works on an empty file

@@ -44,7 +44,7 @@ module Window : BoundedQueueWithCounter = struct
 
 	let rec enqueue item q =
 		if is_full q then dequeue q |> snd |> enqueue item
-		else 
+		else
 		match q.data with
 		|f,b -> {q with data = (f,item::b); size = q.size + 1 ;count = q.count + 1}
 
@@ -52,7 +52,7 @@ module Window : BoundedQueueWithCounter = struct
 
 	let to_list q = (fst q.data)@(snd q.data |> List.rev)
 
-	let fold f init q = 
+	let fold f init q =
 		List.fold_left f init (to_list q)
 
 

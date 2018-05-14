@@ -5,7 +5,7 @@ type color = RED | BLACK | GREEN | CYAN | WHITE
 
 (* type representing the state of the interface *)
 type state = {display: (color * string) list; directory: string; results:
-                CompDict.t option; result_files: string; params: (int*int)}
+                CompDict.t option; result_files: string; params: float}
 
 (* type for commands recognised by MOSS
  * RUN - runs MOSS on the current directory of the state, no arguments
@@ -19,7 +19,7 @@ type state = {display: (color * string) list; directory: string; results:
  * COMPARE - compares two files, printing out the similar sections, takes 2
  * arguments
  *)
-type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+type cmd = RUN of string | DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
 
 (* this is printed every time the user enters the help command *)

@@ -23,7 +23,7 @@ val remove_noise : (string * string * string * bool) ->
  *)
 val k_grams : string -> int -> string list
 
-val hash_file : string -> int -> int list
+val hash_file : string -> int list
 
 val get_file_positions : Unix.dir_handle ->
-  string -> int -> string -> int list -> (string * string) list
+  string-> string -> int list -> (string * string) list

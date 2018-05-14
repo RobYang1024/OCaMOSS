@@ -21,9 +21,9 @@ module type PREPROCESSING =  sig
   val remove_noise : (string * string * string * bool)
     ->string -> string list -> char list -> bool -> string
   val k_grams : string -> int -> string list
-  val hash_file : string -> int -> int list
+  val hash_file : string -> int list
   val get_file_positions : Unix.dir_handle ->
-    string -> int -> string -> int list -> (string *string)list
+    string-> string -> int list -> (string * string) list
 end
 
 module type COMPARISON = sig
@@ -36,7 +36,7 @@ module type COMPARISON = sig
   val make_pair_comp : string ->
     (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
   val compare : FileDict.t -> CompDict.t
-  val create_sim_list : CompDict.t -> (StringKey.t * float) list
+  val create_sim_list : CompDict.t -> float -> (StringKey.t * float) list
   val create_pair_sim_list : StringKey.t -> (StringKey.t * HashValue.t) list ->
     (StringKey.t * float) list
 end
@@ -63,8 +63,8 @@ module type MAIN = sig
   type color = RED | BLACK | GREEN | CYAN | WHITE
   type state = {display: (color * string) list; directory: string; results:
                   Comparison.CompDict.t option; result_files: string;
-                params: (int*int)}
-  type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+                params: float}
+  type cmd = RUN of string | DIR | HELP | SETDIR of string
            | RESULTS of string | COMPARE of (string*string)| ERROR
   val parse: string -> cmd
   val repl : state -> unit
