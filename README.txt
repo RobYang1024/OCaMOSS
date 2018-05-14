@@ -11,8 +11,9 @@ navigate to the root directory of this project, and use "make check"
 -------------------------------------------------------------------------------
 Commands: (note - commands are case-sensitive)
 
-run [words per hash] [window size] --- runs oCaMoss on the working directory.
-params are optional, defaults to 35 words per hash, 40 per window. 
+run [threshold] --- runs oCaMoss on the working directory.
+The threshold argument gives the program the percentage of the file to match with
+another for it to be flagged as plagiarised, and must be at least 0.4 and at most 1 
 
 dir --- lists the working directory and the files that it contains
 
@@ -37,7 +38,7 @@ Usage instructions/tutorial:
 and all files have the same extension 
 (example: [setdir tests/test1])
 
-2. [run] with desired params (example: [run 35 40] is the same as [run])
+2. [run] with desired params (example: [run 0.5] is the same as [run])
 
 3. [results] to view list of results, [results filename] to view list of
 results for specific file, and [compare A B] to compare matching patterns for

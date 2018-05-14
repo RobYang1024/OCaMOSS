@@ -7,22 +7,22 @@ open ANSITerminal
 type color = RED | BLACK | GREEN | CYAN | WHITE
 
 type state = {display: (color * string) list; directory: string; results:
-                CompDict.t option; result_files: string; params: (int*int)}
+                CompDict.t option; result_files: string; params: float}
 
-type cmd = RUN of (string*string)| DIR | HELP | SETDIR of string
+type cmd = RUN of string | DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
 
 let help =
 "Commands (case-sensitive): \n
-run [words per hash] [window size] --- runs oCaMoss on the working directory.
-Parameters are optional, default to 35 words per hash, 40 per window
+run [threshold] --- runs oCaMoss on the working directory.
+The threshold argument gives the program the percentage of the file to match with
+another for it to be flagged as plagiarised. It is optional with default value 0.5,
+and must be at least 0.4 and at most 1
 dir --- lists the working directory and the files that it contains
 setdir [dir] --- sets the relative directory to look for files and resets any results
 results --- lists the file names for which there are results
 results [filename] --- lists the detailed results of overlap for that file
-(Make sure to include the extension of the file)
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
-(Make sure to include the extension of the files)
 quit --- exits the REPL
 help --- display instructions again"
 
@@ -38,14 +38,14 @@ let newstate = {display = [(GREEN,
 ");
 (WHITE,"Welcome to OCaMOSS!!");(CYAN,help)];
                 directory = "./" ; results = None; result_files = "";
-                params = (35,40)}
+                params = 0.5}
 
 let parse str =
   let input_split = String.split_on_char ' ' str in
 	match input_split with
   | ["help"] -> HELP
-  | "run"::k::w::[] -> RUN (k,w)
-  | ["run"] -> RUN ("35","40")
+  | "run"::[t] -> RUN t
+  | ["run"] -> RUN "0.5"
   | ["dir"] -> DIR
   | "setdir"::d::[] -> SETDIR d
   | "results"::f::[] -> RESULTS f
@@ -87,24 +87,21 @@ and handle_input st input =
   in
   match parse input with
   |HELP -> repl {st with display = [(CYAN,help)]}
-  |RUN (k,w)-> begin
+  |RUN t -> begin
       try begin
         if st.directory = "./"
         then repl {st with display =
             [(RED,"Error: Directory has not been set")]}
         else
-        let k' = int_of_string k in
-        let w' = int_of_string w in
-        if (k' >= 15 && k' <=40 && w' >=20 && w' <=100 && k'<w')
-          then handle_run st k' w'
+        let t' = float_of_string t in
+        if t' >= 0.4 && t' <= 1.0
+          then handle_run st t'
         else
           repl {st with display =
-        [(RED, "Error: words per hash must be in range [15,40]
-          and window size must be in range [20,100],
-        with words per hash being less than window size.")]}
+                          [(RED, "Error: Threshold must between 0.4 and 1")]}
       end
       with
-      | Failure f_msg when f_msg = "int_of_string" ->
+      | Failure f_msg when f_msg = "float_of_string" ->
         repl {st with display = [(RED,"Error: Invalid argument(s)")]}
       | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
       | _ -> repl {st with display = [(RED,"Error: Something went wrong")]}
@@ -165,9 +162,9 @@ and handle_compare st a b =
             let l1 = List.map (snd) r1 |> List.rev in
             let l2 = List.map (snd) r2 |> List.rev in
             let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory)
-                      st.directory (fst st.params) a l2 in
+                      st.directory a l2 in
             let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory)
-                      st.directory (fst st.params) b l1 in
+                      st.directory b l1 in
             print_endline "generating display...";
             let padded1 = pad res1 (List.length res2) in
             let padded2 = pad res2 (List.length res1) in
@@ -210,16 +207,16 @@ and handle_results st f =
     "Error: no results to display for file " ^ f)]}
   end
 
-and handle_run st k w =
-  let rec parse_dir dir dict dir_name k w =
+and handle_run st t =
+  let rec parse_dir dir dict dir_name =
     try
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
-      then parse_dir dir dict dir_name k w else
+      then parse_dir dir dict dir_name else
       let new_dict = Comparison.FileDict.insert f_name
           (Winnowing.winnow (Preprocessing.hash_file
-                              (dir_name ^ Filename.dir_sep ^ f_name) k) w) dict in
-      parse_dir dir new_dict dir_name k w
+                               (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
+      parse_dir dir new_dict dir_name
     with
     | End_of_file -> dict
   in
@@ -233,21 +230,20 @@ and handle_run st k w =
         (string_of_float ss)) "" lst
   in
   print_endline "parsing files...";
-  let parsefiles = (parse_dir (Unix.opendir st.directory)
-                        Comparison.FileDict.empty st.directory
-                        k w) in
+  let parsefiles = parse_dir (Unix.opendir st.directory)
+                        Comparison.FileDict.empty st.directory in
   print_endline "comparing files...";
   let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
   let files = concat_result_list
-      (Comparison.create_sim_list comparison) false in
+      (Comparison.create_sim_list comparison t) false in
   if files = "" then repl {st with display =
-                            [(GREEN,"Success. There were no plagarised files found.\n")];
-                            results = Some comparison; params = (k, w)}
+                  [(GREEN,"Success. There were no plagarised files found.\n")];
+                            results = Some comparison; params = t}
   else repl {st with display =
               [(GREEN,"Success. The list of plagiarised files are:");
               (BLACK, files)]; results = Some comparison;
-              result_files = files; params = (k, w)}
+              result_files = files; params = t}
 
 
 let main () = repl newstate

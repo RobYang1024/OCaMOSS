@@ -55,7 +55,7 @@ val compare : FileDict.t -> CompDict.t
  * order of similarity, and files that have the same similarity score are
  * ordered by increasing order of filename.
  *)
-val create_sim_list : CompDict.t -> (StringKey.t * float) list
+val create_sim_list : CompDict.t -> float -> (StringKey.t * float) list
 
 (* [create_pair_sim_list f_name f_dict_list] returns a list of files and
  * their corresponding pair similarity scores when compared with f_name.

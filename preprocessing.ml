@@ -150,7 +150,7 @@ let remove_noise comment_quad code_string keywords spec_chars is_txt =
       replace_generics keywords spec_chars |>
       String.concat ""
 
-let k_grams s n =
+let k_grams s k =
   let rec k_grams_helper acc s n =
     try
       let n_sub_str = String.sub s 0 n in
@@ -158,7 +158,7 @@ let k_grams s n =
       k_grams_helper (n_sub_str::acc) tail_str n
     with Invalid_argument _ -> List.rev acc
   in
-  k_grams_helper [] s n
+  k_grams_helper [] s k
 
 let determine_keywords_file f =
   if check_suffix f "txt" then "txt_keywords.json"
@@ -168,7 +168,7 @@ let determine_keywords_file f =
   else if check_suffix f "py" then "python_keywords.json"
   else failwith "This file format is not supported"
 
-let hash_file f k =
+let hash_file f =
   let rec hash_helper f_channel s =
     try
       let line = input_line f_channel in
@@ -183,10 +183,10 @@ let hash_file f k =
     let com_info = comment_info keywords_file in
     let noise_removed_str =
     remove_noise com_info f_string keywords spec_chars is_txt in
-    let n_grams = k_grams noise_removed_str k in
+    let n_grams = k_grams noise_removed_str 35 in
     List.map (Hashtbl.hash) n_grams
 
-let rec get_file_positions dir dir_name k filename positions =
+let rec get_file_positions dir dir_name filename positions =
   (* let pos_helper a x =
     let acc = snd a in
     let p = fst (fst a) in
@@ -204,7 +204,7 @@ let rec get_file_positions dir dir_name k filename positions =
   in
   try
     let f_name = Unix.readdir dir in
-    if f_name <> filename then get_file_positions dir dir_name k filename positions
+    if f_name <> filename then get_file_positions dir dir_name filename positions
     else begin
       let f = dir_name ^ Filename.dir_sep ^ f_name in
       let keywords_file = determine_keywords_file f in
@@ -216,7 +216,7 @@ let rec get_file_positions dir dir_name k filename positions =
       let com_info = comment_info keywords_file in
       let noise_removed_str =
         remove_noise com_info f_string keywords spec_chars is_txt in
-      let n_grams = k_grams noise_removed_str k in
+      let n_grams = k_grams noise_removed_str 35 in
       let file = n_grams in
       let results = List.map (fun x ->
         (string_of_int x, List.nth file (x - 1))
