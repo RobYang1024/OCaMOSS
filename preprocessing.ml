@@ -187,14 +187,6 @@ let hash_file f =
     List.map (Hashtbl.hash) n_grams
 
 let rec get_file_positions dir dir_name filename positions =
-  (* let pos_helper a x =
-    let acc = snd a in
-    let p = fst (fst a) in
-    let l = snd (fst a) in
-    let current = p + l in
-    if current >= x then ((p, x+k-p),acc)
-    else ((x,k),(p,l)::acc)
-  in *)
   let rec hash_helper f_channel s =
       try
         let line = input_line f_channel in
