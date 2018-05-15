@@ -74,8 +74,7 @@ NOTE: to replicate, run using threshold = 0.4
 1) exact duplicates - should return positive result
 2) variable names changed - should return positive result
 3) functions/comments reordered  - should return positive result
-4) functions1.ml is a copy of functions.ml but with large sections deleted
-- should return positive result for functions1 but not functions
+4) functions1.ml is a copy of functions.ml but with large sections deleted - should return positive result for functions1 but not functions
 5) different implementations of the same algorithm - should NOT return positive
 result
 6) completely different files - should NOT return positive result
