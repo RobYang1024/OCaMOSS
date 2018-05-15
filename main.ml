@@ -136,7 +136,9 @@ and handle_input st input =
   |RESULTS f -> begin
     match st.results with
     |Some r -> begin
-        if f = "" then repl {st with display =
+        if f = "" then if st.result_files = [] then repl {st with display =
+        [(GREEN,"Success. There were no plagarised files found.\n")];} 
+          else repl {st with display =
           (TEXT, "Results for files:")::st.result_files}
         else handle_results st f
     end
@@ -208,8 +210,7 @@ and handle_results st f =
          (string_of_float ss)))::a) []
       (lst |> List.sort (fun (k1,s1) (k2,s2) ->
            if Pervasives.compare s1 s2 = 0 then -Pervasives.compare k1 k2
-           else (Pervasives.compare s1 s2))
-       |> List.filter (fun (k,s) -> s >= st.threshold))
+           else (Pervasives.compare s1 s2)))
   in
   match st.results with
   |None -> failwith "unexpected"

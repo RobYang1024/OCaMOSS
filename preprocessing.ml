@@ -164,7 +164,7 @@ let remove_noise comment_tuple code_string keywords spec_chars is_txt =
         else remove_strings s
         |> String.concat ""
       in
-      (*rm_strings*) code_string |> rm_mult_line_comment |> rm_one_line_comment |>
+      rm_strings code_string |> rm_mult_line_comment |> rm_one_line_comment |>
       split_and_keep_on_spec_chars spec_chars |>
       List.map rem_white_space |> List.flatten |>
       replace_generics keywords spec_chars |>
