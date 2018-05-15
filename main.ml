@@ -213,7 +213,7 @@ and handle_results st f =
     |Some v -> begin
       let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
       repl {st with display = (TEXT, "Results for file " ^ f ^
-        ": \n")::(concat_result_list r_list true)}
+        ": \n")::(concat_result_list r_list true |> List.rev)}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -251,7 +251,7 @@ and handle_run st t =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}
   else repl {st with display =
-              (GREEN,"Success. The list of plagiarised files are:")::files;
+              (GREEN,"Success. The list of plagiarised files are:")::(List.rev files);
               results = Some comparison; result_files = files; threshold = t}
 
 and handle_pair r st =
