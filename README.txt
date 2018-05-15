@@ -45,6 +45,11 @@ and all files have the same extension
 3. [results] to view list of results, [results filename] to view list of
 results for specific file, and [compare A B] to compare matching patterns for
 two files (example: [results Camel.txt])
+
+Example for runnning test case 1 and inspecting results:
+1) setdir tests/test1
+2) run
+3) results/results intset.ml/compare intset1.ml intset.ml
 -------------------------------------------------------------------------------
 Other information:
 
