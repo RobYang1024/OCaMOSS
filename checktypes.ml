@@ -60,12 +60,12 @@ module type WINNOWING = sig
 end
 
 module type MAIN = sig
-  type color = RED | BLACK | GREEN | CYAN | WHITE
+  type color = RED | GREEN | CYAN | TEXT
   type state = {display: (color * string) list; directory: string; results:
                   Comparison.CompDict.t option; result_files: (color * string) list;
-                params: float}
+                threshold: float}
   type cmd = RUN of string | DIR | HELP | SETDIR of string
-           | RESULTS of string | COMPARE of (string*string)| ERROR
+           | RESULTS of string | PAIR | COMPARE of (string*string)| ERROR
   val parse: string -> cmd
   val repl : state -> unit
 end

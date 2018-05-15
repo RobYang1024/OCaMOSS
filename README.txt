@@ -25,6 +25,8 @@ results --- lists the file names for which there are results
 results [filename] --- lists the detailed results of overlap for that file
 (Make sure to include the extension of the file)
 
+pairresults -- lists all the pairs of files for which there are results
+
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
 (Make sure to include the extension of the files)
 

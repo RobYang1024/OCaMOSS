@@ -1,11 +1,12 @@
 open Preprocessing
 open Comparison
 
-type color = RED | BLACK | GREEN | CYAN | WHITE
+type color = RED | GREEN | CYAN | TEXT
 
 (* type representing the state of the interface *)
 type state = {display: (color * string) list; directory: string; results:
-                CompDict.t option; result_files: (color * string) list; params: float}
+                CompDict.t option; result_files: (color * string) list;
+              threshold: float}
 
 (* type for commands recognised by MOSS
  * RUN - runs MOSS on the current directory of the state, no arguments
@@ -20,7 +21,7 @@ type state = {display: (color * string) list; directory: string; results:
  * arguments
  *)
 type cmd = RUN of string | DIR | HELP | SETDIR of string
-         | RESULTS of string | COMPARE of (string*string)| ERROR
+         | RESULTS of string | PAIR | COMPARE of (string*string)| ERROR
 
 (* this is printed every time the user enters the help command *)
 val help: string
