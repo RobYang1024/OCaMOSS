@@ -227,7 +227,7 @@ let rec get_file_positions dir dir_name filename positions =
       let com_info = comment_info keywords_file in
       let noise_removed_str =
         remove_noise com_info f_string keywords spec_chars is_txt in
-      (* print_endline noise_removed_str; *)
+      print_endline noise_removed_str;
       let n_grams = k_grams noise_removed_str 35 in
       let file = n_grams in
       let results = List.map (fun x ->
