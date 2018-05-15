@@ -76,7 +76,17 @@ val remove_noise : (string * string * string * bool * bool) ->
  *)
 val k_grams : string -> int -> string list
 
+(* [hash_file f] returns a list of hashes for n-grams of a file f with default
+ * n = 35, where the file has been preprocessed by removing whitespace,
+ * removing comments, replacing all variable names and strings with a generic
+ * tag, while making sure that keywords and module names remain intact.
+ *)
 val hash_file : string -> int list
 
+(* [get_file_positions dir dir_name filename positions] rehashes file filename
+ * from directory dir, preprocessing it similar to how it would be in hash_file,
+ * and returns a list of parts of the files that start at the values in
+ * positions once the files have been preprocessed.
+ *)
 val get_file_positions : Unix.dir_handle ->
   string -> string -> int list -> (string * string) list
