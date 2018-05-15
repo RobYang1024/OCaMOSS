@@ -270,8 +270,9 @@ and handle_run st t =
 and handle_pair r st =
   let disp = List.fold_left (fun d (f,v) -> d ^ (match CompDict.find f r with
       | None -> ""
-      | Some f_d -> List.fold_left (fun s (f2,ss) ->
-          if ss < st.threshold && f != f2 then s else s ^ f ^ " " ^ f2 ^ "\n")
+      | Some f_d -> List.fold_left (fun s (f2,ss) -> s ^
+      if ss < st.threshold && f != f2 then "" else Printf.sprintf "%-40s%s" (f)
+              (f2) ^ "\n")
                       "" (create_pair_sim_list f (FileDict.to_list f_d))))
       "" (CompDict.to_list r) in
   repl {st with display = [(TEXT,disp)]}
