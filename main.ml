@@ -98,13 +98,15 @@ and handle_input st input =
           then handle_run st t'
         else
           repl {st with display =
-                          [(RED, "Error: Threshold must between 0.4 and 1")]}
+          [(RED, "Error: Threshold must between 0.4 and 1")]}
       end
       with
       | Failure f_msg when f_msg = "float_of_string" ->
         repl {st with display = [(RED,"Error: Invalid argument(s)")]}
       | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
-      | _ -> repl {st with display = [(RED,"Error: Something went wrong")]}
+      | e -> 
+      print_endline (Printexc.to_string e);
+      repl {st with display = [(RED,"Error: Something went wrong")]}
   end
   |DIR ->
     if st.directory = "./"
@@ -125,7 +127,7 @@ and handle_input st input =
           [(RED,"Error: Not all files in this directory are of the same type")]}
           else repl {newstate with directory = d ; display = [(GREEN,
           "Successfully set working directory to: " ^ d);
-                                            (BLACK,"Files: \n" ^ dir_files)]}
+          (BLACK,"Files: \n" ^ dir_files)]}
 
       with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
   end
