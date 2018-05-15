@@ -63,7 +63,7 @@ Supported languages/file formats:
  - English: .txt (note: english comparison does NOT account for semantics)
 
 -------------------------------------------------------------------------------
-Sample test cases description (test case N is in directory tests/testN):
+Self-generated test case descriptions (test case N is in directory tests/testN):
 
 1) exact duplicates - should return positive result
 2) variable names changed - should return positive result
@@ -81,5 +81,3 @@ result
 12) Java check - test for a Java file, where one file has all comments removed
 13) C check - test for a C file where one file has all comments removed
 14) Python check - test for a Python file, where one files has comments removed and variable names changed. 
-SSID_demo) 03-02, 04-06, 05-04, 05-06 are the pair-wise plagiarized files.
-MiniFactorialTests) All should return a positive result. Only 14 are detected: all type 1 and type 2 plagiarized files are caught. Writeup elaborates on definitions of plagiarism types. 

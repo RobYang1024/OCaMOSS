@@ -106,7 +106,7 @@ and handle_input st input =
       | Failure f_msg when f_msg = "float_of_string" ->
         repl {st with display = [(RED,"Error: Invalid argument(s)")]}
       | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
-      | e ->
+      | e -> 
       print_endline (Printexc.to_string e);
       repl {st with display = [(RED,"Error: Something went wrong")]}
   end
@@ -129,7 +129,11 @@ and handle_input st input =
           [(RED,"Error: Not all files in this directory are of the same type")]}
           else repl {newstate with directory = d ; display = [(GREEN,
           "Successfully set working directory to: " ^ d);
+<<<<<<< HEAD
                                             (TEXT,"Files: \n" ^ dir_files)]}
+=======
+          (BLACK,"Files: \n" ^ dir_files)]}
+>>>>>>> c4eb3933c353ebb86fa58cea5352238812655bf4
 
       with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
   end
