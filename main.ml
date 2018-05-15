@@ -250,20 +250,12 @@ and handle_run st t =
        |> List.filter (fun (k,s) -> s >= st.threshold))
   in
   print_endline "parsing files...";
-<<<<<<< HEAD
-  (*let t = Sys.time() in*)
-=======
->>>>>>> f01d38f54e4e0da6280fa1f4000ead1027698634
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
   print_endline "generating results...";
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
-<<<<<<< HEAD
-  (*Printf.printf "Execution time: %fs\n" (Sys.time() -. t);*)
-=======
->>>>>>> f01d38f54e4e0da6280fa1f4000ead1027698634
   if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}
