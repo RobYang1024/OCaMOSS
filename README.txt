@@ -25,7 +25,7 @@ results --- lists the file names for which there are results
 results [filename] --- lists the detailed results of overlap for that file
 (Make sure to include the extension of the file)
 
-resultpairs -- lists all the pairs of files for which there are results
+resultpairs -- lists all the pairs of files for which there are positive results
 
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
 (Make sure to include the extension of the files)
@@ -49,7 +49,7 @@ two files (example: [results Camel.txt])
 Example for runnning test case 1 and inspecting results:
 1) setdir tests/test1
 2) run
-3) results/results intset.ml/compare intset1.ml intset.ml
+3) results/results intset.ml/compare intset1.ml intset.ml/resultpairs
 -------------------------------------------------------------------------------
 Other information:
 
@@ -69,6 +69,7 @@ Supported languages/file formats:
 
 -------------------------------------------------------------------------------
 Self-generated test case descriptions (test case N is in directory tests/testN):
+NOTE: to replicate, run using threshold = 0.4
 
 1) exact duplicates - should return positive result
 2) variable names changed - should return positive result

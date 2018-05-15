@@ -203,14 +203,15 @@ and handle_compare st a b =
   end
 
 and handle_results st f =
+  let cmp_tuple (k1,s1) (k2,s2) = 
+    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
+    else (Pervasives.compare s1 s2)
+  in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
         ((if is_pair then "Similarity score: " else "Overall score: ") ^
-         (string_of_float ss)))::a) []
-      (lst |> List.sort (fun (k1,s1) (k2,s2) ->
-           if Pervasives.compare s1 s2 = 0 then -Pervasives.compare k1 k2
-           else (Pervasives.compare s1 s2)))
+        (string_of_float ss)))::a) [] (List.sort (cmp_tuple) lst)
   in
   match st.results with
   |None -> failwith "unexpected"
@@ -219,7 +220,7 @@ and handle_results st f =
     |Some v -> begin
       let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
       repl {st with display = (TEXT, "Results for file " ^ f ^
-        ": \n")::(concat_result_list r_list true |> List.rev)}
+        ": \n")::(concat_result_list r_list true)}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -231,7 +232,7 @@ and handle_run st t =
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
       then parse_dir dir dict dir_name else begin
-        (*print_endline f_name;*)
+      print_endline f_name;
       let new_dict = Comparison.FileDict.insert f_name
           (Winnowing.winnow (Preprocessing.hash_file
           (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
@@ -240,15 +241,16 @@ and handle_run st t =
     with
     | End_of_file -> dict
   in
+  let cmp_tuple (k1,s1) (k2,s2) = 
+    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
+    else (Pervasives.compare s1 s2)
+  in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
         ((if is_pair then "Similarity score: " else "Overall score: ") ^
          (string_of_float ss)))::a) []
-      (lst |> List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0
-                          then -Pervasives.compare k1 k2 else
-                            (Pervasives.compare s1 s2))
-       |> List.filter (fun (k,s) -> s >= st.threshold))
+    (lst |> List.sort (cmp_tuple)|> List.filter (fun (k,s) -> s >= st.threshold))
   in
   print_endline "parsing files...";
   let parsefiles = parse_dir (Unix.opendir st.directory)
@@ -261,7 +263,7 @@ and handle_run st t =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}
   else repl {st with display =
-              (GREEN,"Success. The list of plagiarised files are:")::(List.rev files);
+              (GREEN,"Success. The list of plagiarised files are:")::files;
               results = Some comparison; result_files = files; threshold = t}
 
 and handle_pair r st =
