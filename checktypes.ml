@@ -18,7 +18,7 @@ end *)
 module type PREPROCESSING =  sig
   val keywords_list : string -> string list
   val special_chars : string -> char list
-  val remove_noise : (string * string * string * bool)
+  val remove_noise : (string * string * string * bool * bool)
     ->string -> string list -> char list -> bool -> string
   val k_grams : string -> int -> string list
   val hash_file : string -> int list
@@ -62,7 +62,7 @@ end
 module type MAIN = sig
   type color = RED | BLACK | GREEN | CYAN | WHITE
   type state = {display: (color * string) list; directory: string; results:
-                  Comparison.CompDict.t option; result_files: string;
+                  Comparison.CompDict.t option; result_files: (color * string) list;
                 params: float}
   type cmd = RUN of string | DIR | HELP | SETDIR of string
            | RESULTS of string | COMPARE of (string*string)| ERROR

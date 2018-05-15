@@ -7,7 +7,7 @@ open ANSITerminal
 type color = RED | BLACK | GREEN | CYAN | WHITE
 
 type state = {display: (color * string) list; directory: string; results:
-                CompDict.t option; result_files: string; params: float}
+                CompDict.t option; result_files: (color * string) list; params: float}
 
 type cmd = RUN of string | DIR | HELP | SETDIR of string
          | RESULTS of string | COMPARE of (string*string)| ERROR
@@ -37,7 +37,7 @@ let newstate = {display = [(GREEN,
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
 (WHITE,"Welcome to OCaMOSS!!");(CYAN,help)];
-                directory = "./" ; results = None; result_files = "";
+                directory = "./" ; results = None; result_files = [];
                 params = 0.5}
 
 let parse str =
@@ -133,7 +133,7 @@ and handle_input st input =
     match st.results with
     |Some r -> begin
         if f = "" then repl {st with display =
-          [(BLACK, "Results for files: \n" ^ st.result_files)]}
+          (BLACK, "Results for files:")::st.result_files}
         else handle_results st f
     end
     |None -> repl {st with display =
@@ -189,10 +189,9 @@ and handle_compare st a b =
 and handle_results st f =
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
-      a ^ "\n" ^ "File: " ^ f ^ (
-        if is_pair then "\t\tSimilarity score: "
-        else "\t\tOverall score: "
-      ) ^ (string_of_float ss)) "" lst
+        (BLACK, Printf.sprintf "%-40s%s" ("File: " ^ f)
+        ((if is_pair then "Similarity score: " else "Overall score: ") ^
+        (string_of_float ss)))::a) [] lst
   in
   match st.results with
   |None -> failwith "unexpected"
@@ -200,8 +199,8 @@ and handle_results st f =
     match CompDict.find f r with
     |Some v -> begin
       let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
-      repl {st with display = [(BLACK, "Results for file " ^ f ^
-        ": \n" ^ concat_result_list r_list true)]}
+      repl {st with display = (BLACK, "Results for file " ^ f ^
+        ": \n")::(concat_result_list r_list true)}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -216,7 +215,7 @@ and handle_run st t =
       print_endline f_name;
       let new_dict = Comparison.FileDict.insert f_name
           (Winnowing.winnow (Preprocessing.hash_file
-                               (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
+          (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
       parse_dir dir new_dict dir_name
     end
     with
@@ -224,12 +223,9 @@ and handle_run st t =
   in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
-        a ^ "\n" ^ "File: " ^ f ^
-        (if String.length f < 10 then "\t\t\t\t" else if String.length f < 18
-         then "\t\t\t" else if String.length f < 27 then "\t\t" else "\t") ^
-        (if is_pair then "Similarity score: "
-         else "Overall score: ") ^
-        (string_of_float ss)) "" lst
+        (BLACK, Printf.sprintf "%-40s%s" ("File: " ^ f)
+        ((if is_pair then "Similarity score: " else "Overall score: ") ^
+        (string_of_float ss)))::a) [] lst
   in
   print_endline "parsing files...";
   let parsefiles = parse_dir (Unix.opendir st.directory)
@@ -238,13 +234,12 @@ and handle_run st t =
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
-  if files = "" then repl {st with display =
+  if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; params = t}
   else repl {st with display =
-              [(GREEN,"Success. The list of plagiarised files are:");
-              (BLACK, files)]; results = Some comparison;
-              result_files = files; params = t}
+              (GREEN,"Success. The list of plagiarised files are:")::files;
+              results = Some comparison; result_files = files; params = t}
 
 
 let main () = repl newstate

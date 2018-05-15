@@ -5,7 +5,7 @@ type color = RED | BLACK | GREEN | CYAN | WHITE
 
 (* type representing the state of the interface *)
 type state = {display: (color * string) list; directory: string; results:
-                CompDict.t option; result_files: string; params: float}
+                CompDict.t option; result_files: (color * string) list; params: float}
 
 (* type for commands recognised by MOSS
  * RUN - runs MOSS on the current directory of the state, no arguments

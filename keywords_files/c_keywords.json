@@ -29,5 +29,6 @@
   "comment-start" : "/*",
   "comment-end" : "*/",
   "comment" : "//",
-  "comments-nest": false
+  "comments-nest": false,
+  "strings":true
 }

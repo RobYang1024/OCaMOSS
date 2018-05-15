@@ -22,7 +22,7 @@ let ocaml_spec_chars =
    '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
    '['; ']'; '{'; '}']
 
-let ocaml_comments_info_quad = ("", "(*", "*)", true)
+let ocaml_comments_info_quad = ("", "(*", "*)", true, true)
 
 let java_keywords =
   ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default"; "package";
@@ -51,7 +51,7 @@ let java_spec_chars =
    '<'; '='; '>'; '?'; '^'; '|';  '\"'; '\''; '('; ')'; ','; '['; ']';
    '{'; '}'; '~'; '@']
 
-let java_comments_info_quad = ("//", "/*", "*/", false)
+let java_comments_info_quad = ("//", "/*", "*/", false, true)
 
 let test_fun_str =
   "(* Hello World this is a comment *)

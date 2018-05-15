@@ -12,12 +12,13 @@
     "ListLabels", "Map", "Marshal", "MoreLabels", "Nativeint", "Oo", "Parsing",
     "Printexc", "Printf", "Queue", "Random", "Scanf", "Set", "Sort",
     "Spacetime", "Stack", "StdLabels", "Stream", "String", "StringLabels",
-    "Sys", "Uchar", "Weak"],
+    "Sys", "Uchar", "Weak", "failwith"],
   "special characters": ["!", "$", "%", "&", "*", "+", "-", ".", "/", ":", ";",
     "<", "=", ">", "?", "@", "^", "|", "~", "#", "\"", "(", ")", ",", "[", "]",
     "{", "}"],
   "comment-start": "(*",
   "comment-end": "*)",
   "comment": "",
-  "comments-nest": true
+  "comments-nest": true,
+  "strings":true
 }

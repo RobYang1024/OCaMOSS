@@ -40,7 +40,8 @@ let comment_info keywords_file_name =
   let mult_line_comm_st = json |> member "comment-start" |> to_string in
   let mult_line_comm_end = json |> member "comment-end" |> to_string in
   let comments_nest = json |> member "comments-nest" |> to_bool in
-  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end, comments_nest)
+  let rm_string = json |> member "strings" |> to_bool in
+  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end, comments_nest, rm_string)
   with
   | _ -> failwith "z"
 
@@ -90,6 +91,22 @@ let rec split_on_str str_to_split_on acc_str_arr str_to_split =
         new_acc_arr_else_case acc_str_arr str_to_split_on str_to_split in
       List.rev new_acc_arr
 
+let remove_strings code_str = 
+  let filter_from_arr (acc_arr, start) str =
+    if str = "\"" && start = false then
+      (" "::acc_arr, true)
+    else if str = "\"" then
+      (" "::acc_arr, false)
+    else
+      if start then (" s "::acc_arr, start)
+      else (" "::str::acc_arr, false)
+  in
+  let split_on_comments_arr = split_on_str "\"" [] code_str in
+  let acc_tup =
+    List.fold_left filter_from_arr ([], false) split_on_comments_arr in
+  match acc_tup with
+  | (acc_arr, _) -> List.rev acc_arr 
+
 let remove_comments
     comment_start comment_end comments_nest code_str =
   let do_filter_from_arr (acc_arr, nesting) str =
@@ -97,7 +114,7 @@ let remove_comments
       if comments_nest then (" "::acc_arr, nesting + 1)
       else (" "::acc_arr, 1)
     else if str = comment_end then
-      if comments_nest then (" "::acc_arr, nesting - 1) (* to account for single line comments *)
+      if comments_nest then (" "::acc_arr, nesting - 1) 
       else (" "::acc_arr, 0)
     else
       if nesting > 0 then (acc_arr, nesting)
@@ -124,27 +141,29 @@ let replace_generics keywords spec_chars str_arr =
          with Failure _ -> "v" )
     str_arr
 
-let remove_noise comment_quad code_string keywords spec_chars is_txt =
+let remove_noise comment_tuple code_string keywords spec_chars is_txt =
   if is_txt then code_string
   else
-    match comment_quad with
-    | (one_line_st, mult_line_st, mult_line_end, comments_nest) ->
-      let one_line_comm_removed =
-        if one_line_st = "" then
-          code_string
+    match comment_tuple with
+    | (one_line_st, mult_line_st, mult_line_end, comments_nest, rm_string) ->
+      let rm_one_line_comment s =
+        if one_line_st = "" then s
         else
-          code_string |>
-          remove_comments one_line_st "\n" false |>
-          String.concat ""
+          remove_comments one_line_st "\n" false s
+          |> String.concat ""
       in
-      let mult_line_comm_removed =
-        if mult_line_st = "" then one_line_comm_removed
+      let rm_mult_line_comment s =
+        if mult_line_st = "" then s
         else
-          one_line_comm_removed |>
-          remove_comments mult_line_st mult_line_end comments_nest |>
-          String.concat ""
+          remove_comments mult_line_st mult_line_end comments_nest s
+          |> String.concat ""
       in
-      mult_line_comm_removed |>
+      let rm_strings s = 
+        if not rm_string then s
+        else remove_strings s
+        |> String.concat ""
+      in
+      rm_strings code_string |> rm_mult_line_comment |> rm_one_line_comment |>
       split_and_keep_on_spec_chars spec_chars |>
       List.map rem_white_space |> List.flatten |>
       replace_generics keywords spec_chars |>
@@ -208,6 +227,7 @@ let rec get_file_positions dir dir_name filename positions =
       let com_info = comment_info keywords_file in
       let noise_removed_str =
         remove_noise com_info f_string keywords spec_chars is_txt in
+      print_endline noise_removed_str;
       let n_grams = k_grams noise_removed_str 35 in
       let file = n_grams in
       let results = List.map (fun x ->
