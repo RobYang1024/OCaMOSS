@@ -3,6 +3,44 @@ open Unix
 open Filename
 open Yojson.Basic.Util
 
+(* Refer to preprocessing.mli for this function's speficiations *)
+let keywords_list language_file_name =
+  let path_to_language_file =
+    String.concat "/" ["language_files"; language_file_name] in
+  Yojson.Basic.from_file path_to_language_file
+  |> member "keywords"
+  |> to_list |> List.map to_string
+
+(* Refer to preprocessing.mli for this function's speficiations *)
+let special_chars language_file_name =
+  let path_to_language_file =
+    String.concat "/" ["language_files"; language_file_name] in
+  Yojson.Basic.from_file path_to_language_file
+  |> member "special characters"
+  |> to_list |> List.map to_string |> List.map (fun str -> String.get str 0)
+
+(* Refer to preprocessing.mli for this function's speficiations *)
+let comment_info language_file_name =
+  let path_to_language_file =
+    "language_files" ^ Filename.dir_sep ^ language_file_name in
+  try
+    let json = Yojson.Basic.from_file path_to_language_file in
+    let one_line_comm_st = json |> member "comment" |> to_string in
+    let mult_line_comm_st = json |> member "comment-start" |> to_string in
+    let mult_line_comm_end = json |> member "comment-end" |> to_string in
+    let comments_nest = json |> member "comments-nest" |> to_bool in
+    let rm_string = json |> member "strings" |> to_bool in
+    (one_line_comm_st, mult_line_comm_st, mult_line_comm_end,
+     comments_nest, rm_string)
+  with
+  | _ -> failwith "z"
+
+(* [rem_white_space code_string] returns a string list representing the strings
+ * in [code_string] separated by tabs, newlines, carriage returns, and spaces,
+ * with empty strings filtered out of said list.
+ *
+ * example: [rem_white_space " Hello World " = ["Hello"; "World"]]
+*)
 let rem_white_space code_string =
   code_string |>
   String.split_on_char '\t' |> String.concat " " |>
@@ -11,42 +49,22 @@ let rem_white_space code_string =
   String.split_on_char ' ' |>
   List.filter (fun str -> str <> "")
 
-let rec str_to_chr_arr str =
-  let tail_len = String.length str - 1 in
-  match str with
-  | "" -> []
-  | str -> (String.get str 0)::(str_to_chr_arr (String.sub str 1 tail_len))
-
-let special_chars keywords_file_name =
-  let path_to_keywords_file =
-    String.concat "/" ["keywords_files"; keywords_file_name] in
-  Yojson.Basic.from_file path_to_keywords_file
-  |> member "special characters"
-  |> to_list |> List.map to_string |> List.map (fun str -> String.get str 0)
-
-let keywords_list keywords_file_name =
-  let path_to_keywords_file =
-    String.concat "/" ["keywords_files"; keywords_file_name] in
-  Yojson.Basic.from_file path_to_keywords_file
-  |> member "keywords"
-  |> to_list |> List.map to_string
-
-let comment_info keywords_file_name =
-  let path_to_keywords_file =
-    "keywords_files" ^ Filename.dir_sep ^ keywords_file_name in
-  try
-  let json = Yojson.Basic.from_file path_to_keywords_file in
-  let one_line_comm_st = json |> member "comment" |> to_string in
-  let mult_line_comm_st = json |> member "comment-start" |> to_string in
-  let mult_line_comm_end = json |> member "comment-end" |> to_string in
-  let comments_nest = json |> member "comments-nest" |> to_bool in
-  let rm_string = json |> member "strings" |> to_bool in
-  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end,
-   comments_nest, rm_string)
-  with
-  | _ -> failwith "z"
-
+(* [split_and_keep_on_spec_chars spec_chars str] essentially does the same
+ * thing as [String.split_on_char] for each character in [spec_char], except
+ * each of the characters in [spec_char] are themselves an element in the
+ * resulting list.
+ *
+ * example:
+ * [split_and_keep_on_spec_chars [!;?] "Hello!World?" =
+ * ["Hello"; "!"; "World"; "?"]]
+ *)
 let split_and_keep_on_spec_chars spec_chars str =
+  let rec str_to_chr_arr str =
+    let tail_len = String.length str - 1 in
+    match str with
+    | "" -> []
+    | str -> (String.get str 0)::(str_to_chr_arr (String.sub str 1 tail_len))
+  in
   let char_array = str_to_chr_arr str in
   (List.fold_left
     (fun acc_arr chr ->
@@ -60,6 +78,15 @@ let split_and_keep_on_spec_chars spec_chars str =
     [""]
     char_array) |> List.filter (fun str -> str <> "") |> List.rev
 
+(* [split_on_str str_to_split_on acc_str_arr str_to_split] splits up
+ * [str_to_split] on every instance of [str_to_split_on] when
+ * [acc_str_arr] = []. [acc_str_arr] acts as an accumulator array that stores
+ * the accumulating string array as splitting is being done.
+ *
+ * example:
+ * [split_on_str "Hello" [] "HelloWorldHelloWorldHello" =
+ * ["Hello"; "World"; "Hello"; "World"; "Hello"]
+ *)
 let rec split_on_str str_to_split_on acc_str_arr str_to_split =
   let str_to_split_on_len = String.length str_to_split_on in
   let str_to_split_len = String.length str_to_split in
@@ -92,6 +119,11 @@ let rec split_on_str str_to_split_on acc_str_arr str_to_split =
         new_acc_arr_else_case acc_str_arr str_to_split_on str_to_split in
       List.rev new_acc_arr
 
+(* [remove_strings code_str], when treating [code_str] as a block of code,
+ * removes all instances of strings in code_str.
+ *
+ * example: [remove_strings "let str = \"Hello\"" = "let str = "]
+ *)
 let remove_strings code_str =
   let filter_from_arr (acc_arr, start) str =
     if str = "\"" && start = false then
@@ -108,6 +140,15 @@ let remove_strings code_str =
   match acc_tup with
   | (acc_arr, _) -> List.rev acc_arr
 
+(* [remove_comments comment_start comment_end comments_nest code_str], where
+ * - [comment_start] is a string that indicates the start of a comment.
+ * - [comment_end] is a string that indicates the end of a comment.
+ * - [comments_nest] is a bool that indicates whether or not comments nest in
+ *   the language that [code_str] is written in.
+ * - and [code_str] is the string representation of code whose comments are to
+ *   be removed.
+ * returns [code_str] but with all of its comments removed.
+ *)
 let remove_comments
     comment_start comment_end comments_nest code_str =
   let do_filter_from_arr (acc_arr, nesting) str =
@@ -130,6 +171,22 @@ let remove_comments
   match acc_tup with
   | (acc_arr, _) -> List.rev acc_arr
 
+(* [replace_generics keywords spec_chars str_arr] goes through the list, and
+ * replaces any string that
+ * - isn't a keyword
+ * - isn't the string representation of a special character
+ * - isn't the string representation of an int
+ * with the letter "v". All relevant keywords and special characters are found
+ * in [keywords] and [spec_chars], respectively.
+ *
+ * example: [
+ *  replace_generics
+ *    ["if"; "then"; "else"]
+ *    ['['; ']']
+ *    ["if"; "some_bool"; "then"; "["; "]"; "else"; "["; "one_element"; "]"] =
+ *  ["if"; "v"; "then"; "["; "]"; "else"; "["; "v"; "]"]
+ * ]
+ *)
 let replace_generics keywords spec_chars str_arr =
   List.map
     (fun str ->
@@ -142,6 +199,7 @@ let replace_generics keywords spec_chars str_arr =
          with Failure _ -> "v" )
     str_arr
 
+(* Refer to preprocessing.mli for this function's speficiations *)
 let remove_noise comment_tuple code_string keywords spec_chars is_txt =
   if is_txt then code_string
   else
@@ -170,6 +228,7 @@ let remove_noise comment_tuple code_string keywords spec_chars is_txt =
       replace_generics keywords spec_chars |>
       String.concat ""
 
+(* Refer to preprocessing.mli for this function's speficiations *)
 let k_grams s k =
   let rec k_grams_helper acc s n =
     try
@@ -180,14 +239,20 @@ let k_grams s k =
   in
   k_grams_helper [] s k
 
-let determine_keywords_file f =
-  if check_suffix f "txt" then "txt_keywords.json"
-  else if check_suffix f "ml" then "ocaml_keywords.json"
-  else if check_suffix f "c" then "c_keywords.json"
-  else if check_suffix f "java" then "java_keywords.json"
-  else if check_suffix f "py" then "python_keywords.json"
+(* [determine_language_file f] returns the string that represents the name of
+ * of the json file that contains all relevant information about the language
+ * that the code in the file named [f] is written in.
+ *)
+let determine_language_file f =
+  if check_suffix f "txt" then "txt_info.json"
+  else if check_suffix f "ml" then "ocaml_info.json"
+  else if check_suffix f "mli" then "ocaml_info.json"
+  else if check_suffix f "c" then "c_info.json"
+  else if check_suffix f "java" then "java_info.json"
+  else if check_suffix f "py" then "python_info.json"
   else failwith "This file format is not supported"
 
+(* Refer to preprocessing.mli for this function's speficiations *)
 let hash_file f =
   let rec hash_helper f_channel s =
     try
@@ -195,17 +260,18 @@ let hash_file f =
       hash_helper f_channel (s^line^"\n")
     with
     | End_of_file -> s in
-    let keywords_file = determine_keywords_file f in
-    let keywords = keywords_list keywords_file in
-    let spec_chars = special_chars keywords_file in
-    let f_string = hash_helper (open_in f) keywords_file in
+    let language_file = determine_language_file f in
+    let keywords = keywords_list language_file in
+    let spec_chars = special_chars language_file in
+    let f_string = hash_helper (open_in f) language_file in
     let is_txt = check_suffix f "txt" in
-    let com_info = comment_info keywords_file in
+    let com_info = comment_info language_file in
     let noise_removed_str =
     remove_noise com_info f_string keywords spec_chars is_txt in
     let n_grams = k_grams noise_removed_str 35 in
     List.map (Hashtbl.hash) n_grams
 
+(* Refer to preprocessing.mli for this function's speficiations *)
 let rec get_file_positions dir dir_name filename positions =
   let rec hash_helper f_channel s =
       try
@@ -220,13 +286,13 @@ let rec get_file_positions dir dir_name filename positions =
         positions
     else begin
       let f = dir_name ^ Filename.dir_sep ^ f_name in
-      let keywords_file = determine_keywords_file f in
-      let keywords = keywords_list keywords_file in
-      let spec_chars = special_chars keywords_file in
+      let language_file = determine_language_file f in
+      let keywords = keywords_list language_file in
+      let spec_chars = special_chars language_file in
       let channel = open_in f in
-      let f_string = hash_helper channel keywords_file in
+      let f_string = hash_helper channel language_file in
       let is_txt = check_suffix f "txt" in
-      let com_info = comment_info keywords_file in
+      let com_info = comment_info language_file in
       let noise_removed_str =
         remove_noise com_info f_string keywords spec_chars is_txt in
       let n_grams = k_grams noise_removed_str 35 in

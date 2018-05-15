@@ -165,20 +165,20 @@ let tests = [
   "k_grams_1" >:: (fun _ -> assert_equal (k_grams "Hello World" 5)
             ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
   "ocaml_keywords" >:: (fun _ -> assert_equal
-                           (keywords_list "ocaml_keywords.json")
+                           (keywords_list "ocaml_info.json")
                            ocaml_keywords);
   "ocaml_spec_chars" >:: (fun _ -> assert_equal
-                        (special_chars "ocaml_keywords.json") ocaml_spec_chars);
+                        (special_chars "ocaml_info.json") ocaml_spec_chars);
   "ocaml_comments_info" >:: (fun _ -> assert_equal
-                                (comment_info "ocaml_keywords.json")
+                                (comment_info "ocaml_info.json")
                                 ocaml_comments_info_quad);
 
   "java_keywords" >:: (fun _ -> assert_equal
-                          (keywords_list "java_keywords.json") java_keywords);
+                          (keywords_list "java_info.json") java_keywords);
   "java_spec_chars" >:: (fun _ -> assert_equal
-                        (special_chars "java_keywords.json") java_spec_chars);
+                        (special_chars "java_info.json") java_spec_chars);
   "java_comments_info" >:: (fun _ -> assert_equal
-                               (comment_info "java_keywords.json")
+                               (comment_info "java_info.json")
                                java_comments_info_quad);
 
 
