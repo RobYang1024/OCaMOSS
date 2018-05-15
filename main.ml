@@ -156,34 +156,30 @@ and handle_input st input =
   end
   |COMPARE (a,b) -> begin
     match st.results with
-    |Some r -> handle_compare st a b
+    |Some r -> handle_compare st a b r
     |None -> repl {st with display =
     [(RED,"Error: no results to display. Run OCaMoss first")]}
   end
   |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
 
-and handle_compare st a b =
+and handle_compare st a b results =
   let rec pad l n =
     if List.length l >= n then l else pad (l@[("","")]) n
   in
-  match st.results with
-  |None -> failwith "unexpected"
-  |Some r -> begin
-    match (CompDict.find a r, CompDict.find b r) with
-      | (Some v1, Some v2) -> begin
-      (*TODO: Avoid triple nesting here. *)
-        match (FileDict.find b v1, FileDict.find a v2) with
-          | (Some r1, Some r2) -> begin
-            let l1 = List.map (snd) r1 |> List.rev in
-            let l2 = List.map (snd) r2 |> List.rev in
-            let res1 = Preprocessing.get_file_positions
-                (Unix.opendir st.directory) st.directory a l2 in
-            let res2 = Preprocessing.get_file_positions
-                (Unix.opendir st.directory) st.directory b l1 in
-            print_endline "generating display...";
-            let padded1 = pad res1 (List.length res2) in
-            let padded2 = pad res2 (List.length res1) in
-            let newdispl = List.fold_left2 (fun acc r1 r2 ->
+  match (CompDict.find a results, CompDict.find b results) with
+  | (Some v1, Some v2) -> begin
+      match (FileDict.find b v1, FileDict.find a v2) with
+      | (Some r1, Some r2) -> begin
+          let l1 = List.map (snd) r1 |> List.rev in
+          let l2 = List.map (snd) r2 |> List.rev in
+          let res1 = Preprocessing.get_file_positions
+              (Unix.opendir st.directory) st.directory a l2 in
+          let res2 = Preprocessing.get_file_positions
+              (Unix.opendir st.directory) st.directory b l1 in
+          print_endline "generating display...";
+          let padded1 = pad res1 (List.length res2) in
+          let padded2 = pad res2 (List.length res1) in
+          let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
                 (TEXT, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
                   (b ^ " position " ^ fst r2))::
@@ -194,13 +190,13 @@ and handle_compare st a b =
                   (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))::acc
             ) [] padded1 padded2 in
-            repl {st with display = newdispl}
-            end
-          |_,_ -> failwith "unexpected"
+          repl {st with display = newdispl}
+        end
+      |_,_ -> failwith "unexpected"
     end
-      |_,_ -> repl {st with display = [(RED,
+  |_,_ -> repl {st with display = [(RED,
       "Error: no results to display for files " ^ a ^","^ b)]}
-  end
+
 
 and handle_results st f =
   let cmp_tuple (k1,s1) (k2,s2) =
