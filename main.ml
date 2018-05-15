@@ -16,14 +16,14 @@ type cmd = RUN of string | DIR | HELP | SETDIR of string | RESULTS of string
 let help =
 "Commands (case-sensitive): \n
 run [threshold] --- runs oCaMoss on the working directory.
-The threshold argument gives the program the percentage of the file to match with
-another for it to be flagged as plagiarised. It is optional with default value
-0.5, and must be at least 0.4 and at most 1
+The threshold argument gives the program the percentage of the file to match
+with another for it to be flagged as plagiarised. It is optional with default
+value 0.5, and must be at least 0.4 and at most 1
 dir --- lists the working directory and the files that it contains
-setdir [dir] --- sets the relative directory to look for files and resets any results
+setdir [dir] --- sets the directory to look for files and resets any results
 results --- lists the file names for which there are results
 results [filename] --- lists the detailed results of overlap for that file
-pairresults -- lists all the pairs of files for which there are results
+resultpairs -- lists all the pairs of files for which there are results
 compare [fileA] [fileB] --- prints out specific overlaps of files A and B
 quit --- exits the REPL
 help --- display instructions again"
@@ -52,7 +52,7 @@ let parse str =
   | "setdir"::d::[] -> SETDIR d
   | "results"::f::[] -> RESULTS f
   | ["results"] -> RESULTS ""
-  | ["pairresults"] -> PAIR
+  | ["resultpairs"] -> PAIR
   | "compare"::a::b::[] -> COMPARE (a,b)
 	| _ -> ERROR
 
@@ -60,17 +60,17 @@ let rec repl st =
   let rec print_display d =
     match d with
     |[] -> ()
-    |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
-    |(TEXT, s)::t -> ANSITerminal.(print_string [Reset] (s^"\n")); print_display t
-    |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
-    |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
+    |(RED, s)::t -> print_string [red] (s^"\n"); print_display t
+    |(TEXT, s)::t -> print_string [Reset] (s^"\n"); print_display t
+    |(GREEN, s)::t -> print_string [green] (s^"\n"); print_display t
+    |(CYAN, s)::t -> print_string [cyan] (s^"\n"); print_display t
   in
   print_display st.display;
-  print_string  [black] "> ";
+  print_string [Reset] "> ";
   match String.trim (read_line ()) with
     | exception End_of_file -> ()
-    | "quit" -> ANSITerminal.(print_string [green]
-                                ("Thank you for using OCaMOSS!!\n"));
+    | "quit" -> print_string [green]
+                                ("Thank you for using OCaMOSS!!\n");
   	| input -> handle_input st input
 
 and handle_input st input =
@@ -174,10 +174,10 @@ and handle_compare st a b =
           | (Some r1, Some r2) -> begin
             let l1 = List.map (snd) r1 |> List.rev in
             let l2 = List.map (snd) r2 |> List.rev in
-            let res1 = Preprocessing.get_file_positions (Unix.opendir st.directory)
-                      st.directory a l2 in
-            let res2 = Preprocessing.get_file_positions (Unix.opendir st.directory)
-                      st.directory b l1 in
+            let res1 = Preprocessing.get_file_positions
+                (Unix.opendir st.directory) st.directory a l2 in
+            let res2 = Preprocessing.get_file_positions
+                (Unix.opendir st.directory) st.directory b l1 in
             print_endline "generating display...";
             let padded1 = pad res1 (List.length res2) in
             let padded2 = pad res2 (List.length res1) in
@@ -185,7 +185,8 @@ and handle_compare st a b =
               if String.length (snd r1) >= 40 then
                 (TEXT, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
                   (b ^ " position " ^ fst r2))::
-                (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (snd r2 ^ "\n"))::acc
+                (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (
+                    snd r2 ^ "\n"))::acc
               else
                 (TEXT, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
                   (b ^ " position " ^ fst r2))::
@@ -204,7 +205,11 @@ and handle_results st f =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
         ((if is_pair then "Similarity score: " else "Overall score: ") ^
-        (string_of_float ss)))::a) [] lst
+         (string_of_float ss)))::a) []
+      (lst |> List.sort (fun (k1,s1) (k2,s2) ->
+           if Pervasives.compare s1 s2 = 0 then -Pervasives.compare k1 k2
+           else (Pervasives.compare s1 s2))
+       |> List.filter (fun (k,s) -> s >= st.threshold))
   in
   match st.results with
   |None -> failwith "unexpected"
@@ -225,7 +230,7 @@ and handle_run st t =
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
       then parse_dir dir dict dir_name else begin
-      print_endline f_name;
+        (*print_endline f_name;*)
       let new_dict = Comparison.FileDict.insert f_name
           (Winnowing.winnow (Preprocessing.hash_file
           (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
@@ -238,17 +243,21 @@ and handle_run st t =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
         ((if is_pair then "Similarity score: " else "Overall score: ") ^
-        (string_of_float ss)))::a) [] lst
+         (string_of_float ss)))::a) []
+      (lst |> List.sort (fun (k1,s1) (k2,s2) -> if Pervasives.compare s1 s2 = 0
+                          then -Pervasives.compare k1 k2 else
+                            (Pervasives.compare s1 s2))
+       |> List.filter (fun (k,s) -> s >= st.threshold))
   in
   print_endline "parsing files...";
-  let t = Sys.time() in
+  (*let t = Sys.time() in*)
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
   print_endline "generating results...";
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
-  Printf.printf "Execution time: %fs\n" (Sys.time() -. t);
+  (*Printf.printf "Execution time: %fs\n" (Sys.time() -. t);*)
   if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}

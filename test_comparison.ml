@@ -71,19 +71,19 @@ let tests = [
    * changes, and if it works if one of the entries in a file dictionary
    * is empty, which are all the edge cases. *)
   "empty file" >:: (fun _ -> assert_equal emp_file
-                       (make_pair_comp "" [] emp_comp));
+                       (make_pair_comp "" []));
   "single entry" >:: (fun _ -> assert_equal se_dict
-                         (make_pair_comp "a" [("a",[(1,0)])] emp_comp));
+                         (make_pair_comp "a" [("a",[(1,0)])]));
   "double entry first" >:: (fun _ -> assert_equal def_p_comp
-  (make_pair_comp "a" (FileDict.to_list de_dict) emp_comp));
+  (make_pair_comp "a" (FileDict.to_list de_dict)));
   "double entry second" >:: (fun _ -> assert_equal des_p_comp
-  (make_pair_comp "b" (FileDict.to_list de_dict) emp_comp));
+  (make_pair_comp "b" (FileDict.to_list de_dict)));
   "empty entry in file" >:: (fun _ -> assert_equal emp_e_f_p_comp
-  (make_pair_comp "a" (FileDict.to_list emp_e_dict) emp_comp));
+  (make_pair_comp "a" (FileDict.to_list emp_e_dict)));
   "empty entry second" >:: (fun _ -> assert_equal emp_e_s_p_comp
-  (make_pair_comp "b" (FileDict.to_list emp_e_dict) emp_comp));
+  (make_pair_comp "b" (FileDict.to_list emp_e_dict)));
   "empty entry third" >:: (fun _ -> assert_equal emp_e_t_p_comp
-  (make_pair_comp "c" (FileDict.to_list emp_e_dict) emp_comp));
+  (make_pair_comp "c" (FileDict.to_list emp_e_dict)));
 
 
   (* The test for compare test if it works on an empty file dictionary,

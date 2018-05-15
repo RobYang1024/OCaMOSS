@@ -41,7 +41,8 @@ let comment_info keywords_file_name =
   let mult_line_comm_end = json |> member "comment-end" |> to_string in
   let comments_nest = json |> member "comments-nest" |> to_bool in
   let rm_string = json |> member "strings" |> to_bool in
-  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end, comments_nest, rm_string)
+  (one_line_comm_st, mult_line_comm_st, mult_line_comm_end,
+   comments_nest, rm_string)
   with
   | _ -> failwith "z"
 
@@ -91,7 +92,7 @@ let rec split_on_str str_to_split_on acc_str_arr str_to_split =
         new_acc_arr_else_case acc_str_arr str_to_split_on str_to_split in
       List.rev new_acc_arr
 
-let remove_strings code_str = 
+let remove_strings code_str =
   let filter_from_arr (acc_arr, start) str =
     if str = "\"" && start = false then
       (" "::acc_arr, true)
@@ -105,7 +106,7 @@ let remove_strings code_str =
   let acc_tup =
     List.fold_left filter_from_arr ([], false) split_on_comments_arr in
   match acc_tup with
-  | (acc_arr, _) -> List.rev acc_arr 
+  | (acc_arr, _) -> List.rev acc_arr
 
 let remove_comments
     comment_start comment_end comments_nest code_str =
@@ -114,7 +115,7 @@ let remove_comments
       if comments_nest then (" "::acc_arr, nesting + 1)
       else (" "::acc_arr, 1)
     else if str = comment_end then
-      if comments_nest then (" "::acc_arr, nesting - 1) 
+      if comments_nest then (" "::acc_arr, nesting - 1)
       else (" "::acc_arr, 0)
     else
       if nesting > 0 then (acc_arr, nesting)
@@ -158,12 +159,12 @@ let remove_noise comment_tuple code_string keywords spec_chars is_txt =
           remove_comments mult_line_st mult_line_end comments_nest s
           |> String.concat ""
       in
-      let rm_strings s = 
+      let rm_strings s =
         if not rm_string then s
         else remove_strings s
         |> String.concat ""
       in
-      rm_strings code_string |> rm_mult_line_comment |> rm_one_line_comment |>
+      (*rm_strings*) code_string |> rm_mult_line_comment |> rm_one_line_comment |>
       split_and_keep_on_spec_chars spec_chars |>
       List.map rem_white_space |> List.flatten |>
       replace_generics keywords spec_chars |>
@@ -215,7 +216,8 @@ let rec get_file_positions dir dir_name filename positions =
   in
   try
     let f_name = Unix.readdir dir in
-    if f_name <> filename then get_file_positions dir dir_name filename positions
+    if f_name <> filename then get_file_positions dir dir_name filename
+        positions
     else begin
       let f = dir_name ^ Filename.dir_sep ^ f_name in
       let keywords_file = determine_keywords_file f in

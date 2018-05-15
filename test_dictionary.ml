@@ -26,13 +26,13 @@ let t9 = DictString.(insert "M" "m" t8)
 let t = DictString.(insert "S" "s" t9)
 
 let tests = [
-  "insert first" >:: (fun _ -> assert_equal [("A","a")] (DictString.to_list t1));
+  "insert first" >::(fun _ -> assert_equal [("A","a")] (DictString.to_list t1));
   "insert 2" >:: (fun _ -> assert_equal [("A","a");("L","l")]
    (DictString.to_list t2));
   "insert 2" >:: (fun _ -> assert_equal [("A","a"); ("G", "g");("L","l")]
   (DictString.to_list t3));
-  "insert 3" >:: (fun _ -> assert_equal [("A","a"); ("G", "g");("L","l");("O","o")]
-  (DictString.to_list t4));
+  "insert 3" >:: (fun _ -> assert_equal [("A","a"); ("G", "g");("L","l");
+                                         ("O","o")] (DictString.to_list t4));
   "insert 4" >:: (fun _ -> assert_equal
    [("A","a"); ("G","g");("L","l"); ("O","o");("R","r")]
    (DictString.to_list t5));
@@ -43,15 +43,16 @@ let tests = [
     [("A","a"); ("G","g");("I","i");("L","l"); ("O","o");("R","r"); ("T","t")]
     (DictString.to_list t7));
   "insert 7" >:: (fun _ -> assert_equal
-    [("A","a"); ("G","g");("H","h");("I","i");("L","l"); ("O","o");("R","r"); ("T","t")]
-    (DictString.to_list t8));
+    [("A","a"); ("G","g");("H","h");("I","i");("L","l"); ("O","o");("R","r");
+                      ("T","t")] (DictString.to_list t8));
   "insert 8" >:: (fun _ -> assert_equal
     [("A","a"); ("G","g");("H","h");("I","i");("L","l");
     ("M","m");("O","o");("R","r"); ("T","t")]
     (DictString.to_list t9));
-  "Inserted Correct" >:: (fun _ -> assert_equal [("A", "a"); ("G", "g");
-  ("H", "h"); ("I", "i"); ("L", "l"); ("M", "m"); ("O", "o"); ("R", "r"); ("S", "s");
-                                                 ("T", "t")] (DictString.to_list t));
+  "Inserted Correct" >:: (fun _ ->
+      assert_equal [("A", "a"); ("G", "g"); ("H", "h"); ("I", "i"); ("L", "l");
+                    ("M", "m"); ("O", "o"); ("R", "r"); ("S", "s"); ("T", "t")]
+        (DictString.to_list t));
 
 
   "size_empty" >:: (fun _ -> assert_equal 0 DictString.(size empty));
@@ -61,7 +62,8 @@ let tests = [
 
   "string_member" >:: (fun _ -> assert_equal true
                                           (DictString.member "A" t1));
-  "member_empty" >:: (fun _ -> assert_equal false (DictString.(member "empty" empty)));
+  "member_empty" >:: (fun _ -> assert_equal false
+                         (DictString.(member "empty" empty)));
   "member_fake" >:: (fun _ -> assert_equal false (DictString.member "B" t1));
   "member_two" >:: (fun _ -> assert_equal true (DictString.member "R" t));
   "member_three" >:: (fun _ -> assert_equal true (DictString.member "S" t));

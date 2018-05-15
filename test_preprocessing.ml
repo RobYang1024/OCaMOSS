@@ -25,26 +25,30 @@ let ocaml_spec_chars =
 let ocaml_comments_info_quad = ("", "(*", "*)", true, true)
 
 let java_keywords =
-  ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default"; "package";
-   "synchronized"; "boolean"; "do"; "if"; "private"; "this"; "break"; "double"; "implements";
-   "protected"; "throw"; "byte"; "else"; "import"; "public"; "throws"; "case"; "enum";
-   "instanceof"; "return"; "transient"; "catch"; "extends"; "int"; "short"; "try"; "char"; "final";
-   "interface"; "static"; "void"; "class"; "finally"; "long"; "strictfp"; "volatile";
-   "float"; "native"; "super"; "while"; "Boolean"; "Byte"; "Character"; "Class"; "ClassLoader";
-   "ClassValue"; "Compiler"; "Double"; "Enum"; "Float"; "InheritableThreadLocal"; "Integer ";
-   "Long"; "Math"; "Number"; "Object"; "Package"; "Process"; "ProcessBuilder"; "Runtime";
-   "RuntimePermission"; "SecurityManager"; "Short"; "StackTraceElement"; "StrictMath"; "String";
-   "StringBuffer"; "StringBuilder"; "System"; "Thread"; "ThreadGroup"; "ThreadLocal";
-   "Throwable"; "Void"; "AbstractCollection"; "AbstractList"; "AbstractMap"; "AbstractQueue";
-   "AbstractSequentialList"; "AbstractSet"; "ArrayDeque"; "ArrayList"; "Arrays"; "BitSet";
-   "Calendar"; "Collections"; "Currency"; "Date"; "Dictionary"; "EnumMap"; "EnumSet";
-   "EventListenerProxy"; "EventObject"; "FormattableFlags"; "Formatter"; "GregorianCalendar";
-   "HashMap";"HashSet"; "Hashtable"; "IdentityHashMap"; "LinkedHashMap"; "LinkedHashSet"; "LinkedList";
-   "ListResourceBundle"; "Locale"; "Objects"; "Observable"; "PriorityQueue"; "Properties";
-   "PropertyPermission"; "PropertyResourceBundle"; "Random"; "ResourceBundle";
-   "ResourceBundle.Control"; "Scanner"; "ServiceLoader"; "SimpleTimeZone"; "Stack";
-   "StringTokenizer"; "Timer"; "TimerTask"; "TimeZone"; "TreeMap"; "TreeSet"; "UUID";
-   "Vector"; "WeakHashMap"]
+  ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default";
+   "package"; "synchronized"; "boolean"; "do"; "if"; "private"; "this"; "break";
+   "double"; "implements"; "protected"; "throw"; "byte"; "else"; "import";
+   "public"; "throws"; "case"; "enum"; "instanceof"; "return"; "transient";
+   "catch"; "extends"; "int"; "short"; "try"; "char"; "final"; "interface";
+   "static"; "void"; "class"; "finally"; "long"; "strictfp"; "volatile";
+   "float"; "native"; "super"; "while"; "Boolean"; "Byte"; "Character"; "Class";
+   "ClassLoader"; "ClassValue"; "Compiler"; "Double"; "Enum"; "Float";
+   "InheritableThreadLocal"; "Integer "; "Long"; "Math"; "Number"; "Object";
+   "Package"; "Process"; "ProcessBuilder"; "Runtime"; "RuntimePermission";
+   "SecurityManager"; "Short"; "StackTraceElement"; "StrictMath"; "String";
+   "StringBuffer"; "StringBuilder"; "System"; "Thread"; "ThreadGroup";
+   "ThreadLocal"; "Throwable"; "Void"; "AbstractCollection"; "AbstractList";
+   "AbstractMap"; "AbstractQueue"; "AbstractSequentialList"; "AbstractSet";
+   "ArrayDeque"; "ArrayList"; "Arrays"; "BitSet"; "Calendar"; "Collections";
+   "Currency"; "Date"; "Dictionary"; "EnumMap"; "EnumSet"; "EventListenerProxy";
+   "EventObject"; "FormattableFlags"; "Formatter"; "GregorianCalendar";
+   "HashMap";"HashSet"; "Hashtable"; "IdentityHashMap"; "LinkedHashMap";
+   "LinkedHashSet"; "LinkedList"; "ListResourceBundle"; "Locale"; "Objects";
+   "Observable"; "PriorityQueue"; "Properties"; "PropertyPermission";
+   "PropertyResourceBundle"; "Random"; "ResourceBundle";
+   "ResourceBundle.Control"; "Scanner"; "ServiceLoader"; "SimpleTimeZone";
+   "Stack"; "StringTokenizer"; "Timer"; "TimerTask"; "TimeZone"; "TreeMap";
+   "TreeSet"; "UUID"; "Vector"; "WeakHashMap"]
 
 let java_spec_chars =
   ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';';
@@ -161,18 +165,21 @@ let tests = [
   "k_grams_1" >:: (fun _ -> assert_equal (k_grams "Hello World" 5)
             ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
   "ocaml_keywords" >:: (fun _ -> assert_equal
-                            (keywords_list "ocaml_keywords.json") ocaml_keywords);
+                           (keywords_list "ocaml_keywords.json")
+                           ocaml_keywords);
   "ocaml_spec_chars" >:: (fun _ -> assert_equal
                         (special_chars "ocaml_keywords.json") ocaml_spec_chars);
   "ocaml_comments_info" >:: (fun _ -> assert_equal
-                        (comment_info "ocaml_keywords.json") ocaml_comments_info_quad);
+                                (comment_info "ocaml_keywords.json")
+                                ocaml_comments_info_quad);
 
   "java_keywords" >:: (fun _ -> assert_equal
                           (keywords_list "java_keywords.json") java_keywords);
   "java_spec_chars" >:: (fun _ -> assert_equal
                         (special_chars "java_keywords.json") java_spec_chars);
   "java_comments_info" >:: (fun _ -> assert_equal
-                        (comment_info "java_keywords.json") java_comments_info_quad);
+                               (comment_info "java_keywords.json")
+                               java_comments_info_quad);
 
 
   "remove_noise" >::

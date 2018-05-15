@@ -33,8 +33,7 @@ module type COMPARISON = sig
   module DictValue : Dictionary.Formattable
   module CompDict: Dictionary.Dictionary
   val intersection : HashValue.t -> HashValue.t -> HashValue.t
-  val make_pair_comp : string ->
-    (StringKey.t * HashValue.t) list -> CompDict.t -> FileDict.t
+  val make_pair_comp : string -> (StringKey.t * HashValue.t) list -> FileDict.t
   val compare : FileDict.t -> CompDict.t
   val create_sim_list : CompDict.t -> float -> (StringKey.t * float) list
   val create_pair_sim_list : StringKey.t -> (StringKey.t * HashValue.t) list ->
@@ -62,8 +61,8 @@ end
 module type MAIN = sig
   type color = RED | GREEN | CYAN | TEXT
   type state = {display: (color * string) list; directory: string; results:
-                  Comparison.CompDict.t option; result_files: (color * string) list;
-                threshold: float}
+                  Comparison.CompDict.t option; result_files:
+                  (color * string) list; threshold: float}
   type cmd = RUN of string | DIR | HELP | SETDIR of string
            | RESULTS of string | PAIR | COMPARE of (string*string)| ERROR
   val parse: string -> cmd

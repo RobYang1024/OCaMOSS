@@ -28,7 +28,7 @@ let intersection v1 v2 =
   in
   List.rev(intersection_helper v1 v2 [])
 
-let make_pair_comp k0 file_list comp_dict =
+let make_pair_comp k0 file_list =
   List.fold_left (fun x (k,v) ->
       FileDict.insert k (intersection v (List.assoc k0 file_list)) x)
     FileDict.empty file_list
@@ -36,7 +36,7 @@ let make_pair_comp k0 file_list comp_dict =
 let compare d =
   let file_list = FileDict.to_list d in
   List.fold_left (fun x (k,v) ->
-      CompDict.insert k (make_pair_comp k file_list x) x)
+      CompDict.insert k (make_pair_comp k file_list) x)
       CompDict.empty file_list
 
 let create_sim_list comp_dict t =

@@ -36,8 +36,7 @@ val intersection : HashValue.t -> HashValue.t -> HashValue.t
  * keys are the keys from file_list, and each value is the intersection of
  * the values in file_list of the key mapped to that value, and the key k0.
  *)
-val make_pair_comp : string -> (StringKey.t * HashValue.t) list ->
-  CompDict.t -> FileDict.t
+val make_pair_comp : string -> (StringKey.t * HashValue.t) list -> FileDict.t
 
 (* [compare d] returns a comparison dictionary whose keys are the keys
  * from d, and whose values are dictionaries representing pairwise comparisons
@@ -45,11 +44,11 @@ val make_pair_comp : string -> (StringKey.t * HashValue.t) list ->
  *)
 val compare : FileDict.t -> CompDict.t
 
-(* [create_sim_list threshold comp_dict] assigns a similarity score to each of the
- * keys in comp_dict, and returns a list of files whose similarity scores are
- * above threshold, and their overall similarity score. The similarity of one
- * file with another is calculated as the number of matching hashes between the
- * files divided by the number of hashes of the file itself, and hence the
+(* [create_sim_list threshold comp_dict] assigns a similarity score to each of
+ * the keys in comp_dict, and returns a list of files whose similarity scores
+ * are above threshold, and their overall similarity score. The similarity of
+ * one file with another is calculated as the number of matching hashes between
+ * the files divided by the number of hashes of the file itself, and hence the
  * similarity score of a file is the average of the similarities of that
  * file with every other file. The files are ordered in decreasing order of
  * similarity, and files that have the same similarity score are ordered by
