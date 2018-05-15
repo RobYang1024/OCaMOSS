@@ -230,12 +230,14 @@ and handle_run st t =
         (string_of_float ss)))::a) [] lst
   in
   print_endline "parsing files...";
+  let t = Sys.time() in
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
   print_endline "generating results...";
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
+  Printf.printf "Execution time: %fs\n" (Sys.time() -. t);
   if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; params = t}

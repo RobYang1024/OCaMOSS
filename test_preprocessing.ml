@@ -15,7 +15,7 @@ let ocaml_keywords =
    "ListLabels"; "Map"; "Marshal"; "MoreLabels"; "Nativeint"; "Oo"; "Parsing";
    "Printexc"; "Printf"; "Queue"; "Random"; "Scanf"; "Set"; "Sort";
    "Spacetime"; "Stack"; "StdLabels"; "Stream"; "String"; "StringLabels";
-   "Sys"; "Uchar"; "Weak"]
+   "Sys"; "Uchar"; "Weak"; "failwith"]
 
 let ocaml_spec_chars =
   ['!'; '$'; '%'; '&'; '*'; '+'; '-'; '.'; '/'; ':'; ';'; '<';
@@ -77,33 +77,9 @@ let test_fun_str =
     char_array) |> List.filter (fun str -> str <> \"\") |> List.rev"
 
 let expected_res_str = String.concat ""
-    ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v\"\"";
-     "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
-     ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"]
-
-(*
-let test_fun_str2 =
-  "let split_and_keep_on_spec_chars spec_chars str =
-  let char_array = str_to_chr_arr str in
-  (* asdf lasjhdkjasd List let char str in *)
-  (List.fold_left
-    (fun acc_arr chr ->
-       let str_of_chr = String.make 1 chr in
-       if List.mem chr spec_chars then
-         List.cons \"\" (List.cons str_of_chr acc_arr)
-       else
-         match acc_arr with (* hello my name is potato *)
-         | h::t -> (String.concat \"\" [h;str_of_chr])::t
-         | [] -> failwith \"Array should never be empty\"
-    )
-    [\"\"]
-    (* me too thanks *)
-    char_array) |> List.filter (fun str -> str <> \"\") |> List.rev"
-
-let expected_res_str2 = String.concat ""
-    ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v\"\"";
-     "(List.vvv)elsematchvwith|v::v->(String.v\"\"[v;v])::v|[]->v\"Arrayvvvv\"";
-      ")[\"\"]v)|>List.v(funv->v<>\"\")|>List.v"] *)
+    ["letvvv=letv=vvin(List.v(funvv->letv=String.v1vinifList.vvvthenList.v";
+     "(List.vvv)elsematchvwith|v::v->(String.v[v;v])::v|[]->failwithv";
+     ")[]v)|>List.v(funv->v<>)|>List.v"]
 
 let test_fun_str3 = "wow(*wow wow wow*)wow"
 
