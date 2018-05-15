@@ -212,11 +212,13 @@ and handle_run st t =
     try
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
-      then parse_dir dir dict dir_name else
+      then parse_dir dir dict dir_name else begin
+      print_endline f_name;
       let new_dict = Comparison.FileDict.insert f_name
           (Winnowing.winnow (Preprocessing.hash_file
                                (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
       parse_dir dir new_dict dir_name
+    end
     with
     | End_of_file -> dict
   in
@@ -232,9 +234,8 @@ and handle_run st t =
   print_endline "parsing files...";
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
-  print_endline "comparing files...";
-  let comparison = Comparison.compare parsefiles in
   print_endline "generating results...";
+  let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
   if files = "" then repl {st with display =

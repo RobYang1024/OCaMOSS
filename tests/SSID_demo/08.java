@@ -23,7 +23,7 @@ public class MyTree {
 
 /**
  * Driver class, you may have to change it to fit your implementation
- * Make sure you compile and run this class
+ * Make sure you compile and run this class 
  */
 
 public class CitiesDriver { 
