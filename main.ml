@@ -218,7 +218,7 @@ and handle_results st f =
     |Some v -> begin
       let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
       repl {st with display = (TEXT, "Results for file " ^ f ^
-        ": \n")::(concat_result_list r_list true)}
+        ": \n")::(concat_result_list r_list true |> List.rev)}
     end
     |None -> repl {st with display = [(RED,
     "Error: no results to display for file " ^ f)]}
@@ -250,19 +250,25 @@ and handle_run st t =
        |> List.filter (fun (k,s) -> s >= st.threshold))
   in
   print_endline "parsing files...";
+<<<<<<< HEAD
   (*let t = Sys.time() in*)
+=======
+>>>>>>> f01d38f54e4e0da6280fa1f4000ead1027698634
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
   print_endline "generating results...";
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
+<<<<<<< HEAD
   (*Printf.printf "Execution time: %fs\n" (Sys.time() -. t);*)
+=======
+>>>>>>> f01d38f54e4e0da6280fa1f4000ead1027698634
   if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}
   else repl {st with display =
-              (GREEN,"Success. The list of plagiarised files are:")::files;
+              (GREEN,"Success. The list of plagiarised files are:")::(List.rev files);
               results = Some comparison; result_files = files; threshold = t}
 
 and handle_pair r st =
