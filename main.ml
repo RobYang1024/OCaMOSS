@@ -61,7 +61,7 @@ let rec repl st =
     match d with
     |[] -> ()
     |(RED, s)::t -> ANSITerminal.(print_string [red] (s^"\n")); print_display t
-    |(TEXT, s)::t -> print_endline s; print_display t
+    |(TEXT, s)::t -> ANSITerminal.(print_string [Reset] (s^"\n")); print_display t
     |(GREEN, s)::t -> ANSITerminal.(print_string [green] (s^"\n")); print_display t
     |(CYAN, s)::t -> ANSITerminal.(print_string [cyan] (s^"\n")); print_display t
   in
