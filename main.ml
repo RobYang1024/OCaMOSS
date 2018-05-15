@@ -137,7 +137,7 @@ and handle_input st input =
     match st.results with
     |Some r -> begin
         if f = "" then if st.result_files = [] then repl {st with display =
-        [(GREEN,"Success. There were no plagarised files found.\n")];} 
+        [(GREEN,"Success. There were no plagarised files found.\n")];}
           else repl {st with display =
           (TEXT, "Results for files:")::st.result_files}
         else handle_results st f
@@ -203,7 +203,7 @@ and handle_compare st a b =
   end
 
 and handle_results st f =
-  let cmp_tuple (k1,s1) (k2,s2) = 
+  let cmp_tuple (k1,s1) (k2,s2) =
     if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
     else (Pervasives.compare s1 s2)
   in
@@ -240,7 +240,7 @@ and handle_run st t =
     with
     | End_of_file -> dict
   in
-  let cmp_tuple (k1,s1) (k2,s2) = 
+  let cmp_tuple (k1,s1) (k2,s2) =
     if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
     else (Pervasives.compare s1 s2)
   in
@@ -249,9 +249,9 @@ and handle_run st t =
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
         ((if is_pair then "Similarity score: " else "Overall score: ") ^
          (string_of_float ss)))::a) []
-    (lst |> List.sort (cmp_tuple)|> List.filter (fun (k,s) -> s >= st.threshold))
+    (lst |> List.sort (cmp_tuple)|> List.filter (fun (k,s) -> s >= t))
   in
-  let tm = Sys.time () in
+  (*let tm = Sys.time () in*)
   print_endline "parsing files...";
   let parsefiles = parse_dir (Unix.opendir st.directory)
                         Comparison.FileDict.empty st.directory in
@@ -259,7 +259,7 @@ and handle_run st t =
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
-  Printf.printf "Execution time: %fs\n" (Sys.time () -. tm);
+  (*Printf.printf "Execution time: %fs\n" (Sys.time () -. tm);*)
   if files = [] then repl {st with display =
                   [(GREEN,"Success. There were no plagarised files found.\n")];
                             results = Some comparison; threshold = t}
