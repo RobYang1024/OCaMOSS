@@ -10,14 +10,14 @@ module HashValue = struct
   let format d = ()
 end
 
-module FileDict = TreeDictionary(StringKey)(HashValue)
+module FileDict = HashtblDict (StringKey)(HashValue)
 
 module DictValue = struct
   type t = FileDict.t
   let format d = ()
 end
 
-module CompDict = TreeDictionary(StringKey)(DictValue)
+module CompDict = HashtblDict (StringKey)(DictValue)
 
 let intersection v1 v2 =
   let rec intersection_helper lst1 lst2 common =

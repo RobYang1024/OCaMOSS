@@ -100,7 +100,7 @@ module type DICTIONARY = sig
       -> functor (V : Formattable)
       -> Dictionary with module Key = K and module Value = V
 
-  module TreeDictionary : DictionaryMaker
+  module HashtblDict : DictionaryMaker
 end
 
 module CheckComparison : COMPARISON = Comparison
