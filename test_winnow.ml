@@ -70,7 +70,7 @@ let tests = [
                                                      |> res_to_string));
   "winnow4" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow 1 [5;4;3;2;1]
                                                      |> res_to_string));
-  "winnow5" >:: (fun _ -> assert_equal "1,2,3,4," (winnow 1 [1;2;3;4;5]
+  "winnow5" >:: (fun _ -> assert_equal "1,2,3,4," (winnow 2 [1;2;3;4;5]
                                                    |> res_to_string));
   "winnow6" >:: (fun _ -> assert_equal r1 (winnow 5 t1 |> res_to_string));
   "winnow7" >:: (fun _ -> assert_equal r2 (winnow 10 t2 |> res_to_string));

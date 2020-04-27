@@ -52,13 +52,10 @@ module HashtblDict (K : Comparable) (V : Formattable) = struct
 
   let find k (Tbl d) = Hashtbl.find_opt d k
 
-  let insert k v (Tbl d) = Hashtbl.add d k v ; Tbl(d)
+  let insert k v (Tbl d) = 
+    let cpy = (Hashtbl.copy d) in
+    Hashtbl.add cpy k v ; Tbl(cpy)
 
   let to_list (Tbl d) = 
-    let rec to_list_helper s l =
-      match s with
-      |Nil -> l
-      |Cons(v, thunk) -> to_list_helper (thunk ()) (v::l)
-    in
-    to_list_helper ((to_seq d) ()) []
+    Hashtbl.fold (fun k v acc -> (k, v) :: acc) d []
 end
