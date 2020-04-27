@@ -50,7 +50,7 @@ let tests = [
   "diff order" >:: (fun _ -> assert_equal [(1,0);(2,0)]
                        ((intersection [(1,0);(2,0)] [(2,0);(1,0)])));
   "second order" >:: (fun _ -> assert_equal [(2,0);(1,0)]
-                       ((intersection [(2,0);(1,0)] [(1,0);(2,0)] )));
+                         ((intersection [(2,0);(1,0)] [(1,0);(2,0)] )));
   "diff pos" >:: (fun _ -> assert_equal [(1,3);(2,1)]
                      ((intersection [(1,3);(2,1)] [(2,2);(1,5)])));
   "diff number of elems" >:: (fun _ -> assert_equal [(1,0);(2,1)]
@@ -62,7 +62,7 @@ let tests = [
   "long case" >:: (fun _ -> assert_equal [(41,0);(20,0);(7,0);(53,0)]
                       (intersection [(82,0);(23,0);(46,0);(93,0);(41,0);(20,0);
                                      (47,0);(7,0);(84,0);(53,0)]
-                    [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
+                         [(80,0);(42,0);(41,0);(53,0);(72,0);(7,0);(20,0);(100,0)]));
 
 
   (* The test cases for make_pair_comp test if the function works on an
@@ -75,15 +75,15 @@ let tests = [
   "single entry" >:: (fun _ -> assert_equal se_dict
                          (make_pair_comp "a" [("a",[(1,0)])]));
   "double entry first" >:: (fun _ -> assert_equal def_p_comp
-  (make_pair_comp "a" (FileDict.to_list de_dict)));
+                               (make_pair_comp "a" (FileDict.to_list de_dict)));
   "double entry second" >:: (fun _ -> assert_equal des_p_comp
-  (make_pair_comp "b" (FileDict.to_list de_dict)));
+                                (make_pair_comp "b" (FileDict.to_list de_dict)));
   "empty entry in file" >:: (fun _ -> assert_equal emp_e_f_p_comp
-  (make_pair_comp "a" (FileDict.to_list emp_e_dict)));
+                                (make_pair_comp "a" (FileDict.to_list emp_e_dict)));
   "empty entry second" >:: (fun _ -> assert_equal emp_e_s_p_comp
-  (make_pair_comp "b" (FileDict.to_list emp_e_dict)));
+                               (make_pair_comp "b" (FileDict.to_list emp_e_dict)));
   "empty entry third" >:: (fun _ -> assert_equal emp_e_t_p_comp
-  (make_pair_comp "c" (FileDict.to_list emp_e_dict)));
+                              (make_pair_comp "c" (FileDict.to_list emp_e_dict)));
 
 
   (* The test for compare test if it works on an empty file dictionary,
@@ -93,7 +93,7 @@ let tests = [
   "empty comp" >:: (fun _ -> assert_equal emp_comp
                        (compare emp_file));
   "single entry comp" >:: (fun _ -> assert_equal se_comp
-                       (compare se_dict));
+                              (compare se_dict));
   "double entry comp" >:: (fun _ -> assert_equal de_comp
                               (compare de_dict));
   "empty entry comp" >:: (fun _ -> assert_equal emp_e_comp
@@ -106,7 +106,7 @@ let tests = [
   "empty sim" >:: (fun _ -> assert_equal []
                       (create_sim_list emp_comp 0.5));
   "single entry sim" >:: (fun _ -> assert_equal []
-                              (create_sim_list se_comp 0.5));
+                             (create_sim_list se_comp 0.5));
   "double entry sim" >:: (fun _ -> assert_equal ["a";"b"]
                              (create_sim_list de_comp 0.5 |> get_files));
   "empty entry sim" >:: (fun _ -> assert_equal ["b"]
@@ -123,12 +123,12 @@ let tests = [
   "single entry" >:: (fun _ -> assert_equal []
                          (create_pair_sim_list "a" (FileDict.to_list se_dict)));
   "double entry first" >:: (fun _ -> assert_equal [("b",0.5)]
-  (create_pair_sim_list "a" (FileDict.to_list def_p_comp)));
+                               (create_pair_sim_list "a" (FileDict.to_list def_p_comp)));
   "double entry second" >:: (fun _ -> assert_equal [("a",0.5)]
-  (create_pair_sim_list "b" (FileDict.to_list des_p_comp)));
+                                (create_pair_sim_list "b" (FileDict.to_list des_p_comp)));
   "empty entry second" >:: (fun _ -> assert_equal [("c",0.5);("a",0.0)]
-  (create_pair_sim_list "b" (FileDict.to_list emp_e_s_p_comp)));
+                               (create_pair_sim_list "b" (FileDict.to_list emp_e_s_p_comp)));
   "empty entry third" >:: (fun _ -> assert_equal ["b";"a"]
-  ((create_pair_sim_list "c" (FileDict.to_list emp_e_t_p_comp)) |> get_files));
+                              ((create_pair_sim_list "c" (FileDict.to_list emp_e_t_p_comp)) |> get_files));
 
 ]

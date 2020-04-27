@@ -4,13 +4,13 @@ open Winnowing
 (* helper function for sorting winnowing results (int*int) list representing
  * hash * position tuples sorts from least to greatest, by hash value first,
  * then by position if hashes are equal
- *)
+*)
 let sort_results r =
-	let cmp x y =
-		let res = Pervasives.compare (fst x) (fst y) in
-		if res = 0 then Pervasives.compare (snd x) (snd y) else res
-	in
-	List.sort (cmp) r
+  let cmp x y =
+    let res = Stdlib.compare (fst x) (fst y) in
+    if res = 0 then Stdlib.compare (snd x) (snd y) else res
+  in
+  List.sort (cmp) r
 
 (* helper function for converting results to strings
  * inputs: (int * int) list representing winnowing results
@@ -62,18 +62,18 @@ let r4 = "-776,-982,-995,-989,-979,-941,-770,-891,-892,-936,-869,"
 
 (* tests to check Winnowing functionality *)
 let tests = [
-"winnow0" >:: (fun _ -> assert_equal "" (winnow [] 1 |> res_to_string));
-"winnow1" >:: (fun _ -> assert_equal "1," (winnow [1] 1 |> res_to_string));
-"winnow2" >:: (fun _ -> assert_equal "1,2,3,4,5," (winnow [1;2;3;4;5] 1
+  "winnow0" >:: (fun _ -> assert_equal "" (winnow 1 [] |> res_to_string));
+  "winnow1" >:: (fun _ -> assert_equal "1," (winnow 1 [1] |> res_to_string));
+  "winnow2" >:: (fun _ -> assert_equal "1,2,3,4,5," (winnow 1 [1;2;3;4;5]
+                                                     |> res_to_string));
+  "winnow3" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow 1 [5;4;3;2;1]
+                                                     |> res_to_string));
+  "winnow4" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow 1 [5;4;3;2;1]
+                                                     |> res_to_string));
+  "winnow5" >:: (fun _ -> assert_equal "1,2,3,4," (winnow 1 [1;2;3;4;5]
                                                    |> res_to_string));
-"winnow3" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow [5;4;3;2;1] 1
-                                                   |> res_to_string));
-"winnow4" >:: (fun _ -> assert_equal "5,4,3,2,1," (winnow [5;4;3;2;1] 2
-                                                   |> res_to_string));
-"winnow5" >:: (fun _ -> assert_equal "1,2,3,4," (winnow [1;2;3;4;5] 2
-                                                 |> res_to_string));
-"winnow6" >:: (fun _ -> assert_equal r1 (winnow t1 5 |> res_to_string));
-"winnow7" >:: (fun _ -> assert_equal r2 (winnow t2 10 |> res_to_string));
-"winnow8" >:: (fun _ -> assert_equal r3 (winnow t3 5 |> res_to_string));
-"winnow9" >:: (fun _ -> assert_equal r4 (winnow t4 20 |> res_to_string));
+  "winnow6" >:: (fun _ -> assert_equal r1 (winnow 5 t1 |> res_to_string));
+  "winnow7" >:: (fun _ -> assert_equal r2 (winnow 10 t2 |> res_to_string));
+  "winnow8" >:: (fun _ -> assert_equal r3 (winnow 5 t3 |> res_to_string));
+  "winnow9" >:: (fun _ -> assert_equal r4 (winnow 20 t4 |> res_to_string));
 ]

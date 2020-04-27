@@ -59,7 +59,7 @@ module Window : BoundedQueueWithCounter = struct
 end
 
 (* h = hashes list, w = window size *)
-let winnow h w =
+let winnow w h =
 	(* calculates the global position of the i-th hash in the window
     example: if [global_pos 5 W] = 100, then the 5th hash in W is the 100th
     hash that was processed by the winnowing algorithm. *)

@@ -5,8 +5,9 @@ Runs using a command-line interface.
 
 <hr>
 
-- To run the REPL - `make run`
-- To build & run tests -`make`
+- To build - `make`
+- To build & run the REPL - `make run`
+- To build & run tests -`make test`
 
 <hr>
 

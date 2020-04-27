@@ -44,7 +44,7 @@ module HashtblDict (K : Comparable) (V : Formattable) = struct
   let empty = Tbl(Hashtbl.create 10000)
 
   let size (Tbl d) = Hashtbl.length d
-  
+
   let member k (Tbl d) = 
     match Hashtbl.find_opt d k with
     |Some _ -> true

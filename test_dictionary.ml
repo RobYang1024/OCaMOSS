@@ -12,7 +12,7 @@ module KeyString = struct
   let compare x y = Pervasives.compare x y
 end
 
-module DictString  = TreeDictionary (KeyString) (ValString)
+module DictString  = HashtblDict (KeyString) (ValString)
 
 let t1 = DictString.(insert "A" "a" empty)
 let t2 = DictString.(insert "L" "l" t1)
