@@ -3,7 +3,7 @@ open Unix
 open Filename
 open Yojson.Basic.Util
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let keywords_list language_file_name =
   let path_to_language_file =
     String.concat "/" ["language_files"; language_file_name] in
@@ -11,7 +11,7 @@ let keywords_list language_file_name =
   |> member "keywords"
   |> to_list |> List.map to_string
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let special_chars language_file_name =
   let path_to_language_file =
     String.concat "/" ["language_files"; language_file_name] in
@@ -19,7 +19,7 @@ let special_chars language_file_name =
   |> member "special characters"
   |> to_list |> List.map to_string |> List.map (fun str -> String.get str 0)
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let comment_info language_file_name =
   let path_to_language_file =
     "language_files" ^ Filename.dir_sep ^ language_file_name in
@@ -199,7 +199,7 @@ let replace_generics keywords spec_chars str_arr =
          with Failure _ -> "v" )
     str_arr
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let remove_noise comment_tuple code_string keywords spec_chars is_txt =
   if is_txt then code_string
   else
@@ -228,7 +228,7 @@ let remove_noise comment_tuple code_string keywords spec_chars is_txt =
       replace_generics keywords spec_chars |>
       String.concat ""
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let k_grams s k =
   let rec k_grams_helper acc s n =
     try
@@ -252,7 +252,7 @@ let determine_language_file f =
   else if check_suffix f "py" then "python_info.json"
   else failwith "This file format is not supported"
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let hash_file f =
   let rec hash_helper f_channel s =
     try
@@ -271,7 +271,7 @@ let hash_file f =
     let n_grams = k_grams noise_removed_str 35 in
     List.map (Hashtbl.hash) n_grams
 
-(* Refer to preprocessing.mli for this function's speficiations *)
+(* Refer to preprocessing.mli for this function's specifications *)
 let rec get_file_positions dir dir_name filename positions =
   let rec hash_helper f_channel s =
       try
@@ -301,7 +301,7 @@ let rec get_file_positions dir dir_name filename positions =
         (string_of_int x, List.nth file (x - 1))
       ) positions in
       List.sort (fun a b ->
-        Pervasives.compare (snd a |> Hashtbl.hash) (snd b |> Hashtbl.hash)
+        Stdlib.compare (snd a |> Hashtbl.hash) (snd b |> Hashtbl.hash)
       ) results
     end
   with

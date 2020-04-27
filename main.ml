@@ -200,8 +200,8 @@ and handle_compare st a b results =
 
 and handle_results st f =
   let cmp_tuple (k1,s1) (k2,s2) =
-    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
-    else (Pervasives.compare s1 s2)
+    if Stdlib.compare s1 s2 = 0 then -(Stdlib.compare k1 k2)
+    else (Stdlib.compare s1 s2)
   in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
@@ -237,8 +237,8 @@ and handle_run st t =
     | End_of_file -> dict
   in
   let cmp_tuple (k1,s1) (k2,s2) =
-    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
-    else (Pervasives.compare s1 s2)
+    if Stdlib.compare s1 s2 = 0 then -(Stdlib.compare k1 k2)
+    else (Stdlib.compare s1 s2)
   in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
