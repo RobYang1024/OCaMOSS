@@ -228,7 +228,8 @@ and handle_run st t =
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
       then parse_dir dir dict dir_name else begin
-        let hashes = Preprocessing.hash_file (dir_name ^ Filename.dir_sep ^ f_name) in
+        let full_path = dir_name ^ Filename.dir_sep ^ f_name in
+        let hashes = Preprocessing.hash_file full_path in
         let winnowed_hashes = Winnowing.winnow 40 hashes in
         let new_dict = Comparison.FileDict.insert f_name winnowed_hashes dict in
         parse_dir dir new_dict dir_name

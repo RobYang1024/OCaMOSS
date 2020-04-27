@@ -22,7 +22,14 @@ let ocaml_spec_chars =
    '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
    '['; ']'; '{'; '}']
 
-let ocaml_comments_info_quad = ("", "(*", "*)", true, true)
+let ocaml_comments_info = 
+  {
+    single_comment = "";
+    multi_comment_start = "(*";
+    multi_comment_end = "*)";
+    nest= true;
+    strings= true;
+  }
 
 let java_keywords =
   ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default";
@@ -55,7 +62,14 @@ let java_spec_chars =
    '<'; '='; '>'; '?'; '^'; '|';  '\"'; '\''; '('; ')'; ','; '['; ']';
    '{'; '}'; '~'; '@']
 
-let java_comments_info_quad = ("//", "/*", "*/", false, true)
+let java_comments_info = 
+  {
+    single_comment = "//";
+    multi_comment_start = "/*";
+    multi_comment_end = "*/";
+    nest= false;
+    strings= true;
+  }
 
 let test_fun_str =
   "(* Hello World this is a comment *)
@@ -160,32 +174,33 @@ public class DumbAI extends Controller {
   }
 }"
 
+let ocaml_info = get_language_info "ocaml_info.json"
+let java_info = get_language_info "java_info.json"
+
 let tests = [
   "k_grams_2" >:: (fun _ -> assert_equal (k_grams "test" 3) ["tes"; "est"]);
   "k_grams_1" >:: (fun _ -> assert_equal (k_grams "Hello World" 5)
                       ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
   "ocaml_keywords" >:: (fun _ -> assert_equal
-                           (keywords_list "ocaml_info.json")
+                           ocaml_info.keywords
                            ocaml_keywords);
   "ocaml_spec_chars" >:: (fun _ -> assert_equal
-                             (special_chars "ocaml_info.json") ocaml_spec_chars);
+                             ocaml_info.special_chars ocaml_spec_chars);
   "ocaml_comments_info" >:: (fun _ -> assert_equal
-                                (comment_info "ocaml_info.json")
-                                ocaml_comments_info_quad);
+                                ocaml_info.comment_info
+                                ocaml_comments_info);
 
-  "java_keywords" >:: (fun _ -> assert_equal
-                          (keywords_list "java_info.json") java_keywords);
-  "java_spec_chars" >:: (fun _ -> assert_equal
-                            (special_chars "java_info.json") java_spec_chars);
+  "java_keywords" >:: (fun _ -> assert_equal java_info.keywords java_keywords);
+  "java_spec_chars" >:: (fun _ -> assert_equal java_info.special_chars java_spec_chars);
   "java_comments_info" >:: (fun _ -> assert_equal
-                               (comment_info "java_info.json")
-                               java_comments_info_quad);
+                               java_info.comment_info
+                               java_comments_info);
 
 
   "remove_noise" >::
   (fun _ -> assert_equal
       (remove_noise
-         ocaml_comments_info_quad
+         ocaml_comments_info
          test_fun_str
          ocaml_keywords ocaml_spec_chars
          false)
@@ -194,7 +209,7 @@ let tests = [
   "remove_noise_3" >::
   (fun _ -> assert_equal
       (remove_noise
-         ocaml_comments_info_quad
+         ocaml_comments_info
          test_fun_str3
          ocaml_keywords ocaml_spec_chars
          false)
@@ -203,7 +218,7 @@ let tests = [
   "remove_noise_4" >::
   (fun _ -> assert_equal
       (remove_noise
-         ocaml_comments_info_quad
+         ocaml_comments_info
          test_fun_str4
          ocaml_keywords ocaml_spec_chars
          false)
@@ -212,7 +227,7 @@ let tests = [
   "remove_noise_5" >::
   (fun _ -> assert_equal
       (remove_noise
-         java_comments_info_quad
+         java_comments_info
          test_fun_str5
          java_keywords java_spec_chars
          false)
@@ -221,7 +236,7 @@ let tests = [
   "remove_noise_6" >::
   (fun _ -> assert_equal
       (remove_noise
-         java_comments_info_quad
+         java_comments_info
          test_fun_str6
          java_keywords java_spec_chars
          false)
