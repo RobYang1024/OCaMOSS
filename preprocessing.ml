@@ -262,8 +262,7 @@ let determine_language_file f =
   else if check_suffix f "py" then "python_info.json"
   else failwith "This file format is not supported"
 
-(* Refer to preprocessing.mli for this function's specifications *)
-let hash_file f =
+let get_ngrams f n = 
   let rec hash_helper f_channel s =
     try
       let line = input_line f_channel in
@@ -279,37 +278,24 @@ let hash_file f =
   let com_info = language_info.comment_info in
   let noise_removed_str =
     remove_noise com_info f_string keywords spec_chars is_txt in
-  let n_grams = k_grams noise_removed_str 35 in
+  k_grams noise_removed_str n
+
+(* Refer to preprocessing.mli for this function's specifications *)
+let hash_file f =
+  let n_grams = get_ngrams f 35 in
   List.map (Hashtbl.hash) n_grams
 
 (* Refer to preprocessing.mli for this function's specifications *)
 let rec get_file_positions dir dir_name filename positions =
-  let rec hash_helper f_channel s =
-    try
-      let line = input_line f_channel in
-      hash_helper f_channel (s^line^"\n")
-    with
-    | End_of_file -> s
-  in
   try
     let f_name = Unix.readdir dir in
     if f_name <> filename then get_file_positions dir dir_name filename
         positions
     else begin
       let f = dir_name ^ Filename.dir_sep ^ f_name in
-      let language_file = determine_language_file f in
-      let language_info = get_language_info language_file in
-      let keywords = language_info.keywords in
-      let spec_chars = language_info.special_chars in
-      let f_string = hash_helper (open_in f) language_file in
-      let is_txt = check_suffix f "txt" in
-      let com_info = language_info.comment_info in
-      let noise_removed_str =
-        remove_noise com_info f_string keywords spec_chars is_txt in
-      let n_grams = k_grams noise_removed_str 35 in
-      let file = n_grams in
+      let n_grams = get_ngrams f 35 in
       let results = List.map (fun x ->
-          (string_of_int x, List.nth file (x - 1))
+          (string_of_int x, List.nth n_grams (x - 1))
         ) positions in
       List.sort (fun a b ->
           Stdlib.compare (snd a |> Hashtbl.hash) (snd b |> Hashtbl.hash)
