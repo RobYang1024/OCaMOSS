@@ -66,6 +66,7 @@ for file A that are > 0.5
 <hr>
 
 Self-generated test case descriptions (test case N is in directory tests/testN):
+
 NOTE: to replicate results, run using threshold = 0.4
 
 1) exact duplicates - should return positive result
