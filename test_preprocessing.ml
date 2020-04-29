@@ -241,4 +241,31 @@ let tests = [
          java_keywords java_spec_chars
          false)
       expected_res_str6);
+
+  "remove_noise_7" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         java_comments_info
+         "abc<=def"
+         java_keywords java_spec_chars
+         false)
+      "v<=v");
+
+  "remove_noise_8" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         ocaml_comments_info
+         "let x = \"(*\" in let y = 5 in \"*)\""
+         ocaml_keywords ocaml_spec_chars
+         false)
+      "letv=vinletv=5inv");
+
+  "remove_noise_9" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         ocaml_comments_info
+         "let x = 'y'"
+         ocaml_keywords ocaml_spec_chars
+         false)
+      "letv=v");
 ]

@@ -138,6 +138,7 @@ let rec split_on_str str_to_split_on acc_str_arr str_to_split =
  * example: [remove_strings "let str = \"Hello\"" = "let str = "]
 *)
 let remove_strings code_str =
+  let code_str = String.split_on_char '\'' code_str |> String.concat "\"" in
   let filter_from_arr (acc_arr, start) str =
     if str = "\"" && start = false then
       (" "::acc_arr, true)
@@ -147,9 +148,9 @@ let remove_strings code_str =
     if start then (" s "::acc_arr, start)
     else (" "::str::acc_arr, false)
   in
-  let split_on_comments_arr = split_on_str "\"" [] code_str in
+  let split_on_strings_arr = split_on_str "\"" [] code_str in
   let acc_tup =
-    List.fold_left filter_from_arr ([], false) split_on_comments_arr in
+    List.fold_left filter_from_arr ([], false) split_on_strings_arr in
   match acc_tup with
   | (acc_arr, _) -> List.rev acc_arr
 
