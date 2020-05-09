@@ -9,7 +9,12 @@ Note: this was originally written as the final project for a course - it has sin
 
 - To build - `make`
 - To build & run the REPL - `make run`
-- To build & run tests -`make test`
+- To build & run unit tests -`make test`
+
+Required Dependencies:
+- Yojson
+- ANSITerminal
+- OUnit (for unit tests)
 
 <hr>
 
