@@ -3,11 +3,18 @@
 Plagiarism detection software, inspired by MOSS and implemented in OCaml.
 Runs using a command-line interface.
 
+Note: this was originally written as the final project for a course - it has since been updated by me, so some aspects of the PDF report may not be accurate. In particular, the latest version of OCaMOSS no longer uses a 2-3 tree.
+
 <hr>
 
 - To build - `make`
 - To build & run the REPL - `make run`
-- To build & run tests -`make test`
+- To build & run unit tests -`make test`
+
+Required Dependencies:
+- Yojson
+- ANSITerminal
+- OUnit (for unit tests)
 
 <hr>
 
