@@ -3,6 +3,8 @@
 Plagiarism detection software, inspired by MOSS and implemented in OCaml.
 Runs using a command-line interface.
 
+For more details about the system or how MOSS works in general, read the PDF report in this repository or [this blog post](https://yangdanny97.github.io/blog/2019/05/03/MOSS) I wrote.
+
 Note: this was originally written as the final project for a course - it has since been updated by me, so some aspects of the PDF report may not be accurate. In particular, the latest version of OCaMOSS no longer uses a 2-3 tree.
 
 <hr>
