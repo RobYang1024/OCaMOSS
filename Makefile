@@ -4,9 +4,6 @@ build:
 test:
 	ocamlbuild -use-ocamlfind test.native && ./test.native
 
-check:
-	bash checkenv.sh && bash checktypes.sh
-
 clean:
 	ocamlbuild -clean
 
