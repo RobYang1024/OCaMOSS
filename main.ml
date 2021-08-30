@@ -14,7 +14,7 @@ type cmd = RUN of string | DIR | HELP | SETDIR of string | RESULTS of string
          | PAIR | COMPARE of (string*string)| ERROR
 
 let help =
-"Commands (case-sensitive): \n
+  "Commands (case-sensitive): \n
 run [threshold] --- runs oCaMoss on the working directory.
 The threshold argument gives the program the percentage of the file to match
 with another for it to be flagged as plagiarised. It is optional with default
@@ -29,7 +29,7 @@ quit --- exits the REPL
 help --- display instructions again"
 
 let newstate = {display = [(GREEN,
-"
+                            "
       _______   _______             __   __   _______   _______   _______
      |       | |       |           |  |_|  | |       | |       | |       |
      |   _   | |     __|  _______  |       | |   _   | |  _____| |  _____|
@@ -38,13 +38,13 @@ let newstate = {display = [(GREEN,
      |       | |       | |   _   | | ||_|| | |       |  _____| |  _____| |
      |_______| |_______| |__| |__| |_|   |_| |_______| |_______| |_______|
 ");
-(TEXT,"Welcome to OCaMOSS!!");(CYAN,help)];
+                           (TEXT,"Welcome to OCaMOSS!!");(CYAN,help)];
                 directory = "./" ; results = None; result_files = [];
                 threshold = 0.5}
 
 let parse str =
   let input_split = String.split_on_char ' ' str in
-	match input_split with
+  match input_split with
   | ["help"] -> HELP
   | "run"::[t] -> RUN t
   | ["run"] -> RUN "0.5"
@@ -54,7 +54,7 @@ let parse str =
   | ["results"] -> RESULTS ""
   | ["resultpairs"] -> PAIR
   | "compare"::a::b::[] -> COMPARE (a,b)
-	| _ -> ERROR
+  | _ -> ERROR
 
 let rec repl st =
   let rec print_display d =
@@ -68,10 +68,10 @@ let rec repl st =
   print_display st.display;
   print_string [Reset] "> ";
   match String.trim (read_line ()) with
-    | exception End_of_file -> ()
-    | "quit" -> print_string [green]
-                                ("Thank you for using OCaMOSS!!\n");
-  	| input -> handle_input st input
+  | exception End_of_file -> ()
+  | "quit" -> print_string [green]
+                ("Thank you for using OCaMOSS!!\n");
+  | input -> handle_input st input
 
 and handle_input st input =
   let rec print_dir_files dir str suf =
@@ -93,23 +93,23 @@ and handle_input st input =
       try begin
         if st.directory = "./"
         then repl {st with display =
-            [(RED,"Error: Directory has not been set")]}
+                             [(RED,"Error: Directory has not been set")]}
         else
-        let t' = float_of_string t in
-        if t' >= 0.4 && t' <= 1.0
+          let t' = float_of_string t in
+          if t' >= 0.4 && t' <= 1.0
           then handle_run st t'
-        else
-          repl {st with display =
-          [(RED, "Error: Threshold must between 0.4 and 1")]}
+          else
+            repl {st with display =
+                            [(RED, "Error: Threshold must between 0.4 and 1")]}
       end
       with
       | Failure f_msg when f_msg = "float_of_string" ->
         repl {st with display = [(RED,"Error: Invalid argument(s)")]}
       | Failure f_msg -> repl {st with display = [(RED,f_msg)]}
       | e ->
-      print_endline (Printexc.to_string e);
-      repl {st with display = [(RED,"Error: Something went wrong")]}
-  end
+        print_endline (Printexc.to_string e);
+        repl {st with display = [(RED,"Error: Something went wrong")]}
+    end
   |DIR ->
     if st.directory = "./"
     then repl {st with display =
@@ -126,40 +126,40 @@ and handle_input st input =
           then repl {st with display = [(RED,"Error: Directory has no files")]}
           else if dir_files = "Different file extensions"
           then repl {st with display =
-          [(RED,"Error: Not all files in this directory are of the same type")]}
+                               [(RED,"Error: Not all files in this directory are of the same type")]}
           else repl {newstate with directory = d ; display = [(GREEN,
-          "Successfully set working directory to: " ^ d);
-                                            (TEXT,"Files: \n" ^ dir_files)]}
+                                                               "Successfully set working directory to: " ^ d);
+                                                              (TEXT,"Files: \n" ^ dir_files)]}
 
       with _ -> repl {st with display = [(RED,"Error: Invalid directory")]}
-  end
-  |RESULTS f -> begin
-    match st.results with
-    |Some r -> begin
-        if f = "" then if st.result_files = [] then repl {st with display =
-        [(GREEN,"Success. There were no plagarised files found.\n")];}
-          else repl {st with display =
-          (TEXT, "Results for files:")::st.result_files}
-        else handle_results st f
     end
-    |None -> repl {st with display =
-    [(RED,"Error: no results to display. Run OCaMoss first")]}
-  end
+  |RESULTS f -> begin
+      match st.results with
+      |Some r -> begin
+          if f = "" then if st.result_files = [] then repl {st with display =
+                                                                      [(GREEN,"Success. There were no plagarised files found.\n")];}
+            else repl {st with display =
+                                 (TEXT, "Results for files:")::st.result_files}
+          else handle_results st f
+        end
+      |None -> repl {st with display =
+                               [(RED,"Error: no results to display. Run OCaMoss first")]}
+    end
   | PAIR -> begin
       match st.results with
       | Some r -> if st.result_files = []
         then repl {st with display =
-        [(GREEN,"Success. There were no plagarised files found.\n")];}
+                             [(GREEN,"Success. There were no plagarised files found.\n")];}
         else handle_pair r st
       | None -> repl {st with display =
-      [(RED,"Error: no results to display. Run OCaMoss first")]}
-  end
+                                [(RED,"Error: no results to display. Run OCaMoss first")]}
+    end
   |COMPARE (a,b) -> begin
-    match st.results with
-    |Some r -> handle_compare st a b r
-    |None -> repl {st with display =
-    [(RED,"Error: no results to display. Run OCaMoss first")]}
-  end
+      match st.results with
+      |Some r -> handle_compare st a b r
+      |None -> repl {st with display =
+                               [(RED,"Error: no results to display. Run OCaMoss first")]}
+    end
   |ERROR -> repl {st with display = [(RED,"Error: invalid command")]}
 
 and handle_compare st a b results =
@@ -182,12 +182,12 @@ and handle_compare st a b results =
           let newdispl = List.fold_left2 (fun acc r1 r2 ->
               if String.length (snd r1) >= 40 then
                 (TEXT, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
-                  (b ^ " position " ^ fst r2))::
+                   (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1 ^ "\n") (
                     snd r2 ^ "\n"))::acc
               else
                 (TEXT, Printf.sprintf "%-40s%s" (a ^ " position " ^ fst r1)
-                  (b ^ " position " ^ fst r2))::
+                   (b ^ " position " ^ fst r2))::
                 (RED, Printf.sprintf "%-40s%s"  (snd r1) (snd r2 ^ "\n"))::acc
             ) [] padded1 padded2 in
           repl {st with display = newdispl}
@@ -195,32 +195,32 @@ and handle_compare st a b results =
       |_,_ -> failwith "unexpected"
     end
   |_,_ -> repl {st with display = [(RED,
-      "Error: no results to display for files " ^ a ^","^ b)]}
+                                    "Error: no results to display for files " ^ a ^","^ b)]}
 
 
 and handle_results st f =
   let cmp_tuple (k1,s1) (k2,s2) =
-    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
-    else (Pervasives.compare s1 s2)
+    if Stdlib.compare s1 s2 = 0 then -(Stdlib.compare k1 k2)
+    else (Stdlib.compare s1 s2)
   in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
-        ((if is_pair then "Similarity score: " else "Overall score: ") ^
-        (string_of_float ss)))::a) [] (List.sort (cmp_tuple) lst)
+           ((if is_pair then "Similarity score: " else "Overall score: ") ^
+            (string_of_float ss)))::a) [] (List.sort (cmp_tuple) lst)
   in
   match st.results with
   |None -> failwith "unexpected"
   |Some r -> begin
-    match CompDict.find f r with
-    |Some v -> begin
-      let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
-      repl {st with display = (TEXT, "Results for file " ^ f ^
-        ": \n")::(concat_result_list r_list true)}
+      match CompDict.find f r with
+      |Some v -> begin
+          let r_list = Comparison.create_pair_sim_list f (FileDict.to_list v) in
+          repl {st with display = (TEXT, "Results for file " ^ f ^
+                                         ": \n")::(concat_result_list r_list true)}
+        end
+      |None -> repl {st with display = [(RED,
+                                         "Error: no results to display for file " ^ f)]}
     end
-    |None -> repl {st with display = [(RED,
-    "Error: no results to display for file " ^ f)]}
-  end
 
 and handle_run st t =
   let rec parse_dir dir dict dir_name =
@@ -228,47 +228,48 @@ and handle_run st t =
       let f_name = Unix.readdir dir in
       if String.get f_name 0 = '.' || not (String.contains f_name '.')
       then parse_dir dir dict dir_name else begin
-      let new_dict = Comparison.FileDict.insert f_name
-          (Winnowing.winnow (Preprocessing.hash_file
-          (dir_name ^ Filename.dir_sep ^ f_name)) 40) dict in
-      parse_dir dir new_dict dir_name
-    end
+        let full_path = dir_name ^ Filename.dir_sep ^ f_name in
+        let hashes = Preprocessing.hash_file full_path in
+        let winnowed_hashes = Winnowing.winnow 40 hashes in
+        let new_dict = Comparison.FileDict.insert f_name winnowed_hashes dict in
+        parse_dir dir new_dict dir_name
+      end
     with
     | End_of_file -> dict
   in
   let cmp_tuple (k1,s1) (k2,s2) =
-    if Pervasives.compare s1 s2 = 0 then -(Pervasives.compare k1 k2)
-    else (Pervasives.compare s1 s2)
+    if Stdlib.compare s1 s2 = 0 then -(Stdlib.compare k1 k2)
+    else (Stdlib.compare s1 s2)
   in
   let concat_result_list lst is_pair =
     List.fold_left (fun a (f,ss) ->
         (TEXT, Printf.sprintf "%-40s%s" ("File: " ^ f)
-        ((if is_pair then "Similarity score: " else "Overall score: ") ^
-         (string_of_float ss)))::a) []
-    (lst |> List.sort (cmp_tuple)|> List.filter (fun (k,s) -> s >= t))
+           ((if is_pair then "Similarity score: " else "Overall score: ") ^
+            (string_of_float ss)))::a) []
+      (lst |> List.sort (cmp_tuple)|> List.filter (fun (k,s) -> s >= t))
   in
   (*let tm = Sys.time () in*)
   print_endline "parsing files...";
   let parsefiles = parse_dir (Unix.opendir st.directory)
-                        Comparison.FileDict.empty st.directory in
+      Comparison.FileDict.empty st.directory in
   print_endline "generating results...";
   let comparison = Comparison.compare parsefiles in
   let files = concat_result_list
       (Comparison.create_sim_list comparison t) false in
   (*Printf.printf "Execution time: %fs\n" (Sys.time () -. tm);*)
   if files = [] then repl {st with display =
-                  [(GREEN,"Success. There were no plagarised files found.\n")];
-                            results = Some comparison; threshold = t}
+                                     [(GREEN,"Success. There were no plagarised files found.\n")];
+                                   results = Some comparison; threshold = t}
   else repl {st with display =
-              (GREEN,"Success. The list of plagiarised files are:")::files;
-              results = Some comparison; result_files = files; threshold = t}
+                       (GREEN,"Success. The list of plagiarised files are:")::files;
+                     results = Some comparison; result_files = files; threshold = t}
 
 and handle_pair r st =
   let disp = List.fold_left (fun d (f,v) -> d ^ (match CompDict.find f r with
       | None -> ""
       | Some f_d -> List.fold_left (fun s (f2,ss) -> s ^
-      if ss < st.threshold && f != f2 then "" else Printf.sprintf "%-40s%s" (f)
-              (f2) ^ "\n")
+                                                     if ss < st.threshold && f != f2 then "" else Printf.sprintf "%-40s%s" (f)
+                                                         (f2) ^ "\n")
                       "" (create_pair_sim_list f (FileDict.to_list f_d))))
       "" (CompDict.to_list r) in
   repl {st with display = [(TEXT,disp)]}

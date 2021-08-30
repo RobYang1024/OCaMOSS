@@ -1,11 +1,11 @@
-test:
-	ocamlbuild -use-ocamlfind test.byte && ./test.byte
+build:
+	ocamlbuild -use-ocamlfind main.native && mv main.native ocamoss
 
-check:
-	bash checkenv.sh && bash checktypes.sh
+test:
+	ocamlbuild -use-ocamlfind test.native && ./test.native
 
 clean:
 	ocamlbuild -clean
 
 run:
-	ocamlbuild -use-ocamlfind main.byte && ./main.byte
+	ocamlbuild -use-ocamlfind main.native && mv main.native ocamoss && ./ocamoss

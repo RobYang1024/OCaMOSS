@@ -1,51 +1,28 @@
 open Winnowing
 open Unix
 
-(* [keywords_list language_file] is a list of keywords pertaining to a
- * particular language, which are stored in a json file with the name
- * [language_file].
- * requires: language_file is a json with a top level field/member named
- * "keywords" that contains a string list.
- *
- * example: [keywords_list "some_language_info.json" = ["let"; "if"; "else"]]
- *)
-val keywords_list : string -> string list
+type comment_info = {
+  single_comment: string;
+  multi_comment_start: string;
+  multi_comment_end: string;
+  nest: bool;
+  strings: bool;
+}
 
-(* [special_chars language_file] is a list of special characters pertaining to a
- * particular language, which are stored in a json file with the name
- * [language_file].
- * requires: language_file is a json with a top level field/member named
- * "special characters" that contains a string list, where each string has a
- * length of 1.
- *
- * example: [special_chars "some_language_info.json" = [':'; '!'; '&']]
- *)
-val special_chars : string -> char list
+type language_info = {
+  keywords: string list;
+  special_chars: char list;
+  comment_info: comment_info;
+}
 
-(* [comment_info language_file] returns a 5-tuple of information pertaining to
- * comments in the corresponding language,
- * [(single_begin, multi_begin, multi_end, comments_nest)], where
- * - [single_begin] represents the string that begins a single line comment,
- *   or an empty string if the language does not have a special string to
- *   indicate the beginning of a single line comment specifically.
- * - [multi_begin] represents the string that begins a multi-line comment, or
- *   an empty string if the language does not have a special string to indicate
- *   the beginning of a multi line comment.
- * - [multi_end] represents the string that ends a multi-line comment, or an
- *   empty string if the language does not have a special string to indicate
- *   the end of a multi line comment.
- * - [comments_nest] is a bool that indicates whether or not multi-line
- *   comments nest in the language.
- *
- * example: [comment_info "java_info.json" = ("//", "/*", "*/", false, true)]
+(* [get_language_info language_file] gets the language info from a particular language JSON file and returns it as a record
+ * requires: language_file is well-formatted JSON with the necessary fields
  *)
-val comment_info : string -> (string * string * string * bool * bool)
+val get_language_info : string -> language_info
 
 (* [remove_noise c_i_q code_str keywords spec_chars comments_nest remove_strings],
  * where
- * - [c_i_q], an abbreviation for "comments_info_quint", is a 5-tuple containing
- *   all of the commenting information regarding a particular language in the
- *   same format as found in [comment_info] function specification.
+ * - [c_i_q] represents a comment_info record
  * - [code_str] is the string representation of the code whose noise is to be
  *   removed.
  * - [keywords] represents a list of keywords in the language that [code_str] is
@@ -64,8 +41,7 @@ val comment_info : string -> (string * string * string * bool * bool)
  * programmer defined variable/class/interface/module/type/function/method etc.,
  * names with a generic character 'v'.
  *)
-val remove_noise : (string * string * string * bool * bool) ->
-  string -> string list -> char list -> bool -> string
+val remove_noise : comment_info -> string -> string list -> char list -> bool -> string
 
 (* [k_grams str n] creates a list of strings of length n, starting at each
  * character in [str] up to and including ([str] length - [n])th character.

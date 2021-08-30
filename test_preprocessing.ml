@@ -22,7 +22,14 @@ let ocaml_spec_chars =
    '='; '>'; '?'; '@'; '^'; '|'; '~'; '#'; '\"'; '('; ')'; ',';
    '['; ']'; '{'; '}']
 
-let ocaml_comments_info_quad = ("", "(*", "*)", true, true)
+let ocaml_comments_info = 
+  {
+    single_comment = "";
+    multi_comment_start = "(*";
+    multi_comment_end = "*)";
+    nest= true;
+    strings= true;
+  }
 
 let java_keywords =
   ["abstract"; "continue"; "for"; "new"; "switch"; "assert"; "default";
@@ -55,7 +62,14 @@ let java_spec_chars =
    '<'; '='; '>'; '?'; '^'; '|';  '\"'; '\''; '('; ')'; ','; '['; ']';
    '{'; '}'; '~'; '@']
 
-let java_comments_info_quad = ("//", "/*", "*/", false, true)
+let java_comments_info = 
+  {
+    single_comment = "//";
+    multi_comment_start = "/*";
+    multi_comment_end = "*/";
+    nest= false;
+    strings= true;
+  }
 
 let test_fun_str =
   "(* Hello World this is a comment *)
@@ -103,7 +117,7 @@ let test_fun_str5 =
 let expected_res_str5 = "publicclassvextendsv"
 
 let test_fun_str6 =
-   "// Note: Calling delay here will make the CLUI work a little more
+  "// Note: Calling delay here will make the CLUI work a little more
     Hello World
     I am the World
     hahaha"
@@ -111,7 +125,7 @@ let test_fun_str6 =
 let expected_res_str6 = "vvvvvvv"
 
 let test_fun_str7 =
-"package controller;
+  "package controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,70 +174,98 @@ public class DumbAI extends Controller {
   }
 }"
 
+let ocaml_info = get_language_info "ocaml_info.json"
+let java_info = get_language_info "java_info.json"
+
 let tests = [
   "k_grams_2" >:: (fun _ -> assert_equal (k_grams "test" 3) ["tes"; "est"]);
   "k_grams_1" >:: (fun _ -> assert_equal (k_grams "Hello World" 5)
-            ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
+                      ["Hello"; "ello "; "llo W"; "lo Wo"; "o Wor"; " Worl"; "World"]);
   "ocaml_keywords" >:: (fun _ -> assert_equal
-                           (keywords_list "ocaml_info.json")
+                           ocaml_info.keywords
                            ocaml_keywords);
   "ocaml_spec_chars" >:: (fun _ -> assert_equal
-                        (special_chars "ocaml_info.json") ocaml_spec_chars);
+                             ocaml_info.special_chars ocaml_spec_chars);
   "ocaml_comments_info" >:: (fun _ -> assert_equal
-                                (comment_info "ocaml_info.json")
-                                ocaml_comments_info_quad);
+                                ocaml_info.comment_info
+                                ocaml_comments_info);
 
-  "java_keywords" >:: (fun _ -> assert_equal
-                          (keywords_list "java_info.json") java_keywords);
-  "java_spec_chars" >:: (fun _ -> assert_equal
-                        (special_chars "java_info.json") java_spec_chars);
+  "java_keywords" >:: (fun _ -> assert_equal java_info.keywords java_keywords);
+  "java_spec_chars" >:: (fun _ -> assert_equal java_info.special_chars java_spec_chars);
   "java_comments_info" >:: (fun _ -> assert_equal
-                               (comment_info "java_info.json")
-                               java_comments_info_quad);
+                               java_info.comment_info
+                               java_comments_info);
 
 
   "remove_noise" >::
-    (fun _ -> assert_equal
+  (fun _ -> assert_equal
       (remove_noise
-        ocaml_comments_info_quad
-        test_fun_str
-        ocaml_keywords ocaml_spec_chars
-        false)
+         ocaml_comments_info
+         test_fun_str
+         ocaml_keywords ocaml_spec_chars
+         false)
       expected_res_str);
 
   "remove_noise_3" >::
-    (fun _ -> assert_equal
+  (fun _ -> assert_equal
       (remove_noise
-        ocaml_comments_info_quad
-        test_fun_str3
-        ocaml_keywords ocaml_spec_chars
-        false)
+         ocaml_comments_info
+         test_fun_str3
+         ocaml_keywords ocaml_spec_chars
+         false)
       expected_res_str3);
 
   "remove_noise_4" >::
-    (fun _ -> assert_equal
+  (fun _ -> assert_equal
       (remove_noise
-        ocaml_comments_info_quad
-        test_fun_str4
-        ocaml_keywords ocaml_spec_chars
-        false)
+         ocaml_comments_info
+         test_fun_str4
+         ocaml_keywords ocaml_spec_chars
+         false)
       expected_res_str4);
 
   "remove_noise_5" >::
-    (fun _ -> assert_equal
+  (fun _ -> assert_equal
       (remove_noise
-        java_comments_info_quad
-        test_fun_str5
-        java_keywords java_spec_chars
-        false)
+         java_comments_info
+         test_fun_str5
+         java_keywords java_spec_chars
+         false)
       expected_res_str5);
 
   "remove_noise_6" >::
-    (fun _ -> assert_equal
+  (fun _ -> assert_equal
       (remove_noise
-        java_comments_info_quad
-        test_fun_str6
-        java_keywords java_spec_chars
-        false)
+         java_comments_info
+         test_fun_str6
+         java_keywords java_spec_chars
+         false)
       expected_res_str6);
+
+  "remove_noise_7" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         java_comments_info
+         "abc<=def"
+         java_keywords java_spec_chars
+         false)
+      "v<=v");
+
+  "remove_noise_8" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         ocaml_comments_info
+         "let x = \"(*\" in let y = 5 in \"*)\""
+         ocaml_keywords ocaml_spec_chars
+         false)
+      "letv=vinletv=5inv");
+
+  "remove_noise_9" >::
+  (fun _ -> assert_equal
+      (remove_noise
+         ocaml_comments_info
+         "let x = 'y'"
+         ocaml_keywords ocaml_spec_chars
+         false)
+      "letv=v");
 ]
