@@ -259,6 +259,7 @@ let determine_language_file f =
   else if check_suffix f "ml" then "ocaml_info.json"
   else if check_suffix f "mli" then "ocaml_info.json"
   else if check_suffix f "c" then "c_info.json"
+  else if check_suffix f "cpp" then "cpp_info.json"
   else if check_suffix f "java" then "java_info.json"
   else if check_suffix f "py" then "python_info.json"
   else failwith "This file format is not supported"
